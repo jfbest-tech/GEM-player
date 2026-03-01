@@ -3,744 +3,582 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GEM – Goalie Efficiency Model</title>
+<title>GEM – Goalie Efficiency Model | Sports Performance Analysis</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
-  :root { --gem-green: #16a34a; --gem-yellow: #ca8a04; --gem-red: #dc2626; }
-  body { background: #0f172a; color: #e2e8f0; font-family: 'Segoe UI', system-ui, sans-serif; }
-  .filter-section { border-bottom: 1px solid #1e293b; }
-  .filter-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; }
-  .chip { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:9999px; font-size:0.72rem; font-weight:600; cursor:pointer; user-select:none; border:1px solid transparent; transition: all .15s; }
-  .chip-r  { background:#7f1d1d22; color:#fca5a5; border-color:#7f1d1d; }
-  .chip-r.active  { background:#dc2626; color:#fff; border-color:#dc2626; }
-  .chip-y  { background:#713f1222; color:#fde68a; border-color:#92400e; }
-  .chip-y.active  { background:#d97706; color:#fff; border-color:#d97706; }
-  .chip-g  { background:#14532d22; color:#86efac; border-color:#166534; }
-  .chip-g.active  { background:#16a34a; color:#fff; border-color:#16a34a; }
-  .chip-n  { background:#1e293b; color:#94a3b8; border-color:#334155; }
-  .chip-n.active  { background:#334155; color:#e2e8f0; border-color:#64748b; }
-  .seq-item { border-left: 3px solid #1e293b; cursor:pointer; transition: all .12s; }
-  .seq-item:hover { background: #1e293b; border-left-color: #3b82f6; }
-  .seq-item.active { background: #1e3a5f; border-left-color: #3b82f6; }
-  .ryg-dot { width:10px; height:10px; border-radius:50%; display:inline-block; flex-shrink:0; }
-  .ryg-R { background: #dc2626; }
-  .ryg-Y { background: #d97706; }
-  .ryg-G { background: #16a34a; }
-  .badge { display:inline-block; padding:1px 6px; border-radius:4px; font-size:0.65rem; font-weight:700; }
-  .badge-goal { background:#7f1d1d; color:#fca5a5; }
-  .badge-save { background:#14532d; color:#86efac; }
-  .badge-ph   { background:#1e3a5f; color:#93c5fd; }
-  select.filter-select {
-    background:#1e293b; border:1px solid #334155; color:#e2e8f0; border-radius:6px;
-    font-size:0.75rem; padding:4px 8px; width:100%; outline:none;
+  :root {
+    --navy-dark:   #0b0f2a;
+    --navy:        #111534;
+    --navy-mid:    #161b3e;
+    --navy-light:  #1c2349;
+    --navy-border: #252d5a;
+    --accent:      #3d5af1;
+    --accent-dim:  #2a3d9e;
+    --text:        #dde3ff;
+    --text-dim:    #7b87b8;
+    --text-mute:   #404878;
   }
-  select.filter-select:focus { border-color:#3b82f6; }
-  input.filter-input {
-    background:#1e293b; border:1px solid #334155; color:#e2e8f0; border-radius:6px;
-    font-size:0.75rem; padding:4px 8px; width:100%; outline:none;
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+
+  /* HEADER */
+  .header { background: var(--navy); border-bottom: 1px solid var(--navy-border); }
+
+  /* SIDEBAR */
+  .sidebar { background: var(--navy); border-right: 1px solid var(--navy-border); width: 190px; }
+  .section-title { font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-mute); padding: 10px 12px 4px; }
+
+  /* CHIPS */
+  .chip { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:0.69rem; font-weight:600; cursor:pointer; user-select:none; border:1px solid transparent; transition:all .12s; }
+  .chip-r { background:#3d0a0a; color:#fca5a5; border-color:#5c1010; }
+  .chip-r.on { background:#dc2626; color:#fff; border-color:#dc2626; }
+  .chip-y { background:#3d2a00; color:#fde68a; border-color:#5c3f00; }
+  .chip-y.on { background:#d97706; color:#fff; border-color:#d97706; }
+  .chip-g { background:#0a2e14; color:#86efac; border-color:#0f4620; }
+  .chip-g.on { background:#16a34a; color:#fff; border-color:#16a34a; }
+  .chip-b { background:var(--navy-light); color:var(--text-dim); border-color:var(--navy-border); }
+  .chip-b.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  /* SELECT */
+  select.sel {
+    width:100%; background:var(--navy-light); border:1px solid var(--navy-border);
+    color:var(--text); border-radius:5px; padding:4px 7px; font-size:0.69rem; outline:none;
+    -webkit-appearance:none; appearance:none;
   }
-  input.filter-input:focus { border-color:#3b82f6; }
-  .slider-row { display:flex; align-items:center; gap:6px; }
-  input[type=range] { accent-color:#3b82f6; }
-  .no-video { background:#1e293b; border:1px dashed #334155; border-radius:8px; }
-  video { background:#000; border-radius:6px; }
-  .psm-tag { background:#1e293b; color:#94a3b8; font-size:0.6rem; padding:1px 5px; border-radius:3px; }
-  .loop-all-btn.active { background:#3b82f6 !important; color:#fff !important; }
-  ::-webkit-scrollbar { width:5px; }
-  ::-webkit-scrollbar-track { background:#0f172a; }
-  ::-webkit-scrollbar-thumb { background:#334155; border-radius:4px; }
+  select.sel:focus { border-color:var(--accent); }
+
+  /* CHECKBOX LABEL */
+  .cb-lbl { display:flex; align-items:center; gap:6px; padding:2px 0; cursor:pointer; color:var(--text-dim); font-size:0.72rem; }
+  .cb-lbl:hover { color:var(--text); }
+  input[type=checkbox] { accent-color:var(--accent); flex-shrink:0; }
+
+  /* VIDEO PANEL */
+  .vpanel { background:var(--navy-dark); border-right:1px solid var(--navy-border); width:500px; }
+
+  /* SEQUENCE TABLE */
+  .seq-header-row {
+    display:grid; grid-template-columns: 18px 1fr 60px 50px 45px 80px 55px;
+    gap:6px; align-items:center;
+    padding:5px 10px; border-bottom:1px solid var(--navy-border);
+    font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-mute);
+  }
+  .seq-row {
+    display:grid; grid-template-columns: 18px 1fr 60px 50px 45px 80px 55px;
+    gap:6px; align-items:center;
+    padding:5px 10px; border-bottom:1px solid #13173200; cursor:pointer; transition:background .1s;
+  }
+  .seq-row:hover { background:var(--navy-light); }
+  .seq-row.active { background:var(--navy-mid); border-left:2px solid var(--accent); padding-left:8px; }
+  .seq-row:nth-child(even) { background:var(--navy); }
+  .seq-row:nth-child(even):hover { background:var(--navy-light); }
+  .seq-row.active:nth-child(even) { background:var(--navy-mid); }
+
+  /* RYG dot */
+  .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .dot-R { background:#dc2626; } .dot-Y { background:#d97706; } .dot-G { background:#16a34a; }
+
+  /* Badges */
+  .badge { font-size:0.58rem; font-weight:700; padding:1px 5px; border-radius:3px; white-space:nowrap; }
+  .b-goal { background:#3d0a0a; color:#fca5a5; }
+  .b-save { background:#0a2e14; color:#86efac; }
+  .b-ph   { background:#0d1f4a; color:#93c5fd; }
+
+  /* Video */
+  video { background:#000; border-radius:6px; width:100%; }
+  .no-vid { background:var(--navy); border:1px dashed var(--navy-border); border-radius:8px; }
+
+  /* PSM tags */
+  .psm { background:var(--navy-light); color:#6677cc; font-size:0.58rem; padding:1px 5px; border-radius:3px; }
+
+  /* Buttons */
+  .btn { padding:5px 14px; border-radius:5px; font-size:0.72rem; font-weight:600; cursor:pointer; border:1px solid var(--navy-border); color:var(--text-dim); background:var(--navy-light); transition:all .12s; }
+  .btn:hover { background:var(--navy-border); color:var(--text); }
+  .btn.primary { background:var(--accent-dim); border-color:var(--accent); color:#fff; }
+  .btn.primary:hover { background:var(--accent); }
+  .btn.active-loop { background:var(--accent) !important; border-color:var(--accent) !important; color:#fff !important; }
+
+  /* Setup notice */
+  .notice { background:#0d1f4a; border:1px solid var(--accent-dim); border-radius:6px; }
+
+  ::-webkit-scrollbar { width:4px; }
+  ::-webkit-scrollbar-track { background:var(--navy-dark); }
+  ::-webkit-scrollbar-thumb { background:var(--navy-border); border-radius:4px; }
 </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col">
 
-<!-- Header -->
-<header class="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800 flex-shrink-0">
-  <div class="flex items-center gap-3">
-    <div class="text-blue-400 font-black text-xl tracking-tight">GEM</div>
-    <div class="text-slate-500 text-xs">Goalie Efficiency Model</div>
+<!-- ═══ HEADER ═══ -->
+<div class="header flex items-center justify-between px-5 py-2 flex-shrink-0" style="height:50px">
+  <div class="flex items-center gap-4">
+    <img src="SPA_Logo+Wordmark.png" alt="Sports Performance Analysis" style="height:30px; object-fit:contain;">
+    <div style="width:1px; height:28px; background:var(--navy-border);"></div>
+    <div>
+      <span class="font-black text-white" style="font-size:0.85rem; letter-spacing:0.05em;">GEM</span>
+      <span style="color:var(--text-mute); font-size:0.72rem; margin-left:6px;">Goalie Efficiency Model</span>
+    </div>
   </div>
-  <div id="stats-bar" class="flex gap-3 text-xs text-slate-400"></div>
-  <button id="clear-filters-btn" class="text-xs text-blue-400 hover:text-blue-300 px-3 py-1 rounded border border-slate-700 hover:border-blue-500 transition">Clear Filters</button>
-</header>
+  <div id="stats-bar" class="flex gap-4" style="font-size:0.7rem;"></div>
+  <button class="btn" id="clear-btn">Clear Filters</button>
+</div>
 
-<!-- Main -->
+<!-- ═══ BODY ═══ -->
 <div class="flex flex-1 overflow-hidden">
 
-  <!-- ===== FILTER SIDEBAR ===== -->
-  <aside class="w-52 flex-shrink-0 bg-slate-900 border-r border-slate-800 overflow-y-auto flex flex-col">
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar flex-shrink-0 overflow-y-auto">
 
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Goalie</div>
-      <div id="filter-goalie" class="flex flex-col gap-1"></div>
+    <div class="section-title">Goalie</div>
+    <div id="f-goalie" class="px-3 pb-2 flex flex-col gap-1"></div>
+
+    <div class="section-title">Shot Quality</div>
+    <div class="px-3 pb-3 flex gap-1 flex-wrap">
+      <span class="chip chip-r" data-f="ryg" data-v="R">Red</span>
+      <span class="chip chip-y" data-f="ryg" data-v="Y">Yellow</span>
+      <span class="chip chip-g" data-f="ryg" data-v="G">Green</span>
     </div>
 
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Shot Quality</div>
-      <div class="flex gap-1 flex-wrap">
-        <span class="chip chip-r" data-filter="ryg" data-val="R">Red</span>
-        <span class="chip chip-y" data-filter="ryg" data-val="Y">Yellow</span>
-        <span class="chip chip-g" data-filter="ryg" data-val="G">Green</span>
+    <div class="section-title">Result</div>
+    <div class="px-3 pb-1 flex gap-1">
+      <span class="chip chip-b" data-f="save" data-v="Y">Save</span>
+      <span class="chip chip-b" data-f="goal" data-v="Y">Goal</span>
+    </div>
+    <div class="px-3 pb-3 mt-2">
+      <select class="sel" id="f-goalQual">
+        <option value="">All goal types</option>
+        <option>Should've Had</option><option>Could've Had</option><option>No Chance</option>
+      </select>
+    </div>
+
+    <div class="section-title">Period</div>
+    <div class="px-3 pb-3 flex gap-1">
+      <span class="chip chip-b" data-f="period" data-v="1">P1</span>
+      <span class="chip chip-b" data-f="period" data-v="2">P2</span>
+      <span class="chip chip-b" data-f="period" data-v="3">P3</span>
+    </div>
+
+    <div class="section-title">Strength</div>
+    <div id="f-strength" class="px-3 pb-2 flex flex-col gap-1"></div>
+
+    <div class="section-title">Attack Type</div>
+    <div id="f-attackType" class="px-3 pb-2 flex flex-col gap-1"></div>
+
+    <div class="section-title">OZP Pattern</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-ozpPattern"><option value="">All patterns</option></select></div>
+
+    <div class="section-title">Rush Type</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-rushType"><option value="">All rush types</option></select></div>
+
+    <div class="section-title">Shot Location</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-shotLocation"><option value="">All locations</option></select></div>
+
+    <div class="section-title">Shot Technique</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-shotTech"><option value="">All techniques</option></select></div>
+
+    <div class="section-title">Screen</div>
+    <div class="px-3 pb-3 flex gap-1">
+      <span class="chip chip-b" data-f="screen" data-v="Y">Yes</span>
+      <span class="chip chip-b" data-f="screen" data-v="N">No</span>
+    </div>
+
+    <div class="section-title">PSM 1 (First Move)</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-psm1"><option value="">Any</option></select></div>
+
+    <div class="section-title">Save Technique</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
+
+    <div class="section-title">Rebound</div>
+    <div class="px-3 pb-3 flex flex-col gap-1">
+      <span class="chip chip-b" data-f="rebCreated"  data-v="Y">Rebound Created</span>
+      <span class="chip chip-b mt-1" data-f="rebAttacked" data-v="Y">Rebound Attacked</span>
+    </div>
+
+    <div class="section-title">Game</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-game"><option value="">All games</option></select></div>
+
+    <div class="px-3 pb-4">
+      <label class="cb-lbl"><input type="checkbox" id="f-hasClip"> Has video only</label>
+    </div>
+
+  </div><!-- /sidebar -->
+
+  <!-- ── VIDEO PANEL ── -->
+  <div class="vpanel flex-shrink-0 flex flex-col overflow-hidden">
+
+    <!-- Setup notice -->
+    <div id="setup-banner" class="notice mx-3 mt-3 p-3 hidden">
+      <div class="font-bold mb-1" style="color:#93c5fd; font-size:0.72rem;">Setup Required</div>
+      <div style="color:var(--text-dim); font-size:0.69rem;">
+        Set <code style="background:#132044; padding:1px 5px; border-radius:3px;">CLIP_BASE_URL</code>
+        in index.html after uploading clips to Cloudflare R2.
       </div>
     </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Result</div>
-      <div class="flex gap-1 flex-wrap">
-        <span class="chip chip-n" data-filter="save" data-val="Y">Save</span>
-        <span class="chip chip-n" data-filter="goal" data-val="Y">Goal</span>
-      </div>
-      <div class="mt-2">
-        <div class="filter-label mb-1">Goal Type</div>
-        <select id="filter-goalQual" class="filter-select">
-          <option value="">All goals</option>
-          <option>Should've Had</option>
-          <option>Could've Had</option>
-          <option>No Chance</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Period</div>
-      <div class="flex gap-1">
-        <span class="chip chip-n" data-filter="period" data-val="1">P1</span>
-        <span class="chip chip-n" data-filter="period" data-val="2">P2</span>
-        <span class="chip chip-n" data-filter="period" data-val="3">P3</span>
-      </div>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Strength</div>
-      <div id="filter-strength" class="flex flex-col gap-1"></div>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Attack Type</div>
-      <div id="filter-attackType" class="flex flex-col gap-1"></div>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">OZP Pattern</div>
-      <select id="filter-ozpPattern" class="filter-select">
-        <option value="">All patterns</option>
-      </select>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Rush Type</div>
-      <select id="filter-rushType" class="filter-select">
-        <option value="">All rush types</option>
-      </select>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Shot Location</div>
-      <select id="filter-shotLocation" class="filter-select">
-        <option value="">All locations</option>
-      </select>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Shot Technique</div>
-      <select id="filter-shotTech" class="filter-select">
-        <option value="">All techniques</option>
-      </select>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Screen</div>
-      <div class="flex gap-1">
-        <span class="chip chip-n" data-filter="screen" data-val="Y">Screened</span>
-        <span class="chip chip-n" data-filter="screen" data-val="N">Clean</span>
-      </div>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">PSM 1 (First Move)</div>
-      <select id="filter-psm1" class="filter-select">
-        <option value="">Any first move</option>
-      </select>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Save Technique</div>
-      <select id="filter-svTech" class="filter-select">
-        <option value="">All save techs</option>
-      </select>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Rebound</div>
-      <div class="flex flex-col gap-1">
-        <span class="chip chip-n" data-filter="rebCreated" data-val="Y">Rebound Created</span>
-        <span class="chip chip-n" data-filter="rebAttacked" data-val="Y">Rebound Attacked</span>
-      </div>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-2">Game</div>
-      <select id="filter-game" class="filter-select">
-        <option value="">All games</option>
-      </select>
-    </div>
-
-    <div class="filter-section p-3">
-      <div class="filter-label mb-1">Has Video Only</div>
-      <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
-        <input type="checkbox" id="filter-hasVideo" class="accent-blue-500"> Only show clips with video
-      </label>
-    </div>
-
-  </aside>
-
-  <!-- ===== VIDEO PANEL ===== -->
-  <main class="flex flex-col flex-shrink-0 bg-slate-950" style="width:520px">
 
     <!-- Video -->
-    <div class="relative p-3 pb-1">
-      <video id="player" class="w-full" style="max-height:260px;" controls></video>
-      <div id="no-video-msg" class="no-video p-6 text-center text-slate-500 text-sm hidden">
-        <div class="text-2xl mb-2">🎥</div>
-        <div id="no-video-text">Select a sequence to play</div>
+    <div class="p-3 pb-1">
+      <video id="player" style="display:none; max-height:260px;" controls loop></video>
+      <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:200px; color:var(--text-mute);">
+        <div style="font-size:2rem; margin-bottom:8px;">▶</div>
+        <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
       </div>
     </div>
 
     <!-- Clip info -->
-    <div id="clip-info" class="px-3 py-1 text-xs text-slate-400 hidden">
-      <div class="flex items-center gap-2 flex-wrap">
-        <span id="clip-goalie" class="text-white font-semibold"></span>
-        <span id="clip-game" class="text-slate-400"></span>
-        <span id="clip-ryg" class="ryg-dot"></span>
-        <span id="clip-attack" class="text-blue-400"></span>
-        <span id="clip-result" class="badge"></span>
+    <div id="clip-meta" class="px-3 py-2 hidden" style="border-top:1px solid var(--navy-border);">
+      <div class="flex items-center gap-2 flex-wrap" style="font-size:0.72rem;">
+        <span id="m-goalie" class="font-bold text-white"></span>
+        <span id="m-game" style="color:var(--text-mute);"></span>
+        <span id="m-ryg" class="dot"></span>
+        <span id="m-attack" style="color:#93c5fd;"></span>
+        <span id="m-result" class="badge"></span>
       </div>
-      <div id="clip-psm" class="mt-1 flex flex-wrap gap-1"></div>
+      <div id="m-psm" class="flex flex-wrap gap-1 mt-1"></div>
     </div>
 
-    <!-- Clip controls -->
-    <div class="px-3 py-2 border-t border-slate-800">
-      <div class="filter-label mb-2">Clip Window</div>
-      <div class="slider-row mb-1">
-        <span class="text-xs text-slate-400 w-20">Before shot</span>
-        <input type="range" id="pre-buffer" min="0" max="60" value="15" class="flex-1">
-        <span id="pre-label" class="text-xs text-blue-300 w-8 text-right">15s</span>
-      </div>
-      <div class="slider-row">
-        <span class="text-xs text-slate-400 w-20">After shot</span>
-        <input type="range" id="post-buffer" min="0" max="30" value="10" class="flex-1">
-        <span id="post-label" class="text-xs text-blue-300 w-8 text-right">10s</span>
-      </div>
+    <!-- Controls -->
+    <div class="px-3 py-2 flex gap-2 items-center" style="border-top:1px solid var(--navy-border);">
+      <button class="btn primary flex-1" id="loop-btn">&#9654; Loop All Filtered</button>
+      <button class="btn" id="prev-btn">&#9664; Prev</button>
+      <button class="btn" id="next-btn">Next &#9654;</button>
     </div>
 
-    <!-- Loop All -->
-    <div class="px-3 py-2 border-t border-slate-800 flex items-center gap-2">
-      <button id="loop-all-btn" class="loop-all-btn flex-1 py-1.5 rounded text-xs font-semibold border border-slate-600 text-slate-300 hover:bg-slate-800 transition">
-        ▶ Loop All Filtered
-      </button>
-      <button id="prev-btn" class="px-3 py-1.5 rounded text-xs border border-slate-700 text-slate-400 hover:bg-slate-800 transition">◄ Prev</button>
-      <button id="next-btn" class="px-3 py-1.5 rounded text-xs border border-slate-700 text-slate-400 hover:bg-slate-800 transition">Next ►</button>
+    <div id="nav-info" class="hidden px-3 pb-2 text-center" style="font-size:0.65rem; color:var(--text-mute);">
+      Clip <span id="nav-cur"></span> of <span id="nav-tot"></span>
+      &nbsp;&middot;&nbsp; <span id="nav-game"></span>
     </div>
 
-    <!-- Current position in list -->
-    <div id="nav-info" class="px-3 pb-2 text-xs text-slate-500 text-center hidden">
-      Clip <span id="nav-current">0</span> of <span id="nav-total">0</span>
+  </div><!-- /vpanel -->
+
+  <!-- ── SEQUENCE LIST ── -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Table header -->
+    <div class="seq-header-row flex-shrink-0" style="background:var(--navy);">
+      <span></span>
+      <span>Goalie</span>
+      <span>Game</span>
+      <span>Strength</span>
+      <span>Type</span>
+      <span>PSM Sequence</span>
+      <span>Result</span>
     </div>
 
-  </main>
-
-  <!-- ===== SEQUENCE LIST ===== -->
-  <section class="flex-1 flex flex-col overflow-hidden border-l border-slate-800">
-    <div class="px-3 py-2 border-b border-slate-800 flex items-center justify-between flex-shrink-0">
-      <div class="text-sm font-semibold text-slate-300">Sequences</div>
-      <div id="result-count" class="text-xs text-slate-500"></div>
+    <!-- Stats row -->
+    <div id="stats-row" class="flex items-center gap-4 px-3 py-1 flex-shrink-0"
+         style="background:var(--navy-mid); border-bottom:1px solid var(--navy-border); font-size:0.65rem; color:var(--text-mute);">
     </div>
-    <div id="sequence-list" class="flex-1 overflow-y-auto"></div>
-  </section>
 
-</div>
+    <div id="seq-list" class="flex-1 overflow-y-auto"></div>
+  </div>
+
+</div><!-- /body -->
 
 <script>
-// ============================================================
+// ═══════════════════════════════════════════════════════════
 //  CONFIG
-// ============================================================
-const CONFIG = {
-  preBuffer:  15,   // seconds before shot timestamp
-  postBuffer: 10,   // seconds after shot timestamp
-};
+// ═══════════════════════════════════════════════════════════
+// After uploading clips to Cloudflare R2, paste the public bucket URL here.
+// Example: 'https://pub-abc123def456.r2.dev/'
+const CLIP_BASE_URL = '';
 
-// Video URL map: "MM.DD.YYYY_OPP_P#" -> direct streaming URL
-// Fill this in with your OneDrive direct download URLs
-// See SETUP.md for instructions on getting these URLs
-let VIDEO_MAP = {};
-
-// ============================================================
+// ═══════════════════════════════════════════════════════════
 //  STATE
-// ============================================================
-let allData = [];
-let filteredData = [];
-let activeFilters = {
-  goalie: new Set(),
-  ryg: new Set(),
-  save: null,
-  goal: null,
-  goalQual: '',
-  period: new Set(),
-  strength: new Set(),
-  attackType: new Set(),
-  ozpPattern: '',
-  rushType: '',
-  shotLocation: '',
-  shotTech: '',
-  screen: null,
-  psm1: '',
-  svTech: '',
-  rebCreated: null,
-  rebAttacked: null,
-  game: '',
-  hasVideo: false,
+// ═══════════════════════════════════════════════════════════
+let allData = [], filteredData = [];
+let currentIndex = -1, loopAllActive = false;
+
+const filters = {
+  goalie:new Set(), ryg:new Set(), period:new Set(),
+  strength:new Set(), attackType:new Set(),
+  save:null, goal:null, goalQual:'',
+  ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
+  screen:null, psm1:'', svTech:'',
+  rebCreated:null, rebAttacked:null,
+  game:'', hasClip:false,
 };
-let currentIndex = -1;
-let loopAllActive = false;
-let loopEndTime = 0;
-let loopStartTime = 0;
 
-const video = document.getElementById('player');
-const noVideoMsg = document.getElementById('no-video-msg');
-const noVideoText = document.getElementById('no-video-text');
+const video  = document.getElementById('player');
+const noVid  = document.getElementById('no-vid');
+const noTxt  = document.getElementById('no-vid-text');
 
-// ============================================================
-//  DATA LOADING
-// ============================================================
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
 async function init() {
+  if (!CLIP_BASE_URL) document.getElementById('setup-banner').classList.remove('hidden');
+
   try {
-    const [dataRes, configRes] = await Promise.allSettled([
-      fetch('data.json'),
-      fetch('video_config.json'),
-    ]);
-
-    if (dataRes.status === 'fulfilled' && dataRes.value.ok) {
-      allData = await dataRes.value.json();
-    } else {
-      document.body.innerHTML = '<div class="p-8 text-red-400">Error: could not load data.json</div>';
-      return;
-    }
-
-    if (configRes.status === 'fulfilled' && configRes.value.ok) {
-      VIDEO_MAP = await configRes.value.json();
-    }
-
-    buildFilterUI();
-    applyFilters();
-  } catch (e) {
-    console.error(e);
+    const res = await fetch('data.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    allData = await res.json();
+  } catch(e) {
+    document.getElementById('seq-list').innerHTML =
+      `<div style="padding:24px; color:#f87171; font-size:0.78rem;">Error loading data.json: ${e.message}</div>`;
+    return;
   }
+
+  buildFilters();
+  applyFilters();
 }
 
-// ============================================================
-//  FILTER UI BUILDER
-// ============================================================
-function getUnique(field, subfield) {
-  const vals = new Set();
-  allData.forEach(r => {
-    if (subfield !== undefined) {
-      const arr = r[field] || [];
-      if (arr[subfield]) vals.add(arr[subfield]);
-    } else {
-      if (r[field]) vals.add(r[field]);
-    }
-  });
-  return [...vals].filter(Boolean).sort();
+// ═══════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════
+const clipUrl  = r => CLIP_BASE_URL ? CLIP_BASE_URL.replace(/\/$/,'') + '/' + r.id + '.mp4' : null;
+const hasClip  = r => !!CLIP_BASE_URL && r.fileClock != null;
+const fmtTime  = s => s==null ? '--:--' : Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+
+function unique(field, sub) {
+  const s = new Set();
+  allData.forEach(r => { const v = sub!==undefined?(r[field]||[])[sub]:r[field]; if(v) s.add(v); });
+  return [...s].sort();
 }
 
-function buildCheckboxGroup(containerId, field, values) {
-  const el = document.getElementById(containerId);
-  values.forEach(val => {
-    const label = document.createElement('label');
-    label.className = 'flex items-center gap-2 text-xs text-slate-300 cursor-pointer';
-    label.innerHTML = `<input type="checkbox" class="accent-blue-500" data-filter="${field}" data-val="${val}"> ${val}`;
-    el.appendChild(label);
-  });
-}
-
-function populateSelect(id, values) {
+// ═══════════════════════════════════════════════════════════
+//  BUILD FILTER UI
+// ═══════════════════════════════════════════════════════════
+function cbGroup(id, field, values) {
   const el = document.getElementById(id);
   values.forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v; opt.textContent = v;
-    el.appendChild(opt);
+    const l = document.createElement('label');
+    l.className = 'cb-lbl';
+    l.innerHTML = `<input type="checkbox" data-f="${field}" data-v="${v}"> ${v}`;
+    el.appendChild(l);
+  });
+}
+function fillSel(id, values) {
+  const el = document.getElementById(id);
+  values.forEach(v => { const o = document.createElement('option'); o.value=o.textContent=v; el.appendChild(o); });
+}
+
+function buildFilters() {
+  cbGroup('f-goalie',     'goalie',     unique('goalie'));
+  cbGroup('f-strength',   'strength',   unique('strength'));
+  cbGroup('f-attackType', 'attackType', unique('attackType'));
+  fillSel('f-ozpPattern',  unique('ozpPattern'));
+  fillSel('f-rushType',    unique('rushType'));
+  fillSel('f-shotLocation',unique('shotLocation'));
+  fillSel('f-shotTech',    unique('shotTech'));
+  fillSel('f-psm1',        unique('psm',0));
+  fillSel('f-svTech',      unique('svTech'));
+  const ge = document.getElementById('f-game');
+  unique('game').forEach(g => {
+    const o = document.createElement('option'); o.value=g;
+    o.textContent = g.replace(/(\d+\.\d+\.\d+)_/,'').replace('_',' ');
+    ge.appendChild(o);
   });
 }
 
-function buildFilterUI() {
-  buildCheckboxGroup('filter-goalie', 'goalie', getUnique('goalie'));
-  buildCheckboxGroup('filter-strength', 'strength', getUnique('strength'));
-  buildCheckboxGroup('filter-attackType', 'attackType', getUnique('attackType'));
-  populateSelect('filter-ozpPattern', getUnique('ozpPattern'));
-  populateSelect('filter-rushType', getUnique('rushType'));
-  populateSelect('filter-shotLocation', getUnique('shotLocation'));
-  populateSelect('filter-shotTech', getUnique('shotTech'));
-  populateSelect('filter-psm1', getUnique('psm', 0));
-  populateSelect('filter-svTech', getUnique('svTech'));
-
-  const games = getUnique('game');
-  const gameEl = document.getElementById('filter-game');
-  games.forEach(g => {
-    const opt = document.createElement('option');
-    opt.value = g; opt.textContent = g.replace('_', ' vs ');
-    gameEl.appendChild(opt);
-  });
-}
-
-// ============================================================
-//  FILTER LOGIC
-// ============================================================
-function getVideoKey(r) {
-  return `${r.game}_P${r.period}`;
-}
-
-function hasVideo(r) {
-  return !!VIDEO_MAP[getVideoKey(r)];
-}
-
+// ═══════════════════════════════════════════════════════════
+//  FILTER
+// ═══════════════════════════════════════════════════════════
 function applyFilters() {
   filteredData = allData.filter(r => {
-    if (activeFilters.goalie.size && !activeFilters.goalie.has(r.goalie)) return false;
-    if (activeFilters.ryg.size && !activeFilters.ryg.has(r.ryg)) return false;
-    if (activeFilters.save && r.save !== activeFilters.save) return false;
-    if (activeFilters.goal && r.goal !== activeFilters.goal) return false;
-    if (activeFilters.goalQual && r.goalQualitative !== activeFilters.goalQual) return false;
-    if (activeFilters.period.size && !activeFilters.period.has(String(r.period))) return false;
-    if (activeFilters.strength.size && !activeFilters.strength.has(r.strength)) return false;
-    if (activeFilters.attackType.size && !activeFilters.attackType.has(r.attackType)) return false;
-    if (activeFilters.ozpPattern && r.ozpPattern !== activeFilters.ozpPattern) return false;
-    if (activeFilters.rushType && r.rushType !== activeFilters.rushType) return false;
-    if (activeFilters.shotLocation && r.shotLocation !== activeFilters.shotLocation) return false;
-    if (activeFilters.shotTech && r.shotTech !== activeFilters.shotTech) return false;
-    if (activeFilters.screen && r.screen !== activeFilters.screen) return false;
-    if (activeFilters.psm1 && (r.psm || [])[0] !== activeFilters.psm1) return false;
-    if (activeFilters.svTech && r.svTech !== activeFilters.svTech) return false;
-    if (activeFilters.rebCreated && r.rebCreated !== activeFilters.rebCreated) return false;
-    if (activeFilters.rebAttacked && r.rebAttacked !== activeFilters.rebAttacked) return false;
-    if (activeFilters.game && r.game !== activeFilters.game) return false;
-    if (activeFilters.hasVideo && !hasVideo(r)) return false;
+    if(filters.goalie.size     && !filters.goalie.has(r.goalie))          return false;
+    if(filters.ryg.size        && !filters.ryg.has(r.ryg))                return false;
+    if(filters.period.size     && !filters.period.has(String(r.period)))  return false;
+    if(filters.strength.size   && !filters.strength.has(r.strength))      return false;
+    if(filters.attackType.size && !filters.attackType.has(r.attackType))  return false;
+    if(filters.save            && r.save!==filters.save)                   return false;
+    if(filters.goal            && r.goal!==filters.goal)                   return false;
+    if(filters.goalQual        && r.goalQualitative!==filters.goalQual)   return false;
+    if(filters.ozpPattern      && r.ozpPattern!==filters.ozpPattern)       return false;
+    if(filters.rushType        && r.rushType!==filters.rushType)           return false;
+    if(filters.shotLocation    && r.shotLocation!==filters.shotLocation)   return false;
+    if(filters.shotTech        && r.shotTech!==filters.shotTech)           return false;
+    if(filters.screen          && r.screen!==filters.screen)               return false;
+    if(filters.psm1            && (r.psm||[])[0]!==filters.psm1)          return false;
+    if(filters.svTech          && r.svTech!==filters.svTech)               return false;
+    if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)       return false;
+    if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
+    if(filters.game            && r.game!==filters.game)                   return false;
+    if(filters.hasClip         && !hasClip(r))                             return false;
     return true;
   });
-
   renderList();
   updateStats();
 }
 
-// ============================================================
-//  STATS BAR
-// ============================================================
+// ═══════════════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════════════
 function updateStats() {
-  const counts = { R: 0, Y: 0, G: 0, total: filteredData.length };
-  let withVideo = 0;
-  filteredData.forEach(r => {
-    if (r.ryg) counts[r.ryg] = (counts[r.ryg] || 0) + 1;
-    if (hasVideo(r)) withVideo++;
-  });
-
-  document.getElementById('stats-bar').innerHTML = `
-    <span class="text-slate-400">${counts.total} sequences</span>
-    <span class="text-red-400">R: ${counts.R || 0}</span>
-    <span class="text-yellow-400">Y: ${counts.Y || 0}</span>
-    <span class="text-green-400">G: ${counts.G || 0}</span>
-    <span class="text-blue-400">📹 ${withVideo} with video</span>
-  `;
-  document.getElementById('result-count').textContent = `${counts.total} results`;
+  const t=filteredData.length;
+  const R=filteredData.filter(r=>r.ryg==='R').length;
+  const Y=filteredData.filter(r=>r.ryg==='Y').length;
+  const G=filteredData.filter(r=>r.ryg==='G').length;
+  const v=filteredData.filter(r=>hasClip(r)).length;
+  document.getElementById('stats-bar').innerHTML =
+    `<span>${t} sequences</span>
+     <span style="color:#f87171">&#9679; Red: ${R}</span>
+     <span style="color:#fbbf24">&#9679; Yellow: ${Y}</span>
+     <span style="color:#4ade80">&#9679; Green: ${G}</span>
+     <span style="color:#60a5fa">&#9654; ${v} with video</span>`;
+  document.getElementById('stats-bar').style.display = t ? 'flex' : 'none';
 }
 
-// ============================================================
-//  SEQUENCE LIST RENDERING
-// ============================================================
-function fmtTime(sec) {
-  if (sec == null) return '--:--';
-  const m = Math.floor(sec / 60);
-  const s = String(sec % 60).padStart(2, '0');
-  return `${m}:${s}`;
-}
-
+// ═══════════════════════════════════════════════════════════
+//  SEQUENCE LIST
+// ═══════════════════════════════════════════════════════════
 function renderList() {
-  const list = document.getElementById('sequence-list');
+  const list = document.getElementById('seq-list');
   list.innerHTML = '';
 
-  if (!filteredData.length) {
-    list.innerHTML = '<div class="p-6 text-slate-500 text-sm text-center">No sequences match the current filters.</div>';
+  if(!filteredData.length) {
+    list.innerHTML = `<div style="padding:32px; text-align:center; color:var(--text-mute); font-size:0.78rem;">No sequences match the current filters.</div>`;
     return;
   }
 
-  filteredData.forEach((r, i) => {
-    const div = document.createElement('div');
-    div.className = 'seq-item px-3 py-2' + (i === currentIndex ? ' active' : '');
-    div.dataset.index = i;
+  filteredData.forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'seq-row' + (i===currentIndex?' active':'');
+    row.dataset.i = i;
 
-    const hasVid = hasVideo(r);
-    const rygClass = r.ryg ? `ryg-${r.ryg}` : 'ryg-R';
-    const resultBadge = r.goal === 'Y'
-      ? `<span class="badge badge-goal">GOAL</span>`
-      : r.save === 'Y'
-        ? `<span class="badge badge-save">SAVE</span>`
-        : r.phType ? `<span class="badge badge-ph">PH</span>` : '';
+    const has  = hasClip(r);
+    const dc   = `dot dot-${r.ryg||'R'}`;
+    const opp  = (r.game||'').replace(/^\d+\.\d+\.\d+_/,'');
+    const psm  = (r.psm||[]).slice(0,2).join(' → ') || '—';
+    const res  = r.goal==='Y'
+      ? `<span class="badge b-goal">GOAL</span>`
+      : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
+      : r.phType ? `<span class="badge b-ph">PH</span>` : '—';
 
-    const psmText = (r.psm || []).slice(0, 3).join(' → ');
-    const gameShort = r.game ? r.game.replace('_', ' vs ').replace(/^\d+\.\d+\./, '') : '';
-    const clockStr = r.fileClock != null ? `⏱ ${fmtTime(r.fileClock)}` : '';
-
-    div.innerHTML = `
-      <div class="flex items-center gap-2">
-        <span class="ryg-dot ${rygClass}"></span>
-        <span class="text-xs font-semibold text-slate-200">${r.goalie || '—'}</span>
-        ${resultBadge}
-        ${hasVid ? '<span class="text-blue-500 text-xs">📹</span>' : '<span class="text-slate-700 text-xs">○</span>'}
-      </div>
-      <div class="flex items-center gap-2 mt-0.5 text-slate-500" style="font-size:0.68rem">
-        <span>${gameShort}</span>
-        <span>P${r.period || '?'}</span>
-        <span>${r.strength || ''}</span>
-        <span class="text-slate-400">${r.attackType || r.phType || ''}</span>
-        <span class="text-slate-500">${clockStr}</span>
-      </div>
-      ${psmText ? `<div class="mt-0.5 text-slate-600" style="font-size:0.62rem">${psmText}</div>` : ''}
+    row.innerHTML = `
+      <span class="${dc}"></span>
+      <span style="color:var(--text); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.goalie||'—'}</span>
+      <span style="color:var(--text-dim); font-size:0.65rem;">${opp} P${r.period||'?'}</span>
+      <span style="color:var(--text-mute); font-size:0.65rem;">${r.strength||'—'}</span>
+      <span style="color:#93c5fd; font-size:0.65rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
+      <span style="color:var(--text-mute); font-size:0.62rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${psm}</span>
+      <span>${res} ${has?'<span style="color:#3d5af1;font-size:0.6rem;">▶</span>':''}</span>
     `;
-
-    div.addEventListener('click', () => selectSequence(i));
-    list.appendChild(div);
+    row.addEventListener('click', ()=>selectClip(i));
+    list.appendChild(row);
   });
 }
 
-// ============================================================
-//  VIDEO PLAYBACK
-// ============================================================
-function selectSequence(index) {
-  currentIndex = index;
+// ═══════════════════════════════════════════════════════════
+//  PLAYBACK
+// ═══════════════════════════════════════════════════════════
+function selectClip(idx) {
+  currentIndex = idx;
   loopAllActive = false;
-  document.getElementById('loop-all-btn').classList.remove('active');
-  document.getElementById('loop-all-btn').textContent = '▶ Loop All Filtered';
+  const lb = document.getElementById('loop-btn');
+  lb.classList.remove('active-loop');
+  lb.textContent = '▶ Loop All Filtered';
 
-  // Update list highlight
-  document.querySelectorAll('.seq-item').forEach((el, i) => {
-    el.classList.toggle('active', i === index);
-  });
+  document.querySelectorAll('.seq-row').forEach((el,i)=>el.classList.toggle('active',i===idx));
+  document.querySelector(`.seq-row[data-i="${idx}"]`)?.scrollIntoView({block:'nearest'});
 
-  // Scroll into view
-  const item = document.querySelector(`.seq-item[data-index="${index}"]`);
-  if (item) item.scrollIntoView({ block: 'nearest' });
-
-  // Update nav
+  const r = filteredData[idx];
   document.getElementById('nav-info').classList.remove('hidden');
-  document.getElementById('nav-current').textContent = index + 1;
-  document.getElementById('nav-total').textContent = filteredData.length;
-
-  const r = filteredData[index];
+  document.getElementById('nav-cur').textContent = idx+1;
+  document.getElementById('nav-tot').textContent = filteredData.length;
+  document.getElementById('nav-game').textContent = (r.game||'').replace('_',' vs ');
   loadClip(r);
 }
 
 function loadClip(r) {
-  const pre = parseInt(document.getElementById('pre-buffer').value);
-  const post = parseInt(document.getElementById('post-buffer').value);
-  const key = getVideoKey(r);
-  const url = VIDEO_MAP[key];
-
-  // Update clip info panel
-  document.getElementById('clip-info').classList.remove('hidden');
-  document.getElementById('clip-goalie').textContent = r.goalie || '';
-  document.getElementById('clip-game').textContent = r.game ? r.game.replace('_', ' vs ') : '';
-  const rygDot = document.getElementById('clip-ryg');
-  rygDot.className = `ryg-dot ryg-${r.ryg || 'R'}`;
-  document.getElementById('clip-attack').textContent = r.attackType || r.phType || '';
-  const resultEl = document.getElementById('clip-result');
-  if (r.goal === 'Y') { resultEl.className = 'badge badge-goal'; resultEl.textContent = 'GOAL'; }
-  else if (r.save === 'Y') { resultEl.className = 'badge badge-save'; resultEl.textContent = 'SAVE'; }
-  else { resultEl.className = ''; resultEl.textContent = ''; }
-
-  // PSM tags
-  const psmEl = document.getElementById('clip-psm');
-  psmEl.innerHTML = (r.psm || []).map((p, i) => {
-    const d = r.psmDir && r.psmDir[i] ? ` <span style="color:#60a5fa">${r.psmDir[i]}</span>` : '';
-    return `<span class="psm-tag">${p}${d}</span>`;
+  document.getElementById('clip-meta').classList.remove('hidden');
+  document.getElementById('m-goalie').textContent = r.goalie||'';
+  document.getElementById('m-game').textContent   = (r.game||'').replace('_',' vs ');
+  document.getElementById('m-ryg').className      = `dot dot-${r.ryg||'R'}`;
+  document.getElementById('m-attack').textContent = r.attackType||r.phType||'';
+  const rb = document.getElementById('m-result');
+  if(r.goal==='Y')     { rb.className='badge b-goal'; rb.textContent='GOAL'; }
+  else if(r.save==='Y'){ rb.className='badge b-save'; rb.textContent='SAVE'; }
+  else                 { rb.className=''; rb.textContent=''; }
+  document.getElementById('m-psm').innerHTML = (r.psm||[]).map((p,i)=>{
+    const d=(r.psmDir||[])[i]?` <span style="color:#60a5fa">${r.psmDir[i]}</span>`:'';
+    return `<span class="psm">${p}${d}</span>`;
   }).join('');
 
-  if (!url) {
-    video.style.display = 'none';
-    noVideoMsg.classList.remove('hidden');
-    noVideoText.textContent = url === undefined
-      ? `No video configured for ${key}`
-      : `Video not available`;
-    return;
-  }
-
-  noVideoMsg.classList.add('hidden');
-  video.style.display = 'block';
-
-  if (r.fileClock == null) {
-    noVideoMsg.classList.remove('hidden');
-    noVideoText.textContent = 'No timestamp recorded for this clip';
-    video.style.display = 'none';
-    return;
-  }
-
-  loopStartTime = Math.max(0, r.fileClock - pre);
-  loopEndTime = r.fileClock + post;
-
-  // If same video is already loaded, just seek
-  if (video.src === url || video.currentSrc === url) {
-    video.currentTime = loopStartTime;
-    video.play();
-  } else {
-    video.src = url;
-    video.load();
-    video.addEventListener('loadedmetadata', () => {
-      video.currentTime = loopStartTime;
-      video.play();
-    }, { once: true });
-  }
+  if(!CLIP_BASE_URL){ showNoVid('Configure CLIP_BASE_URL to enable video playback'); return; }
+  if(r.fileClock==null){ showNoVid('No timestamp recorded for this sequence'); return; }
+  showVideo(clipUrl(r));
 }
 
-// Loop within clip window
-video.addEventListener('timeupdate', () => {
-  if (loopEndTime && video.currentTime >= loopEndTime) {
-    if (loopAllActive) {
-      // Advance to next
-      const next = currentIndex + 1 < filteredData.length ? currentIndex + 1 : 0;
-      selectSequence(next);
-    } else {
-      video.currentTime = loopStartTime;
-    }
-  }
-});
+function showVideo(url) {
+  noVid.style.display='none'; video.style.display='block';
+  if(video.src!==url){ video.src=url; video.load(); }
+  video.play().catch(()=>{});
+}
+function showNoVid(msg) {
+  video.style.display='none'; noVid.style.display='flex'; noTxt.textContent=msg;
+}
 
-// ============================================================
-//  LOOP ALL
-// ============================================================
-document.getElementById('loop-all-btn').addEventListener('click', () => {
-  if (!filteredData.length) return;
+video.addEventListener('ended', ()=>{ if(loopAllActive){ selectClip((currentIndex+1)%filteredData.length); } });
+
+// ═══════════════════════════════════════════════════════════
+//  CONTROLS
+// ═══════════════════════════════════════════════════════════
+document.getElementById('loop-btn').addEventListener('click', ()=>{
+  if(!filteredData.length) return;
   loopAllActive = !loopAllActive;
-  const btn = document.getElementById('loop-all-btn');
-  if (loopAllActive) {
-    btn.classList.add('active');
-    btn.textContent = '⏹ Stop Loop All';
-    if (currentIndex < 0 || currentIndex >= filteredData.length) {
-      selectSequence(0);
+  const lb = document.getElementById('loop-btn');
+  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='⏹ Stop Loop All'; if(currentIndex<0) selectClip(0); }
+  else             { lb.classList.remove('active-loop'); lb.textContent='▶ Loop All Filtered'; }
+});
+document.getElementById('prev-btn').addEventListener('click', ()=>{ if(currentIndex>0) selectClip(currentIndex-1); });
+document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIndex<filteredData.length-1) selectClip(currentIndex+1); });
+
+// ═══════════════════════════════════════════════════════════
+//  FILTER WIRING
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('.chip[data-f]').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    const f=chip.dataset.f, v=chip.dataset.v;
+    if(['ryg','period','strength','attackType'].includes(f)){
+      chip.classList.toggle('on');
+      filters[f].has(v)?filters[f].delete(v):filters[f].add(v);
     } else {
-      loadClip(filteredData[currentIndex]);
-    }
-  } else {
-    btn.classList.remove('active');
-    btn.textContent = '▶ Loop All Filtered';
-  }
-});
-
-document.getElementById('prev-btn').addEventListener('click', () => {
-  if (currentIndex > 0) selectSequence(currentIndex - 1);
-});
-document.getElementById('next-btn').addEventListener('click', () => {
-  if (currentIndex < filteredData.length - 1) selectSequence(currentIndex + 1);
-});
-
-// ============================================================
-//  BUFFER SLIDERS
-// ============================================================
-document.getElementById('pre-buffer').addEventListener('input', e => {
-  document.getElementById('pre-label').textContent = e.target.value + 's';
-  if (currentIndex >= 0) loadClip(filteredData[currentIndex]);
-});
-document.getElementById('post-buffer').addEventListener('input', e => {
-  document.getElementById('post-label').textContent = e.target.value + 's';
-  // No reload needed; timeupdate uses live value
-  loopEndTime = filteredData[currentIndex]?.fileClock + parseInt(e.target.value);
-});
-
-// ============================================================
-//  FILTER EVENT WIRING
-// ============================================================
-document.querySelectorAll('.chip[data-filter]').forEach(chip => {
-  chip.addEventListener('click', () => {
-    const f = chip.dataset.filter;
-    const v = chip.dataset.val;
-
-    if (f === 'ryg' || f === 'period' || f === 'strength') {
-      chip.classList.toggle('active');
-      const set = activeFilters[f];
-      if (set.has(v)) set.delete(v); else set.add(v);
-    } else if (f === 'save' || f === 'goal' || f === 'screen' || f === 'rebCreated' || f === 'rebAttacked') {
-      const isActive = chip.classList.contains('active');
-      // Toggle: if same, clear; else set
-      document.querySelectorAll(`.chip[data-filter="${f}"]`).forEach(c => c.classList.remove('active'));
-      if (!isActive) {
-        chip.classList.add('active');
-        activeFilters[f] = v;
-      } else {
-        activeFilters[f] = null;
-      }
+      const was=chip.classList.contains('on');
+      document.querySelectorAll(`.chip[data-f="${f}"]`).forEach(c=>c.classList.remove('on'));
+      filters[f]=was?null:v;
+      if(!was) chip.classList.add('on');
     }
     applyFilters();
   });
 });
 
-document.querySelectorAll('input[type=checkbox][data-filter]').forEach(cb => {
-  cb.addEventListener('change', () => {
-    const f = cb.dataset.filter;
-    const v = cb.dataset.val;
-    if (cb.checked) activeFilters[f].add(v);
-    else activeFilters[f].delete(v);
+document.querySelectorAll('input[type=checkbox][data-f]').forEach(cb=>{
+  cb.addEventListener('change',()=>{
+    if(filters[cb.dataset.f] instanceof Set){
+      cb.checked?filters[cb.dataset.f].add(cb.dataset.v):filters[cb.dataset.f].delete(cb.dataset.v);
+    }
     applyFilters();
   });
 });
 
-['filter-ozpPattern','filter-rushType','filter-shotLocation','filter-shotTech',
- 'filter-psm1','filter-svTech','filter-game'].forEach(id => {
-  document.getElementById(id).addEventListener('change', e => {
-    const map = {
-      'filter-ozpPattern': 'ozpPattern',
-      'filter-rushType': 'rushType',
-      'filter-shotLocation': 'shotLocation',
-      'filter-shotTech': 'shotTech',
-      'filter-psm1': 'psm1',
-      'filter-svTech': 'svTech',
-      'filter-game': 'game',
-    };
-    activeFilters[map[id]] = e.target.value;
-    applyFilters();
+[['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
+ ['f-shotTech','shotTech'],['f-psm1','psm1'],['f-svTech','svTech'],['f-game','game']
+].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
+
+document.getElementById('f-goalQual').addEventListener('change',e=>{filters.goalQual=e.target.value;applyFilters();});
+document.getElementById('f-hasClip').addEventListener('change', e=>{filters.hasClip=e.target.checked;applyFilters();});
+
+document.getElementById('clear-btn').addEventListener('click',()=>{
+  Object.keys(filters).forEach(k=>{
+    filters[k]=filters[k] instanceof Set?new Set():typeof filters[k]==='boolean'?false:null instanceof Object?null:'';
   });
-});
-
-document.getElementById('filter-goalQual').addEventListener('change', e => {
-  activeFilters.goalQual = e.target.value;
-  applyFilters();
-});
-document.getElementById('filter-hasVideo').addEventListener('change', e => {
-  activeFilters.hasVideo = e.target.checked;
-  applyFilters();
-});
-
-document.getElementById('clear-filters-btn').addEventListener('click', () => {
-  activeFilters = {
-    goalie: new Set(), ryg: new Set(), save: null, goal: null, goalQual: '',
-    period: new Set(), strength: new Set(), attackType: new Set(),
-    ozpPattern: '', rushType: '', shotLocation: '', shotTech: '', screen: null,
-    psm1: '', svTech: '', rebCreated: null, rebAttacked: null, game: '', hasVideo: false,
-  };
-  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-  document.querySelectorAll('input[type=checkbox][data-filter]').forEach(c => c.checked = false);
-  document.querySelectorAll('.filter-select').forEach(s => s.value = '');
-  document.getElementById('filter-goalQual').value = '';
-  document.getElementById('filter-hasVideo').checked = false;
+  // reset null fields properly
+  ['save','goal','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
+  ['goalQual','ozpPattern','rushType','shotLocation','shotTech','psm1','svTech','game'].forEach(k=>filters[k]='');
+  filters.hasClip=false;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>c.checked=false);
+  document.querySelectorAll('select.sel').forEach(s=>s.value='');
+  document.getElementById('f-hasClip').checked=false;
   applyFilters();
 });
 
-// Keyboard shortcuts
-document.addEventListener('keydown', e => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-  if (e.key === 'ArrowRight' || e.key === 'n') document.getElementById('next-btn').click();
-  if (e.key === 'ArrowLeft' || e.key === 'p') document.getElementById('prev-btn').click();
-  if (e.key === ' ') { e.preventDefault(); video.paused ? video.play() : video.pause(); }
-  if (e.key === 'l') document.getElementById('loop-all-btn').click();
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+  if(e.key==='ArrowRight'||e.key==='n') document.getElementById('next-btn').click();
+  if(e.key==='ArrowLeft' ||e.key==='p') document.getElementById('prev-btn').click();
+  if(e.key===' '){ e.preventDefault(); video.paused?video.play():video.pause(); }
+  if(e.key==='l') document.getElementById('loop-btn').click();
 });
 
-// ============================================================
-//  KICK OFF
-// ============================================================
 init();
 </script>
 </body>
