@@ -169,9 +169,65 @@
   ::-webkit-scrollbar { width:5px; }
   ::-webkit-scrollbar-track { background:var(--navy-mid); }
   ::-webkit-scrollbar-thumb { background:#bbb; border-radius:4px; }
+
+  /* ═══ MOBILE FILTER BUTTON (hidden on desktop) ═══ */
+  #mobile-filter-btn {
+    display: none;
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 6px; padding: 6px 13px;
+    font-size: 0.8rem; font-weight: 700;
+    cursor: pointer; align-items: center; gap: 6px;
+  }
+
+  /* ═══ SIDEBAR BACKDROP (hidden on desktop) ═══ */
+  #sidebar-backdrop {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.38); z-index: 199;
+  }
+
+  /* ═══ MOBILE (≤ 640px) ═══ */
+  @media (max-width: 640px) {
+    body { padding-left: 0; padding-right: 0; box-shadow: none; }
+    :root { --vid-h: 42vh; }
+
+    /* Sidebar slides in from left */
+    .sidebar {
+      position: fixed; top: 50px; left: -215px; bottom: 0;
+      z-index: 200; width: 215px;
+      transition: left 0.22s ease;
+    }
+    body.sidebar-open .sidebar {
+      left: 0;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.22);
+    }
+    body.sidebar-open #sidebar-backdrop { display: block; }
+
+    /* Show filter button in header */
+    #mobile-filter-btn { display: flex; }
+
+    /* Video: no side borders on edge-to-edge */
+    .vid-wrap { border-left: none; border-right: none; border-radius: 4px; }
+
+    /* Control buttons: bigger touch targets */
+    .ctrl-btn { height: 38px; width: 38px; font-size: 0.85rem; }
+    #slomo-btn { width: auto; padding: 0 12px; }
+
+    /* Progress bar: taller for easier tapping */
+    .prog-bar { height: 5px; }
+    .prog-bar:hover { height: 7px; }
+
+    /* Playlist: horizontal scroll so nothing wraps */
+    .seq-list { overflow-x: auto; }
+    .seq-header-row, .seq-row { min-width: 520px; }
+
+    /* Hide resize handle (not useful on touch) */
+    #resize-handle { display: none; }
+  }
 </style>
 </head>
 <body class="h-screen overflow-hidden flex flex-col">
+
+<div id="sidebar-backdrop"></div>
 
 <!-- ═══ HEADER ═══ -->
 <div class="header flex items-center justify-between px-5 py-2 flex-shrink-0" style="height:50px">
@@ -183,6 +239,7 @@
       <span style="color:var(--text-mute); font-size:0.72rem; margin-left:6px;">Goalie Efficiency Model</span>
     </div>
   </div>
+  <button id="mobile-filter-btn" title="Filters">⊟ Filters</button>
 </div>
 
 <!-- ═══ BODY ═══ -->
@@ -867,6 +924,14 @@ document.addEventListener('keyup',e=>{
 })();
 
 init();
+
+// Mobile sidebar toggle
+document.getElementById('mobile-filter-btn').addEventListener('click', ()=>{
+  document.body.classList.toggle('sidebar-open');
+});
+document.getElementById('sidebar-backdrop').addEventListener('click', ()=>{
+  document.body.classList.remove('sidebar-open');
+});
 </script>
 </body>
 </html>
