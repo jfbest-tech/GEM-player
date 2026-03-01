@@ -110,7 +110,7 @@
 <!-- ═══ HEADER ═══ -->
 <div class="header flex items-center justify-between px-5 py-2 flex-shrink-0" style="height:50px">
   <div class="flex items-center gap-4">
-    <img src="SPA_Logo%2BWordmark.png" alt="Sports Performance Analysis" style="height:30px; object-fit:contain;">
+    <img src="SPA_Wordmark.png" alt="Sports Performance Analysis" style="height:30px; object-fit:contain;">
     <div style="width:1px; height:28px; background:var(--navy-border);"></div>
     <div>
       <span class="font-black text-white" style="font-size:0.85rem; letter-spacing:0.05em;">GEM</span>
@@ -310,7 +310,10 @@ async function init() {
     const res = await fetch('data.json');
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     allData = await res.json();
-    allData.forEach(r => { if (r.strength) r.strength = r.strength.toLowerCase(); });
+    allData.forEach(r => {
+      if (r.strength) r.strength = r.strength.toLowerCase();
+      if (r.attackType) r.attackType = r.attackType.replace(/\bOzp\b/g, 'OZP');
+    });
   } catch(e) {
     document.getElementById('seq-list').innerHTML =
       `<div style="padding:24px; color:#f87171; font-size:0.78rem;">Error loading data.json: ${e.message}</div>`;
