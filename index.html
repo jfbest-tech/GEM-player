@@ -12,14 +12,14 @@
     --navy-mid:    #161b3e;
     --navy-light:  #1c2349;
     --navy-border: #252d5a;
-    --accent:      #3d5af1;
-    --accent-dim:  #2a3d9e;
-    --text:        #dde3ff;
-    --text-dim:    #7b87b8;
-    --text-mute:   #404878;
+    --accent:      #a8b2c0;
+    --accent-dim:  #6b7585;
+    --text:        #e2e8f0;
+    --text-dim:    #a8b2c0;
+    --text-mute:   #4a5260;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+  body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
 
   /* HEADER */
   .header { background: var(--navy); border-bottom: 1px solid var(--navy-border); }
@@ -53,17 +53,17 @@
   input[type=checkbox] { accent-color:var(--accent); flex-shrink:0; }
 
   /* VIDEO PANEL */
-  .vpanel { background:var(--navy-dark); border-right:1px solid var(--navy-border); width:500px; }
+  .vpanel { background:var(--navy-dark); border-bottom:1px solid var(--navy-border); }
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 18px 1fr 60px 50px 45px 80px 55px;
+    display:grid; grid-template-columns: 14px 150px 65px 40px 90px 1fr 55px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border);
     font-size:0.6rem; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 18px 1fr 60px 50px 45px 80px 55px;
+    display:grid; grid-template-columns: 14px 150px 65px 40px 90px 1fr 55px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid #13173200; cursor:pointer; transition:background .1s;
   }
@@ -81,14 +81,14 @@
   .badge { font-size:0.58rem; font-weight:700; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   .b-goal { background:#3d0a0a; color:#fca5a5; }
   .b-save { background:#0a2e14; color:#86efac; }
-  .b-ph   { background:#0d1f4a; color:#93c5fd; }
+  .b-ph   { background:#22273a; color:var(--text-dim); }
 
   /* Video */
   video { background:#000; border-radius:6px; width:100%; }
   .no-vid { background:var(--navy); border:1px dashed var(--navy-border); border-radius:8px; }
 
   /* PSM tags */
-  .psm { background:var(--navy-light); color:#6677cc; font-size:0.58rem; padding:1px 5px; border-radius:3px; }
+  .psm { background:var(--navy-light); color:#8b96a8; font-size:0.58rem; padding:1px 5px; border-radius:3px; }
 
   /* Buttons */
   .btn { padding:5px 14px; border-radius:5px; font-size:0.72rem; font-weight:600; cursor:pointer; border:1px solid var(--navy-border); color:var(--text-dim); background:var(--navy-light); transition:all .12s; }
@@ -201,74 +201,86 @@
 
   </div><!-- /sidebar -->
 
-  <!-- ── VIDEO PANEL ── -->
-  <div class="vpanel flex-shrink-0 flex flex-col overflow-hidden">
-
-    <!-- Setup notice -->
-    <div id="setup-banner" class="notice mx-3 mt-3 p-3 hidden">
-      <div class="font-bold mb-1" style="color:#93c5fd; font-size:0.72rem;">Setup Required</div>
-      <div style="color:var(--text-dim); font-size:0.69rem;">
-        Set <code style="background:#132044; padding:1px 5px; border-radius:3px;">CLIP_BASE_URL</code>
-        in index.html after uploading clips to Cloudflare R2.
-      </div>
-    </div>
-
-    <!-- Video -->
-    <div class="p-3 pb-1">
-      <video id="player" style="display:none; max-height:260px;" controls loop></video>
-      <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:200px; color:var(--text-mute);">
-        <div style="font-size:2rem; margin-bottom:8px;">▶</div>
-        <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
-      </div>
-    </div>
-
-    <!-- Clip info -->
-    <div id="clip-meta" class="px-3 py-2 hidden" style="border-top:1px solid var(--navy-border);">
-      <div class="flex items-center gap-2 flex-wrap" style="font-size:0.72rem;">
-        <span id="m-goalie" class="font-bold text-white"></span>
-        <span id="m-game" style="color:var(--text-mute);"></span>
-        <span id="m-ryg" class="dot"></span>
-        <span id="m-attack" style="color:#93c5fd;"></span>
-        <span id="m-result" class="badge"></span>
-      </div>
-      <div id="m-psm" class="flex flex-wrap gap-1 mt-1"></div>
-    </div>
-
-    <!-- Controls -->
-    <div class="px-3 py-2 flex gap-2 items-center" style="border-top:1px solid var(--navy-border);">
-      <button class="btn primary flex-1" id="loop-btn">&#9654; Loop All Filtered</button>
-      <button class="btn" id="prev-btn">&#9664; Prev</button>
-      <button class="btn" id="next-btn">Next &#9654;</button>
-    </div>
-
-    <div id="nav-info" class="hidden px-3 pb-2 text-center" style="font-size:0.65rem; color:var(--text-mute);">
-      Clip <span id="nav-cur"></span> of <span id="nav-tot"></span>
-      &nbsp;&middot;&nbsp; <span id="nav-game"></span>
-    </div>
-
-  </div><!-- /vpanel -->
-
-  <!-- ── SEQUENCE LIST ── -->
+  <!-- ── MAIN AREA ── -->
   <div class="flex-1 flex flex-col overflow-hidden">
 
-    <!-- Table header -->
-    <div class="seq-header-row flex-shrink-0" style="background:var(--navy);">
-      <span></span>
-      <span>Goalie</span>
-      <span>Game</span>
-      <span>Strength</span>
-      <span>Type</span>
-      <span>PSM Sequence</span>
-      <span>Result</span>
+    <!-- VIDEO PANEL -->
+    <div class="vpanel flex-shrink-0 flex flex-col">
+
+      <!-- Setup notice -->
+      <div id="setup-banner" class="notice mx-3 mt-3 p-3 hidden">
+        <div class="font-bold mb-1" style="color:var(--text-dim); font-size:0.72rem;">Setup Required</div>
+        <div style="color:var(--text-dim); font-size:0.69rem;">
+          Set <code style="background:#132044; padding:1px 5px; border-radius:3px;">CLIP_BASE_URL</code>
+          in index.html after uploading clips to Cloudflare R2.
+        </div>
+      </div>
+
+      <!-- Video -->
+      <div class="p-3 pb-1">
+        <video id="player" style="display:none; max-height:420px;" controls loop></video>
+        <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:380px; color:var(--text-mute);">
+          <div style="font-size:2rem; margin-bottom:8px;">▶</div>
+          <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
+        </div>
+      </div>
+
+      <!-- Clip info -->
+      <div id="clip-meta" class="px-3 py-2 hidden" style="border-top:1px solid var(--navy-border);">
+        <div class="flex items-center gap-2 flex-wrap" style="font-size:0.72rem;">
+          <span id="m-goalie" class="font-bold text-white"></span>
+          <span id="m-game" style="color:var(--text-mute);"></span>
+          <span id="m-ryg" class="dot"></span>
+          <span id="m-attack" style="color:var(--text-dim);"></span>
+          <span id="m-result" class="badge"></span>
+        </div>
+        <div id="m-psm" class="flex flex-wrap gap-1 mt-1"></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="px-3 pt-2 pb-1" style="border-top:1px solid var(--navy-border);">
+        <div class="flex gap-1 items-center mb-1">
+          <button class="btn" id="prev-btn" title="Previous clip (←/P)">⏮ Prev</button>
+          <button class="btn" id="back3-btn" title="Back 3 seconds ([)">−3s</button>
+          <button class="btn" id="frame-back-btn" title="Previous frame (,)">◁</button>
+          <button class="btn primary flex-1" id="play-pause-btn" title="Play / Pause (Space)">▶ Play</button>
+          <button class="btn" id="frame-fwd-btn" title="Next frame (.)">▷</button>
+          <button class="btn" id="fwd3-btn" title="Forward 3 seconds (])">+3s</button>
+          <button class="btn" id="next-btn" title="Next clip (→/N)">Next ⏭</button>
+        </div>
+        <button class="btn w-full" id="loop-btn" style="width:100%;">⟳ Loop All Filtered</button>
+      </div>
+
+      <div id="nav-info" class="hidden px-3 pb-2 text-center" style="font-size:0.65rem; color:var(--text-mute);">
+        Clip <span id="nav-cur"></span> of <span id="nav-tot"></span>
+        &nbsp;&middot;&nbsp; <span id="nav-game"></span>
+      </div>
+
+    </div><!-- /vpanel -->
+
+    <!-- SEQUENCE LIST -->
+    <div class="flex flex-col flex-1 overflow-hidden">
+
+      <!-- Table header -->
+      <div class="seq-header-row flex-shrink-0" style="background:var(--navy);">
+        <span></span>
+        <span>Goalie</span>
+        <span>Game</span>
+        <span>Strength</span>
+        <span>Type</span>
+        <span>PSM Sequence</span>
+        <span>Result</span>
+      </div>
+
+      <!-- Stats row -->
+      <div id="stats-row" class="flex items-center gap-4 px-3 py-1 flex-shrink-0"
+           style="background:var(--navy-mid); border-bottom:1px solid var(--navy-border); font-size:0.65rem; color:var(--text-mute);">
+      </div>
+
+      <div id="seq-list" class="flex-1 overflow-y-auto"></div>
     </div>
 
-    <!-- Stats row -->
-    <div id="stats-row" class="flex items-center gap-4 px-3 py-1 flex-shrink-0"
-         style="background:var(--navy-mid); border-bottom:1px solid var(--navy-border); font-size:0.65rem; color:var(--text-mute);">
-    </div>
-
-    <div id="seq-list" class="flex-1 overflow-y-auto"></div>
-  </div>
+  </div><!-- /main area -->
 
 </div><!-- /body -->
 
@@ -278,7 +290,7 @@
 // ═══════════════════════════════════════════════════════════
 // After uploading clips to Cloudflare R2, paste the public bucket URL here.
 // Example: 'https://pub-abc123def456.r2.dev/'
-const CLIP_BASE_URL = '';
+const CLIP_BASE_URL = 'https://pub-ae6606f2384f4e86b806f43ee755b3bf.r2.dev/';
 
 // ═══════════════════════════════════════════════════════════
 //  STATE
@@ -416,7 +428,7 @@ function updateStats() {
      <span style="color:#f87171">&#9679; Red: ${R}</span>
      <span style="color:#fbbf24">&#9679; Yellow: ${Y}</span>
      <span style="color:#4ade80">&#9679; Green: ${G}</span>
-     <span style="color:#60a5fa">&#9654; ${v} with video</span>`;
+     <span style="color:var(--text-dim)">&#9654; ${v} with video</span>`;
   document.getElementById('stats-bar').style.display = t ? 'flex' : 'none';
 }
 
@@ -451,9 +463,9 @@ function renderList() {
       <span style="color:var(--text); font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.goalie||'—'}</span>
       <span style="color:var(--text-dim); font-size:0.65rem;">${opp} P${r.period||'?'}</span>
       <span style="color:var(--text-mute); font-size:0.65rem;">${r.strength||'—'}</span>
-      <span style="color:#93c5fd; font-size:0.65rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
+      <span style="color:var(--text-dim); font-size:0.65rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="color:var(--text-mute); font-size:0.62rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${psm}</span>
-      <span>${res} ${has?'<span style="color:#3d5af1;font-size:0.6rem;">▶</span>':''}</span>
+      <span>${res} ${has?'<span style="color:var(--accent);font-size:0.6rem;">▶</span>':''}</span>
     `;
     row.addEventListener('click', ()=>selectClip(i));
     list.appendChild(row);
@@ -492,7 +504,7 @@ function loadClip(r) {
   else if(r.save==='Y'){ rb.className='badge b-save'; rb.textContent='SAVE'; }
   else                 { rb.className=''; rb.textContent=''; }
   document.getElementById('m-psm').innerHTML = (r.psm||[]).map((p,i)=>{
-    const d=(r.psmDir||[])[i]?` <span style="color:#60a5fa">${r.psmDir[i]}</span>`:'';
+    const d=(r.psmDir||[])[i]?` <span style="color:var(--text-dim)">${r.psmDir[i]}</span>`:'';
     return `<span class="psm">${p}${d}</span>`;
   }).join('');
 
@@ -519,11 +531,18 @@ document.getElementById('loop-btn').addEventListener('click', ()=>{
   if(!filteredData.length) return;
   loopAllActive = !loopAllActive;
   const lb = document.getElementById('loop-btn');
-  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='⏹ Stop Loop All'; if(currentIndex<0) selectClip(0); }
-  else             { lb.classList.remove('active-loop'); lb.textContent='▶ Loop All Filtered'; }
+  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='⏹ Stop Loop'; if(currentIndex<0) selectClip(0); }
+  else             { lb.classList.remove('active-loop'); lb.textContent='⟳ Loop All Filtered'; }
 });
 document.getElementById('prev-btn').addEventListener('click', ()=>{ if(currentIndex>0) selectClip(currentIndex-1); });
 document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIndex<filteredData.length-1) selectClip(currentIndex+1); });
+document.getElementById('play-pause-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
+document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.max(0,video.currentTime-3); });
+document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
+document.getElementById('frame-back-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.pause(); video.currentTime=Math.max(0,video.currentTime-1/30); } });
+document.getElementById('frame-fwd-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.pause(); video.currentTime=Math.min(video.duration||0,video.currentTime+1/30); } });
+video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸ Pause'; });
+video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶ Play'; });
 
 // ═══════════════════════════════════════════════════════════
 //  FILTER WIRING
@@ -579,8 +598,12 @@ document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
   if(e.key==='ArrowRight'||e.key==='n') document.getElementById('next-btn').click();
   if(e.key==='ArrowLeft' ||e.key==='p') document.getElementById('prev-btn').click();
-  if(e.key===' '){ e.preventDefault(); video.paused?video.play():video.pause(); }
+  if(e.key===' '){ e.preventDefault(); document.getElementById('play-pause-btn').click(); }
   if(e.key==='l') document.getElementById('loop-btn').click();
+  if(e.key==='[') document.getElementById('back3-btn').click();
+  if(e.key===']') document.getElementById('fwd3-btn').click();
+  if(e.key===',') document.getElementById('frame-back-btn').click();
+  if(e.key==='.') document.getElementById('frame-fwd-btn').click();
 });
 
 init();
