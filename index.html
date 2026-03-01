@@ -672,6 +672,11 @@ document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.st
 document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
 // Frame step + hold-to-slow-motion
 let fHoldTimeout = null, fHoldActive = false, fPreMuted = false;
+let sPreMuted = false; // mute state saved before entering slow-mo
+
+function syncMuteBtn() {
+  document.getElementById('mute-btn').textContent = video.muted ? '🔇' : '🔊';
+}
 
 function stopFrameHold() {
   clearTimeout(fHoldTimeout); fHoldTimeout = null;
@@ -680,16 +685,23 @@ function stopFrameHold() {
   if(sloMoActive){ video.playbackRate=0.5; }
   else { video.playbackRate=1; video.pause(); }
   video.muted = fPreMuted;          // restore whatever the user had set
+  syncMuteBtn();
 }
 
 document.getElementById('frame-fwd-btn').addEventListener('mousedown', ()=>{
   if(video.style.display==='none') return;
+  if(sloMoActive) {
+    // In slow-mo: just step forward, no pause/hold needed
+    video.currentTime = Math.min(video.duration||0, video.currentTime + 1/30);
+    return;
+  }
   video.pause();
   video.currentTime = Math.min(video.duration||0, video.currentTime + 1/30);
   fHoldTimeout = setTimeout(()=>{
     fHoldActive = true;
     fPreMuted = video.muted;        // save current mute state before overriding
     video.muted = true; video.playbackRate = 0.15; video.play().catch(()=>{});
+    syncMuteBtn();
   }, 500);
 });
 ['mouseup','mouseleave','touchend'].forEach(ev=>{
@@ -701,14 +713,20 @@ document.getElementById('slomo-btn').addEventListener('click', ()=>{
   if(video.style.display==='none') return;
   sloMoActive=!sloMoActive;
   const btn=document.getElementById('slomo-btn');
-  if(sloMoActive){ video.muted=true;  video.playbackRate=0.5; video.play().catch(()=>{}); btn.classList.add('active-slomo'); }
-  else           { video.muted=false; video.playbackRate=1;                                btn.classList.remove('active-slomo'); }
+  if(sloMoActive){
+    sPreMuted = video.muted;        // save mute state before slow-mo overrides it
+    video.muted=true; video.playbackRate=0.5; video.play().catch(()=>{}); btn.classList.add('active-slomo');
+  } else {
+    video.muted=sPreMuted; video.playbackRate=1; btn.classList.remove('active-slomo');
+  }
+  syncMuteBtn();
 });
 // Any other ctrl-row button click resets slo-mo
 document.querySelector('.ctrl-row').addEventListener('click', e=>{
   if(sloMoActive && !e.target.closest('#slomo-btn')){
-    sloMoActive=false; video.playbackRate=1; video.muted=false;
+    sloMoActive=false; video.playbackRate=1; video.muted=sPreMuted;
     document.getElementById('slomo-btn').classList.remove('active-slomo');
+    syncMuteBtn();
   }
 }, true);
 video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸'; playOverlay.style.display='none'; });
