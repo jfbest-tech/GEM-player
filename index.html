@@ -136,8 +136,10 @@
   .ctrl-loop.active-loop, .ctrl-slomo.active-slomo { background:rgba(255,255,255,0.3) !important; border-color:#fff !important; }
   .ctrl-spacer { flex:1; }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex-shrink:0; }
-  #resize-handle { height:6px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; }
-  #resize-handle:hover, #resize-handle.dragging { background:var(--accent); }
+  #resize-handle { height:8px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; }
+  #resize-handle:hover, #resize-handle.dragging { background:var(--navy-light); }
+  #resize-handle::after { content:'⌃⌄'; font-size:7px; line-height:1; letter-spacing:-2px; color:var(--text-mute); opacity:0.45; pointer-events:none; }
+  #resize-handle:hover::after, #resize-handle.dragging::after { opacity:0.85; }
 
   /* PSM tags */
   .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; }
@@ -182,14 +184,30 @@
     <div class="section-title">Goalie</div>
     <div id="f-goalie" class="px-3 pb-2 flex flex-col gap-1"></div>
 
-    <div class="section-title">Shot Quality</div>
-    <div class="px-3 pb-3 flex gap-1 flex-wrap">
-      <span class="chip chip-r" data-f="ryg" data-v="R">LowQ</span>
-      <span class="chip chip-y" data-f="ryg" data-v="Y">MidQ</span>
-      <span class="chip chip-g" data-f="ryg" data-v="G">GrA</span>
+    <div class="section-title">Period</div>
+    <div class="px-3 pb-3 flex gap-1">
+      <span class="chip chip-b" data-f="period" data-v="1">P1</span>
+      <span class="chip chip-b" data-f="period" data-v="2">P2</span>
+      <span class="chip chip-b" data-f="period" data-v="3">P3</span>
     </div>
 
-    <div class="section-title">Result</div>
+    <div class="section-title">Attack Type</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-attackType"><option value="">All types</option></select></div>
+
+    <div class="section-title">PSM Filter</div>
+    <div class="px-3 pb-3 flex flex-col gap-1">
+      <div class="psm-lbl">Move 1 (PSM1)</div>
+      <select class="sel" id="f-psm0"><option value="">Any</option></select>
+      <div class="psm-lbl">Move 2 (PSM2)</div>
+      <select class="sel" id="f-psm1"><option value="">Any</option></select>
+      <div class="psm-lbl">Move 3 (PSM3)</div>
+      <select class="sel" id="f-psm2"><option value="">Any</option></select>
+    </div>
+
+    <div class="section-title">Save Technique</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
+
+    <div class="section-title">Save / Goal</div>
     <div class="px-3 pb-1 flex gap-1">
       <span class="chip chip-b" data-f="save" data-v="Y">Save</span>
       <span class="chip chip-b" data-f="goal" data-v="Y">Goal</span>
@@ -202,18 +220,23 @@
       </select>
     </div>
 
-    <div class="section-title">Period</div>
-    <div class="px-3 pb-3 flex gap-1">
-      <span class="chip chip-b" data-f="period" data-v="1">P1</span>
-      <span class="chip chip-b" data-f="period" data-v="2">P2</span>
-      <span class="chip chip-b" data-f="period" data-v="3">P3</span>
+    <div class="section-title">Rebound</div>
+    <div class="px-3 pb-3 flex flex-col gap-1">
+      <span class="chip chip-b" data-f="rebCreated"  data-v="Y">Rebound Created</span>
+      <span class="chip chip-b mt-1" data-f="rebAttacked" data-v="Y">Rebound Attacked</span>
+    </div>
+
+    <div style="height:1px; background:var(--navy-border); margin:4px 12px 8px;"></div>
+
+    <div class="section-title">Shot Quality</div>
+    <div class="px-3 pb-3 flex gap-1 flex-wrap">
+      <span class="chip chip-r" data-f="ryg" data-v="R">LowQ</span>
+      <span class="chip chip-y" data-f="ryg" data-v="Y">MidQ</span>
+      <span class="chip chip-g" data-f="ryg" data-v="G">GrA</span>
     </div>
 
     <div class="section-title">Strength</div>
     <div class="px-3 pb-3"><select class="sel" id="f-strength"><option value="">All strengths</option></select></div>
-
-    <div class="section-title">Attack Type</div>
-    <div id="f-attackType" class="px-3 pb-2 flex flex-col gap-1"></div>
 
     <div class="section-title">OZP Pattern</div>
     <div class="px-3 pb-3"><select class="sel" id="f-ozpPattern"><option value="">All patterns</option></select></div>
@@ -231,25 +254,6 @@
     <div class="px-3 pb-3 flex gap-1">
       <span class="chip chip-b" data-f="screen" data-v="Y">Yes</span>
       <span class="chip chip-b" data-f="screen" data-v="N">No</span>
-    </div>
-
-    <div class="section-title">PSM Filter</div>
-    <div class="px-3 pb-3 flex flex-col gap-1">
-      <div class="psm-lbl">Move 1 (PSM1)</div>
-      <select class="sel" id="f-psm0"><option value="">Any</option></select>
-      <div class="psm-lbl">Move 2 (PSM2)</div>
-      <select class="sel" id="f-psm1"><option value="">Any</option></select>
-      <div class="psm-lbl">Move 3 (PSM3)</div>
-      <select class="sel" id="f-psm2"><option value="">Any</option></select>
-    </div>
-
-    <div class="section-title">Save Technique</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
-
-    <div class="section-title">Rebound</div>
-    <div class="px-3 pb-3 flex flex-col gap-1">
-      <span class="chip chip-b" data-f="rebCreated"  data-v="Y">Rebound Created</span>
-      <span class="chip chip-b mt-1" data-f="rebAttacked" data-v="Y">Rebound Attacked</span>
     </div>
 
     <div class="section-title">Game</div>
@@ -298,10 +302,10 @@
               <button class="ctrl-btn" id="prev-btn" title="Previous clip (←/P)">⏮</button>
               <button class="ctrl-btn" id="back3-btn" title="Back 3s ([)">−3s</button>
               <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶</button>
-              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame by Frame — hold for slow-mo (.)">Frame by Frame</button>
               <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (])">+3s</button>
               <button class="ctrl-btn" id="next-btn" title="Next clip (→/N)">⏭</button>
               <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow motion ½×">Slow-Mo</button>
+              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame by Frame — hold for slow-mo (.)">Frame by Frame</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
@@ -358,7 +362,7 @@ let currentIndex = -1, loopAllActive = false, sloMoActive = false;
 
 const filters = {
   goalie:new Set(), ryg:new Set(), period:new Set(),
-  strength:'', attackType:new Set(),
+  strength:'', attackType:'',
   save:null, goal:null, ph:null, goalQual:'',
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
   screen:null, psm0:'', psm1:'', psm2:'', svTech:'',
@@ -427,7 +431,7 @@ function fillSel(id, values) {
 function buildFilters() {
   cbGroup('f-goalie',     'goalie',     unique('goalie'));
   fillSel('f-strength',   unique('strength'));
-  cbGroup('f-attackType', 'attackType', unique('attackType'));
+  fillSel('f-attackType', unique('attackType'));
   fillSel('f-ozpPattern',  unique('ozpPattern'));
   fillSel('f-rushType',    unique('rushType'));
   fillSel('f-shotLocation',unique('shotLocation'));
@@ -439,7 +443,10 @@ function buildFilters() {
   const ge = document.getElementById('f-game');
   unique('game').forEach(g => {
     const o = document.createElement('option'); o.value=g;
-    o.textContent = g.replace(/(\d+\.\d+\.\d+)_/,'').replace('_',' ');
+    const m = g.match(/^(\d+)\.(\d+)\.\d+_(.+)$/);
+    const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const label = m ? `${months[+m[1]]} ${+m[2]} vs ${m[3]}` : g;
+    o.textContent = label; o.dataset.base = label;
     ge.appendChild(o);
   });
 }
@@ -453,7 +460,7 @@ function applyFilters() {
     if(filters.ryg.size        && !filters.ryg.has(r.ryg))                return false;
     if(filters.period.size     && !filters.period.has(String(r.period)))  return false;
     if(filters.strength        && r.strength!==filters.strength)           return false;
-    if(filters.attackType.size && !filters.attackType.has(r.attackType))  return false;
+    if(filters.attackType      && r.attackType!==filters.attackType)       return false;
     if(filters.save            && r.save!==filters.save)                   return false;
     if(filters.goal            && r.goal!==filters.goal)                   return false;
     if(filters.ph              && !r.phType)                               return false;
@@ -499,6 +506,7 @@ function updateStats() {
 }
 
 function updatePsmCounts() {
+  // PSM dropdowns
   [[0,'f-psm0'],[1,'f-psm1'],[2,'f-psm2']].forEach(([idx,id])=>{
     const sel = document.getElementById(id);
     Array.from(sel.options).forEach(opt=>{
@@ -506,6 +514,26 @@ function updatePsmCounts() {
       const n = filteredData.filter(r=>(r.psm||[])[idx]===opt.value).length;
       opt.textContent = `${opt.value} (${n})`;
     });
+  });
+  // Simple field dropdowns (value === base label)
+  [['f-attackType',r=>r.attackType],['f-svTech',r=>r.svTech],
+   ['f-strength',r=>r.strength],['f-ozpPattern',r=>r.ozpPattern],
+   ['f-rushType',r=>r.rushType],['f-shotLocation',r=>r.shotLocation],
+   ['f-shotTech',r=>r.shotTech]
+  ].forEach(([id,fn])=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    Array.from(sel.options).forEach(opt=>{
+      if(!opt.value) return;
+      const n=filteredData.filter(r=>fn(r)===opt.value).length;
+      opt.textContent=`${opt.value} (${n})`;
+    });
+  });
+  // Game dropdown (formatted label stored in data-base)
+  const gSel=document.getElementById('f-game');
+  Array.from(gSel.options).forEach(opt=>{
+    if(!opt.value) return;
+    const n=filteredData.filter(r=>r.game===opt.value).length;
+    opt.textContent=`${opt.dataset.base||opt.value} (${n})`;
   });
 }
 
@@ -575,11 +603,10 @@ function selectClip(idx) {
 }
 
 function loadClip(r, autoplay=true) {
-  // Build clip label: PSM sequence + save technique
-  const psmStr = (r.psm||[]).join(' → ') || '';
-  const svStr  = r.svTech || '';
-  const labelParts = [psmStr, svStr].filter(Boolean);
-  document.getElementById('vid-clip-text').textContent = labelParts.join('  |  ');
+  // Build clip label: Type → PSMs → Save Tech
+  const parts = [r.attackType||r.phType, ...(r.psm||[]), r.svTech].filter(Boolean);
+  document.getElementById('vid-clip-text').textContent = parts.join(' → ');
+  document.getElementById('vid-clip-label').style.display = 'flex';
 
   if(!CLIP_BASE_URL){ showNoVid('Configure CLIP_BASE_URL to enable video playback'); return; }
   if(r.fileClock==null){ showNoVid('No timestamp recorded for this sequence'); return; }
@@ -588,7 +615,6 @@ function loadClip(r, autoplay=true) {
 
 function showVideo(url, autoplay=true) {
   noVid.style.display='none'; video.style.display='block';
-  document.getElementById('vid-clip-label').style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
     video.addEventListener('loadedmetadata', ()=>{ video.currentTime=15; if(autoplay) video.play().catch(()=>{}); }, {once:true});
@@ -598,7 +624,6 @@ function showVideo(url, autoplay=true) {
 }
 function showNoVid(msg) {
   video.style.display='none'; noVid.style.display='flex'; noTxt.textContent=msg;
-  document.getElementById('vid-clip-label').style.display='none';
 }
 
 video.addEventListener('ended', ()=>{
@@ -721,7 +746,7 @@ document.getElementById('dl-btn').addEventListener('click', async ()=>{
 document.querySelectorAll('.chip[data-f]').forEach(chip=>{
   chip.addEventListener('click',()=>{
     const f=chip.dataset.f, v=chip.dataset.v;
-    if(['ryg','period','attackType'].includes(f)){
+    if(['ryg','period'].includes(f)){
       chip.classList.toggle('on');
       filters[f].has(v)?filters[f].delete(v):filters[f].add(v);
     } else {
@@ -743,7 +768,7 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
   applyFilters();
 });
 
-[['f-strength','strength'],['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
+[['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
  ['f-shotTech','shotTech'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],
  ['f-svTech','svTech'],['f-game','game']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
@@ -757,7 +782,7 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   });
   // reset null fields properly
   ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
-  ['goalQual','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','svTech','game'].forEach(k=>filters[k]='');
+  ['goalQual','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','svTech','game'].forEach(k=>filters[k]='');
   filters.hasClip=false;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>c.checked=false);
