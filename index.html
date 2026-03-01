@@ -12,8 +12,8 @@
     --navy-mid:    #f2f2f2;
     --navy-light:  #e8e8e8;
     --navy-border: #d5d5d5;
-    --accent:      #2563eb;
-    --accent-dim:  #93b4f0;
+    --accent:      #0c2461;
+    --accent-dim:  #4a70c8;
     --text:        #111111;
     --text-dim:    #444444;
     --text-mute:   #888888;
@@ -34,10 +34,10 @@
   .chip-r.on { background:#888; color:#fff; border-color:#888; }
   .chip-y { background:#ebebeb; color:#555; border-color:#ccc; }
   .chip-y.on { background:#555; color:#fff; border-color:#555; }
-  .chip-g { background:#eff4fe; color:#1d4ed8; border-color:#93c4f8; }
-  .chip-g.on { background:#2563eb; color:#fff; border-color:#2563eb; }
+  .chip-g { background:#eff4fe; color:#0c2461; border-color:#93c4f8; }
+  .chip-g.on { background:#0c2461; color:#fff; border-color:#0c2461; }
   .chip-b { background:#ececec; color:#444; border-color:#d0d0d0; }
-  .chip-b.on { background:#2563eb; color:#fff; border-color:#2563eb; }
+  .chip-b.on { background:#0c2461; color:#fff; border-color:#0c2461; }
 
   /* SELECT */
   select.sel {
@@ -57,37 +57,37 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 130px 58px 48px 95px 1fr 62px;
+    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 130px 58px 48px 95px 1fr 62px;
+    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
   .seq-row:hover { background:#eef4ff; }
-  .seq-row.active { background:#dbeafe; border-left:3px solid #2563eb; padding-left:7px; }
+  .seq-row.active { background:#dbeafe; border-left:3px solid #0c2461; padding-left:7px; }
   .seq-row:nth-child(even) { background:var(--navy); }
   .seq-row:nth-child(even):hover { background:#eef4ff; }
   .seq-row.active:nth-child(even) { background:#dbeafe; }
 
   /* Quality dot */
   .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-  .dot-R { background:#aaaaaa; } .dot-Y { background:#666666; } .dot-G { background:#2563eb; }
+  .dot-R { background:#aaaaaa; } .dot-Y { background:#666666; } .dot-G { background:#0c2461; }
 
   /* Badges */
   .badge { font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }
-  .b-goal { background:#fee2e2; color:#b91c1c; border:1px solid #fca5a5; }
-  .b-save { background:#dcfce7; color:#15803d; border:1px solid #86efac; }
+  .b-goal { background:#4b5563; color:#f3f4f6; border:1px solid #374151; }
+  .b-save { background:#bfdbfe; color:#0c2461; border:1px solid #93c5fd; }
   .b-ph   { background:#f3f4f6; color:#555; border:1px solid #d1d5db; }
 
   /* Video wrapper + overlay controls */
-  .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; min-height:calc(60vh - 80px); }
+  .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; min-height:calc(60vh - 80px); border-left:3px solid var(--accent); border-right:3px solid var(--accent); }
   .vid-wrap video { width:100%; height:calc(60vh - 80px); max-height:calc(60vh - 80px); display:block; object-fit:contain; }
-  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; }
+  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
   .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
   .no-vid { background:#1a1a1a; border:1px dashed #444; border-radius:8px; line-height:1.5; color:#888; }
   .vid-clip-label {
@@ -95,9 +95,13 @@
     background:rgba(0,0,0,0.62); backdrop-filter:blur(4px);
     color:#dde3ec; font-size:0.78rem; font-weight:700;
     padding:5px 13px; border-radius:5px; letter-spacing:0.01em;
-    max-width:60%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    pointer-events:none; display:none;
+    max-width:60%; pointer-events:none; display:none;
+    align-items:center; gap:7px;
   }
+  .vid-clip-label span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .vid-clip-logo { display:none; height:1em; width:auto; flex-shrink:0; }
+  .vid-wrap:fullscreen .vid-clip-logo,
+  .vid-wrap:-webkit-full-screen .vid-clip-logo { display:block; }
 
   /* Overlay — always visible */
   .vid-controls {
@@ -161,14 +165,14 @@
       <span style="color:var(--text-mute); font-size:0.72rem; margin-left:6px;">Goalie Efficiency Model</span>
     </div>
   </div>
-  <button class="btn" id="clear-btn">Clear Filters</button>
 </div>
 
 <!-- ═══ BODY ═══ -->
 <div class="flex flex-1 overflow-hidden">
 
   <!-- ── SIDEBAR ── -->
-  <div class="sidebar flex-shrink-0 overflow-y-auto">
+  <div class="sidebar flex-shrink-0 flex flex-col" style="overflow:hidden">
+  <div class="flex-1 overflow-y-auto">
 
     <div class="section-title">Goalie</div>
     <div id="f-goalie" class="px-3 pb-2 flex flex-col gap-1"></div>
@@ -200,7 +204,7 @@
     </div>
 
     <div class="section-title">Strength</div>
-    <div id="f-strength" class="px-3 pb-2 flex flex-col gap-1"></div>
+    <div class="px-3 pb-3"><select class="sel" id="f-strength"><option value="">All strengths</option></select></div>
 
     <div class="section-title">Attack Type</div>
     <div id="f-attackType" class="px-3 pb-2 flex flex-col gap-1"></div>
@@ -249,6 +253,10 @@
       <label class="cb-lbl"><input type="checkbox" id="f-hasClip"> Has video only</label>
     </div>
 
+  </div><!-- /scroll -->
+  <div class="flex-shrink-0 px-3 py-2" style="border-top:1px solid var(--navy-border);">
+    <button class="btn" id="clear-btn" style="width:100%;">Clear Filters</button>
+  </div>
   </div><!-- /sidebar -->
 
   <!-- ── MAIN AREA ── -->
@@ -269,12 +277,15 @@
       <!-- Video + overlay controls -->
       <div class="p-3 pb-0">
         <div class="vid-wrap" id="vid-wrap">
-          <video id="player" style="display:none;" loop></video>
+          <video id="player" style="display:none;"></video>
           <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:calc(60vh - 80px); color:var(--text-mute);">
             <div style="font-size:2rem; margin-bottom:8px;">▶</div>
             <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
           </div>
-          <div class="vid-clip-label" id="vid-clip-label"></div>
+          <div class="vid-clip-label" id="vid-clip-label">
+            <img class="vid-clip-logo" src="SPA_Logo-1 - Square Favicon.png" alt="">
+            <span id="vid-clip-text"></span>
+          </div>
           <div class="vid-controls" id="vid-controls">
             <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
             <div class="ctrl-row">
@@ -307,11 +318,6 @@
         <div id="m-psm" class="flex flex-wrap gap-1 mt-1"></div>
       </div>
 
-      <div id="nav-info" class="hidden px-3 pb-2 text-center" style="font-size:0.65rem; color:var(--text-mute);">
-        Clip <span id="nav-cur"></span> of <span id="nav-tot"></span>
-        &nbsp;&middot;&nbsp; <span id="nav-game"></span>
-      </div>
-
     </div><!-- /vpanel -->
 
     <!-- SEQUENCE LIST -->
@@ -322,18 +328,17 @@
         <span></span>
         <span>Goalie</span>
         <span>Game</span>
-        <span>Strength</span>
         <span>Type</span>
         <span>PSM Sequence</span>
         <span>Result</span>
       </div>
 
-      <!-- Stats row -->
-      <div id="stats-row" class="flex items-center gap-4 px-3 py-1 flex-shrink-0"
-           style="background:var(--navy-mid); border-bottom:1px solid var(--navy-border); font-size:0.65rem; color:var(--text-mute);">
-      </div>
-
       <div id="seq-list" class="flex-1 overflow-y-auto"></div>
+
+      <!-- Stats row — fixed at bottom -->
+      <div id="stats-row" class="flex items-center gap-4 px-3 py-1 flex-shrink-0"
+           style="background:var(--navy-mid); border-top:1px solid var(--navy-border); font-size:0.65rem; color:var(--text-mute);">
+      </div>
     </div>
 
   </div><!-- /main area -->
@@ -356,7 +361,7 @@ let currentIndex = -1, loopAllActive = false;
 
 const filters = {
   goalie:new Set(), ryg:new Set(), period:new Set(),
-  strength:new Set(), attackType:new Set(),
+  strength:'', attackType:new Set(),
   save:null, goal:null, goalQual:'',
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
   screen:null, psm0:'', psm1:'', psm2:'', svTech:'',
@@ -424,7 +429,7 @@ function fillSel(id, values) {
 
 function buildFilters() {
   cbGroup('f-goalie',     'goalie',     unique('goalie'));
-  cbGroup('f-strength',   'strength',   unique('strength'));
+  fillSel('f-strength',   unique('strength'));
   cbGroup('f-attackType', 'attackType', unique('attackType'));
   fillSel('f-ozpPattern',  unique('ozpPattern'));
   fillSel('f-rushType',    unique('rushType'));
@@ -450,7 +455,7 @@ function applyFilters() {
     if(filters.goalie.size     && !filters.goalie.has(r.goalie))          return false;
     if(filters.ryg.size        && !filters.ryg.has(r.ryg))                return false;
     if(filters.period.size     && !filters.period.has(String(r.period)))  return false;
-    if(filters.strength.size   && !filters.strength.has(r.strength))      return false;
+    if(filters.strength        && r.strength!==filters.strength)           return false;
     if(filters.attackType.size && !filters.attackType.has(r.attackType))  return false;
     if(filters.save            && r.save!==filters.save)                   return false;
     if(filters.goal            && r.goal!==filters.goal)                   return false;
@@ -487,7 +492,7 @@ function updateStats() {
     ? `<span>${t} sequences</span>
        <span style="color:#999">&#9679; LowQ: ${R}</span>
        <span style="color:#555">&#9679; MidQ: ${Y}</span>
-       <span style="color:#2563eb">&#9679; GrA: ${G}</span>
+       <span style="color:#0c2461">&#9679; GrA: ${G}</span>
        <span style="color:var(--text-mute)">&#9654; ${v} with video</span>`
     : '';
 }
@@ -525,10 +530,9 @@ function renderList() {
       <span class="${dc}"></span>
       <span style="color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px;">${r.goalie||'—'}</span>
       <span style="color:var(--text-dim); font-size:11px;">${opp} P${r.period||'?'}</span>
-      <span style="color:var(--text-mute); font-size:11px;">${r.strength||'—'}</span>
       <span style="color:var(--text-dim); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
-      <span style="font-size:11px;">${res} ${has?'<span style="color:#2563eb;font-size:0.65rem;">▶</span>':''}</span>
+      <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶</span>':''}</span>
     `;
     row.addEventListener('click', ()=>selectClip(i));
     list.appendChild(row);
@@ -550,10 +554,6 @@ function selectClip(idx) {
   if(activeRow) activeRow.scrollIntoView({block:'start', behavior:'smooth'});
 
   const r = filteredData[idx];
-  document.getElementById('nav-info').classList.remove('hidden');
-  document.getElementById('nav-cur').textContent = idx+1;
-  document.getElementById('nav-tot').textContent = filteredData.length;
-  document.getElementById('nav-game').textContent = (r.game||'').replace('_',' vs ');
   loadClip(r);
 }
 
@@ -576,7 +576,7 @@ function loadClip(r) {
   const psmStr = (r.psm||[]).join(' → ') || '';
   const svStr  = r.svTech || '';
   const labelParts = [psmStr, svStr].filter(Boolean);
-  document.getElementById('vid-clip-label').textContent = labelParts.join('  |  ');
+  document.getElementById('vid-clip-text').textContent = labelParts.join('  |  ');
 
   if(!CLIP_BASE_URL){ showNoVid('Configure CLIP_BASE_URL to enable video playback'); return; }
   if(r.fileClock==null){ showNoVid('No timestamp recorded for this sequence'); return; }
@@ -585,12 +585,12 @@ function loadClip(r) {
 
 function showVideo(url) {
   noVid.style.display='none'; video.style.display='block';
-  document.getElementById('vid-clip-label').style.display='block';
+  document.getElementById('vid-clip-label').style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
     video.addEventListener('loadedmetadata', ()=>{ video.currentTime=15; video.play().catch(()=>{}); }, {once:true});
   } else {
-    video.play().catch(()=>{});
+    video.currentTime=15; video.play().catch(()=>{});
   }
 }
 function showNoVid(msg) {
@@ -598,7 +598,10 @@ function showNoVid(msg) {
   document.getElementById('vid-clip-label').style.display='none';
 }
 
-video.addEventListener('ended', ()=>{ if(loopAllActive){ selectClip((currentIndex+1)%filteredData.length); } });
+video.addEventListener('ended', ()=>{
+  if(loopAllActive){ selectClip((currentIndex+1)%filteredData.length); }
+  else { video.currentTime=15; video.play().catch(()=>{}); }
+});
 
 // ═══════════════════════════════════════════════════════════
 //  CONTROLS
@@ -642,10 +645,27 @@ document.getElementById('fullscreen-btn').addEventListener('click', ()=>{
 });
 document.addEventListener('fullscreenchange', ()=>{
   document.getElementById('fullscreen-btn').textContent = document.fullscreenElement ? '⊡' : '⛶';
+  updateControlsPadding();
 });
 document.addEventListener('webkitfullscreenchange', ()=>{
   document.getElementById('fullscreen-btn').textContent = document.webkitFullscreenElement ? '⊡' : '⛶';
+  updateControlsPadding();
 });
+
+function updateControlsPadding() {
+  const ctrl = document.getElementById('vid-controls');
+  const wrap = document.getElementById('vid-wrap');
+  if (document.fullscreenElement || document.webkitFullscreenElement || !video.videoWidth || video.style.display === 'none') {
+    ctrl.style.left = ''; ctrl.style.right = ''; return;
+  }
+  const ar = video.videoWidth / video.videoHeight;
+  const side = wrap.clientWidth / wrap.clientHeight > ar
+    ? Math.round((wrap.clientWidth - wrap.clientHeight * ar) / 2) : 0;
+  ctrl.style.left = side + 'px';
+  ctrl.style.right = side + 'px';
+}
+video.addEventListener('loadedmetadata', updateControlsPadding);
+window.addEventListener('resize', updateControlsPadding);
 
 // Download
 document.getElementById('dl-btn').addEventListener('click', async ()=>{
@@ -666,7 +686,7 @@ document.getElementById('dl-btn').addEventListener('click', async ()=>{
 document.querySelectorAll('.chip[data-f]').forEach(chip=>{
   chip.addEventListener('click',()=>{
     const f=chip.dataset.f, v=chip.dataset.v;
-    if(['ryg','period','strength','attackType'].includes(f)){
+    if(['ryg','period','attackType'].includes(f)){
       chip.classList.toggle('on');
       filters[f].has(v)?filters[f].delete(v):filters[f].add(v);
     } else {
@@ -688,7 +708,7 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
   applyFilters();
 });
 
-[['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
+[['f-strength','strength'],['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
  ['f-shotTech','shotTech'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],
  ['f-svTech','svTech'],['f-game','game']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
