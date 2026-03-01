@@ -69,10 +69,10 @@
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
   .seq-row:hover { background:#eef4ff; }
-  .seq-row.active { background:#dbeafe; border-left:3px solid #0c2461; padding-left:7px; }
+  .seq-row.active { background:#d1d5db; border-left:3px solid #0c2461; padding-left:7px; }
   .seq-row:nth-child(even) { background:var(--navy); }
   .seq-row:nth-child(even):hover { background:#eef4ff; }
-  .seq-row.active:nth-child(even) { background:#dbeafe; }
+  .seq-row.active:nth-child(even) { background:#d1d5db; }
 
   /* Quality dot */
   .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
@@ -81,7 +81,7 @@
   /* Badges */
   .badge { font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }
   .b-goal { background:#4b5563; color:#f3f4f6; border:1px solid #374151; }
-  .b-save { background:#bfdbfe; color:#0c2461; border:1px solid #93c5fd; }
+  .b-save { background:#1d4ed8; color:#fff; border:1px solid #1e3a8a; }
   .b-ph   { background:#f3f4f6; color:#555; border:1px solid #d1d5db; }
 
   /* Video wrapper + overlay controls */
@@ -137,6 +137,7 @@
 
   /* PSM tags */
   .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; }
+  .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #9ab0d0; }
 
   /* Buttons (header only) */
   .btn { padding:5px 14px; border-radius:5px; font-size:0.72rem; font-weight:600; cursor:pointer; border:1px solid var(--navy-border); color:var(--text-dim); background:#fff; transition:all .12s; }
@@ -477,6 +478,7 @@ function applyFilters() {
   });
   renderList();
   updateStats();
+  updatePsmCounts();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -495,6 +497,17 @@ function updateStats() {
        <span style="color:#0c2461">&#9679; GrA: ${G}</span>
        <span style="color:var(--text-mute)">&#9654; ${v} with video</span>`
     : '';
+}
+
+function updatePsmCounts() {
+  [[0,'f-psm0'],[1,'f-psm1'],[2,'f-psm2']].forEach(([idx,id])=>{
+    const sel = document.getElementById(id);
+    Array.from(sel.options).forEach(opt=>{
+      if(!opt.value) return;
+      const n = filteredData.filter(r=>(r.psm||[])[idx]===opt.value).length;
+      opt.textContent = `${opt.value} (${n})`;
+    });
+  });
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -518,9 +531,10 @@ function renderList() {
     const dc   = `dot dot-${r.ryg||'R'}`;
     const opp  = (r.game||'').replace(/^\d+\.\d+\.\d+_/,'');
     const psmArr = r.psm||[];
-    const psmHtml = psmArr.length
+    let psmHtml = psmArr.length
       ? psmArr.map(p=>`<span class="psm">${p}</span>`).join('<span style="color:#aaa;padding:0 2px;">→</span>')
       : '<span style="color:var(--text-mute)">—</span>';
+    if(r.svTech) psmHtml += `<span style="color:#aaa;padding:0 2px;">→</span><span class="psm-sv">${r.svTech}</span>`;
     const res  = r.goal==='Y'
       ? `<span class="badge b-goal">GOAL</span>`
       : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
