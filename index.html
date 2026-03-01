@@ -19,7 +19,7 @@
     --text-mute:   #888888;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
+  body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; padding-left: 24px; padding-right: 24px; }
 
   /* HEADER */
   .header { background: #ffffff; border-bottom: 1px solid var(--navy-border); }
@@ -57,14 +57,14 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
+    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 75px 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
+    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 75px 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
@@ -81,7 +81,7 @@
   /* Badges */
   .badge { font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }
   .b-goal { background:#4b5563; color:#f3f4f6; border:1px solid #374151; }
-  .b-save { background:#1d4ed8; color:#fff; border:1px solid #1e3a8a; }
+  .b-save { background:#0c2461; color:#fff; border:1px solid #0a1d4e; }
   .b-ph   { background:#f3f4f6; color:#555; border:1px solid #d1d5db; }
 
   /* Video wrapper + overlay controls */
@@ -131,7 +131,7 @@
     flex-shrink:0;
   }
   .ctrl-btn:hover { background:rgba(255,255,255,0.26); border-color:rgba(255,255,255,0.42); }
-  .ctrl-loop.active-loop { background:rgba(255,255,255,0.3) !important; border-color:#fff !important; }
+  .ctrl-loop.active-loop, .ctrl-slomo.active-slomo { background:rgba(255,255,255,0.3) !important; border-color:#fff !important; }
   .ctrl-spacer { flex:1; }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex-shrink:0; }
 
@@ -189,6 +189,7 @@
     <div class="px-3 pb-1 flex gap-1">
       <span class="chip chip-b" data-f="save" data-v="Y">Save</span>
       <span class="chip chip-b" data-f="goal" data-v="Y">Goal</span>
+      <span class="chip chip-b" data-f="ph" data-v="Y">PH</span>
     </div>
     <div class="px-3 pb-3 mt-2">
       <select class="sel" id="f-goalQual">
@@ -292,11 +293,12 @@
             <div class="ctrl-row">
               <button class="ctrl-btn" id="prev-btn" title="Previous clip (←/P)">⏮</button>
               <button class="ctrl-btn" id="back3-btn" title="Back 3s ([)">−3s</button>
-              <button class="ctrl-btn" id="frame-back-btn" title="Frame back (,)">◁</button>
+              <button class="ctrl-btn" id="frame-back-btn" title="Frame back — hold for slow-mo (,)">|◁</button>
               <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶</button>
-              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame forward (.)">▷</button>
+              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame forward — hold for slow-mo (.)">▷|</button>
               <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (])">+3s</button>
               <button class="ctrl-btn" id="next-btn" title="Next clip (→/N)">⏭</button>
+              <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow motion ½×">½×</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
@@ -307,17 +309,6 @@
         </div>
       </div>
 
-      <!-- Clip info -->
-      <div id="clip-meta" class="px-3 py-2 hidden" style="border-top:1px solid var(--navy-border);">
-        <div class="flex items-center gap-2 flex-wrap" style="font-size:0.72rem;">
-          <span id="m-goalie" class="font-bold text-white"></span>
-          <span id="m-game" style="color:var(--text-mute);"></span>
-          <span id="m-ryg" class="dot"></span>
-          <span id="m-attack" style="color:var(--text-dim);"></span>
-          <span id="m-result" class="badge"></span>
-        </div>
-        <div id="m-psm" class="flex flex-wrap gap-1 mt-1"></div>
-      </div>
 
     </div><!-- /vpanel -->
 
@@ -330,7 +321,8 @@
         <span>Goalie</span>
         <span>Game</span>
         <span>Type</span>
-        <span>PSM Sequence</span>
+        <span>Pre-Save Movements</span>
+        <span>Save Tech</span>
         <span>Result</span>
       </div>
 
@@ -358,12 +350,12 @@ const CLIP_BASE_URL = 'https://pub-ae6606f2384f4e86b806f43ee755b3bf.r2.dev/';
 //  STATE
 // ═══════════════════════════════════════════════════════════
 let allData = [], filteredData = [];
-let currentIndex = -1, loopAllActive = false;
+let currentIndex = -1, loopAllActive = false, sloMoActive = false;
 
 const filters = {
   goalie:new Set(), ryg:new Set(), period:new Set(),
   strength:'', attackType:new Set(),
-  save:null, goal:null, goalQual:'',
+  save:null, goal:null, ph:null, goalQual:'',
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
   screen:null, psm0:'', psm1:'', psm2:'', svTech:'',
   rebCreated:null, rebAttacked:null,
@@ -460,6 +452,7 @@ function applyFilters() {
     if(filters.attackType.size && !filters.attackType.has(r.attackType))  return false;
     if(filters.save            && r.save!==filters.save)                   return false;
     if(filters.goal            && r.goal!==filters.goal)                   return false;
+    if(filters.ph              && !r.phType)                               return false;
     if(filters.goalQual        && r.goalQualitative!==filters.goalQual)   return false;
     if(filters.ozpPattern      && r.ozpPattern!==filters.ozpPattern)       return false;
     if(filters.rushType        && r.rushType!==filters.rushType)           return false;
@@ -476,9 +469,12 @@ function applyFilters() {
     if(filters.hasClip         && !hasClip(r))                             return false;
     return true;
   });
+  const preload = filteredData.length > 0 && video.style.display === 'none';
+  if(preload) currentIndex = 0;
   renderList();
   updateStats();
   updatePsmCounts();
+  if(preload) loadClip(filteredData[0], false);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -534,7 +530,6 @@ function renderList() {
     let psmHtml = psmArr.length
       ? psmArr.map(p=>`<span class="psm">${p}</span>`).join('<span style="color:#aaa;padding:0 2px;">→</span>')
       : '<span style="color:var(--text-mute)">—</span>';
-    if(r.svTech) psmHtml += `<span style="color:#aaa;padding:0 2px;">→</span><span class="psm-sv">${r.svTech}</span>`;
     const res  = r.goal==='Y'
       ? `<span class="badge b-goal">GOAL</span>`
       : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
@@ -546,6 +541,7 @@ function renderList() {
       <span style="color:var(--text-dim); font-size:11px;">${opp} P${r.period||'?'}</span>
       <span style="color:var(--text-dim); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
+      <span style="overflow:hidden;">${r.svTech?`<span class="psm-sv">${r.svTech}</span>`:''}</span>
       <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶</span>':''}</span>
     `;
     row.addEventListener('click', ()=>selectClip(i));
@@ -571,21 +567,7 @@ function selectClip(idx) {
   loadClip(r);
 }
 
-function loadClip(r) {
-  document.getElementById('clip-meta').classList.remove('hidden');
-  document.getElementById('m-goalie').textContent = r.goalie||'';
-  document.getElementById('m-game').textContent   = (r.game||'').replace('_',' vs ');
-  document.getElementById('m-ryg').className      = `dot dot-${r.ryg||'R'}`;
-  document.getElementById('m-attack').textContent = r.attackType||r.phType||'';
-  const rb = document.getElementById('m-result');
-  if(r.goal==='Y')     { rb.className='badge b-goal'; rb.textContent='GOAL'; }
-  else if(r.save==='Y'){ rb.className='badge b-save'; rb.textContent='SAVE'; }
-  else                 { rb.className=''; rb.textContent=''; }
-  document.getElementById('m-psm').innerHTML = (r.psm||[]).map((p,i)=>{
-    const d=(r.psmDir||[])[i]?` <span style="color:var(--text-dim)">${r.psmDir[i]}</span>`:'';
-    return `<span class="psm">${p}${d}</span>`;
-  }).join('');
-
+function loadClip(r, autoplay=true) {
   // Build clip label: PSM sequence + save technique
   const psmStr = (r.psm||[]).join(' → ') || '';
   const svStr  = r.svTech || '';
@@ -594,17 +576,17 @@ function loadClip(r) {
 
   if(!CLIP_BASE_URL){ showNoVid('Configure CLIP_BASE_URL to enable video playback'); return; }
   if(r.fileClock==null){ showNoVid('No timestamp recorded for this sequence'); return; }
-  showVideo(clipUrl(r));
+  showVideo(clipUrl(r), autoplay);
 }
 
-function showVideo(url) {
+function showVideo(url, autoplay=true) {
   noVid.style.display='none'; video.style.display='block';
   document.getElementById('vid-clip-label').style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
-    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=15; video.play().catch(()=>{}); }, {once:true});
+    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=15; if(autoplay) video.play().catch(()=>{}); }, {once:true});
   } else {
-    video.currentTime=15; video.play().catch(()=>{});
+    video.currentTime=15; if(autoplay) video.play().catch(()=>{});
   }
 }
 function showNoVid(msg) {
@@ -632,8 +614,48 @@ document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIn
 document.getElementById('play-pause-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
 document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.max(0,video.currentTime-3); });
 document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
-document.getElementById('frame-back-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.pause(); video.currentTime=Math.max(0,video.currentTime-1/30); } });
-document.getElementById('frame-fwd-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.pause(); video.currentTime=Math.min(video.duration||0,video.currentTime+1/30); } });
+// Frame step + hold-to-slow-motion
+let fHoldTimeout = null, fHoldInterval = null;
+
+function stopFrameHold() {
+  clearTimeout(fHoldTimeout); clearInterval(fHoldInterval);
+  fHoldTimeout = fHoldInterval = null;
+  if(sloMoActive){ video.playbackRate=0.5; }
+  else { video.playbackRate=1; video.pause(); }
+}
+
+document.getElementById('frame-back-btn').addEventListener('mousedown', ()=>{
+  if(video.style.display==='none') return;
+  video.pause(); video.currentTime=Math.max(0,video.currentTime-1/30);
+  fHoldTimeout=setTimeout(()=>{
+    fHoldInterval=setInterval(()=>{ video.currentTime=Math.max(0,video.currentTime-1/30); },80);
+  },400);
+});
+document.getElementById('frame-fwd-btn').addEventListener('mousedown', ()=>{
+  if(video.style.display==='none') return;
+  video.pause(); video.currentTime=Math.min(video.duration||0,video.currentTime+1/30);
+  fHoldTimeout=setTimeout(()=>{ video.playbackRate=0.15; video.play().catch(()=>{}); },400);
+});
+['mouseup','mouseleave','touchend'].forEach(ev=>{
+  document.getElementById('frame-back-btn').addEventListener(ev, ()=>{ if(fHoldTimeout||fHoldInterval) stopFrameHold(); });
+  document.getElementById('frame-fwd-btn').addEventListener(ev, ()=>{ if(fHoldTimeout||fHoldInterval) stopFrameHold(); });
+});
+
+// Slo-Mo toggle
+document.getElementById('slomo-btn').addEventListener('click', ()=>{
+  if(video.style.display==='none') return;
+  sloMoActive=!sloMoActive;
+  const btn=document.getElementById('slomo-btn');
+  if(sloMoActive){ video.playbackRate=0.5; video.play().catch(()=>{}); btn.classList.add('active-slomo'); }
+  else           { video.playbackRate=1;                                  btn.classList.remove('active-slomo'); }
+});
+// Any other ctrl-row button click resets slo-mo
+document.querySelector('.ctrl-row').addEventListener('click', e=>{
+  if(sloMoActive && !e.target.closest('#slomo-btn')){
+    sloMoActive=false; video.playbackRate=1;
+    document.getElementById('slomo-btn').classList.remove('active-slomo');
+  }
+}, true);
 video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸'; });
 video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶'; });
 
@@ -735,7 +757,7 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
     filters[k]=filters[k] instanceof Set?new Set():typeof filters[k]==='boolean'?false:null instanceof Object?null:'';
   });
   // reset null fields properly
-  ['save','goal','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
+  ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
   ['goalQual','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','svTech','game'].forEach(k=>filters[k]='');
   filters.hasClip=false;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
@@ -753,8 +775,8 @@ document.addEventListener('keydown',e=>{
   if(e.key==='l') document.getElementById('loop-btn').click();
   if(e.key==='[') document.getElementById('back3-btn').click();
   if(e.key===']') document.getElementById('fwd3-btn').click();
-  if(e.key===',') document.getElementById('frame-back-btn').click();
-  if(e.key==='.') document.getElementById('frame-fwd-btn').click();
+  if(e.key===',') document.getElementById('frame-back-btn').dispatchEvent(new MouseEvent('mousedown'));
+  if(e.key==='.') document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mousedown'));
 });
 
 init();
