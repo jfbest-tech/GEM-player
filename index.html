@@ -91,6 +91,21 @@
   .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
   .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
   .no-vid { background:#1a1a1a; border:1px dashed #444; border-radius:8px; line-height:1.5; color:#888; }
+  #play-overlay {
+    position:absolute; inset:0; z-index:10;
+    background:rgba(200,200,200,0.35);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  #play-overlay::after {
+    content:'▶';
+    font-size:3rem; color:#fff;
+    background:rgba(0,0,0,0.45);
+    width:72px; height:72px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    padding-left:6px;
+    box-shadow:0 2px 16px rgba(0,0,0,0.3);
+  }
   video::-webkit-media-controls-overlay-cast-button { display:none; }
   video::-webkit-media-controls-cast-button { display:none; }
   .vid-clip-label {
@@ -290,6 +305,7 @@
       <div class="p-3 pb-0">
         <div class="vid-wrap" id="vid-wrap">
           <video id="player" disableRemotePlayback style="display:none;"></video>
+          <div id="play-overlay" style="display:none;"></div>
           <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h); color:var(--text-mute);">
             <div style="font-size:2rem; margin-bottom:8px;">▶</div>
             <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
@@ -616,8 +632,10 @@ function loadClip(r, autoplay=true) {
   showVideo(clipUrl(r), autoplay);
 }
 
+const playOverlay = document.getElementById('play-overlay');
 function showVideo(url, autoplay=true) {
   noVid.style.display='none'; video.style.display='block';
+  if(!autoplay) playOverlay.style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
     video.addEventListener('loadedmetadata', ()=>{ video.currentTime=15; if(autoplay) video.play().catch(()=>{}); }, {once:true});
@@ -629,7 +647,9 @@ function showVideo(url, autoplay=true) {
 }
 function showNoVid(msg) {
   video.style.display='none'; noVid.style.display='flex'; noTxt.textContent=msg;
+  playOverlay.style.display='none';
 }
+playOverlay.addEventListener('click', ()=>{ video.play().catch(()=>{}); });
 
 video.addEventListener('ended', ()=>{
   const next = (currentIndex+1) % filteredData.length;
@@ -649,6 +669,7 @@ document.getElementById('loop-btn').addEventListener('click', ()=>{
 document.getElementById('prev-btn').addEventListener('click', ()=>{ if(currentIndex>0) selectClip(currentIndex-1); });
 document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIndex<filteredData.length-1) selectClip(currentIndex+1); });
 document.getElementById('play-pause-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
+document.getElementById('vid-wrap').addEventListener('click', e=>{ if(!e.target.closest('#vid-controls') && video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
 document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.max(0,video.currentTime-3); });
 document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
 // Frame step + hold-to-slow-motion
@@ -685,7 +706,7 @@ document.querySelector('.ctrl-row').addEventListener('click', e=>{
     document.getElementById('slomo-btn').classList.remove('active-slomo');
   }
 }, true);
-video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸'; });
+video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸'; playOverlay.style.display='none'; });
 video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶'; });
 
 // Progress bar + time display
