@@ -143,7 +143,7 @@
     flex-shrink:0; outline:none;
   }
   .ctrl-btn:hover { background:rgba(255,255,255,0.26); border-color:rgba(255,255,255,0.42); }
-  #frame-fwd-btn, #slomo-btn { width:auto; padding:0 10px; }
+  #slomo-btn { width:auto; padding:0 10px; }
   .ctrl-loop.active-loop, .ctrl-slomo.active-slomo { background:rgba(255,255,255,0.3) !important; border-color:#fff !important; }
   .ctrl-spacer { flex:1; }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex-shrink:0; }
@@ -319,7 +319,6 @@
               <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (Shift+→)">+3s</button>
               <button class="ctrl-btn" id="next-btn" title="Next clip (N)">⏭</button>
               <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
-              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame x Frame — hold for slow-mo (E)">Frame x Frame</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
               <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)">🔊</button>
@@ -670,48 +669,11 @@ document.getElementById('play-pause-btn').addEventListener('click', ()=>{ if(vid
 document.getElementById('vid-wrap').addEventListener('click', e=>{ if(!e.target.closest('#vid-controls') && video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
 document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.max(0,video.currentTime-3); });
 document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
-// Frame step + hold-to-slow-motion
-let fHoldTimeout = null, fHoldActive = false, fPreMuted = false;
 let sPreMuted = false; // mute state saved before entering slow-mo
 
 function syncMuteBtn() {
   document.getElementById('mute-btn').textContent = video.muted ? '🔇' : '🔊';
 }
-
-function stopFrameHold() {
-  clearTimeout(fHoldTimeout); fHoldTimeout = null;
-  if(!fHoldActive) return;          // quick tap — nothing to undo
-  fHoldActive = false;
-  if(sloMoActive){ video.playbackRate=0.5; }
-  else { video.playbackRate=1; video.pause(); }
-  video.muted = fPreMuted;          // restore whatever the user had set
-  syncMuteBtn();
-}
-
-document.getElementById('frame-fwd-btn').addEventListener('mousedown', ()=>{
-  if(video.style.display==='none') return;
-  if(sloMoActive) {
-    // In slow-mo: just step forward, no pause/hold needed
-    video.currentTime = Math.min(video.duration||0, video.currentTime + 1/30);
-    return;
-  }
-  const wasPlaying = !video.paused;
-  video.pause();
-  if(!wasPlaying) {
-    // Already paused: step forward one frame
-    video.currentTime = Math.min(video.duration||0, video.currentTime + 1/30);
-  }
-  // If transitioning from play: just pause cleanly on current frame — no seek lag
-  fHoldTimeout = setTimeout(()=>{
-    fHoldActive = true;
-    fPreMuted = video.muted;        // save current mute state before overriding
-    video.muted = true; video.playbackRate = 0.15; video.play().catch(()=>{});
-    syncMuteBtn();
-  }, 500);
-});
-['mouseup','mouseleave','touchend'].forEach(ev=>{
-  document.getElementById('frame-fwd-btn').addEventListener(ev, stopFrameHold);
-});
 
 // Slo-Mo toggle
 document.getElementById('slomo-btn').addEventListener('click', ()=>{
@@ -869,10 +831,8 @@ document.addEventListener('keydown',e=>{
   if(e.key==='m') document.getElementById('mute-btn').click();
   if(e.key==='ArrowLeft'  && e.shiftKey) document.getElementById('back3-btn').click();
   if(e.key==='ArrowRight' && e.shiftKey) document.getElementById('fwd3-btn').click();
-  if(e.key==='e' && !e.repeat) document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mousedown'));
 });
 document.addEventListener('keyup',e=>{
-  if(e.key==='e') document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mouseup'));
 });
 
 // ── Resizable video panel ──────────────────────────────────────────────────
