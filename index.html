@@ -99,7 +99,7 @@
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
   }
-  #play-overlay img { width:64px; height:64px; object-fit:contain; opacity:0.75; pointer-events:none; }
+  #play-overlay::after { content:'▶'; font-size:3.2rem; color:rgba(220,220,220,0.85); }
   video::-webkit-media-controls-overlay-cast-button { display:none; }
   video::-webkit-media-controls-cast-button { display:none; }
   .vid-clip-label {
@@ -302,9 +302,8 @@
       <div class="p-3 pb-0">
         <div class="vid-wrap" id="vid-wrap">
           <video id="player" disableRemotePlayback style="display:none;"></video>
-          <div id="play-overlay" style="display:none;"><img src="SPA_Logo-1 - Square Favicon.png" alt=""></div>
+          <div id="play-overlay" style="display:none;"></div>
           <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h); color:var(--text-mute);">
-            <div style="font-size:2rem; margin-bottom:8px;">▶</div>
             <div id="no-vid-text" style="font-size:0.78rem;">Select a Goalie</div>
           </div>
           <div class="vid-clip-label" id="vid-clip-label">
