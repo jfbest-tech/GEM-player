@@ -131,7 +131,7 @@
     transition:background 0.1s, border-color 0.1s;
     backdrop-filter:blur(6px);
     display:inline-flex; align-items:center; justify-content:center;
-    flex-shrink:0;
+    flex-shrink:0; outline:none;
   }
   .ctrl-btn:hover { background:rgba(255,255,255,0.26); border-color:rgba(255,255,255,0.42); }
   #frame-fwd-btn, #slomo-btn { width:auto; padding:0 10px; }
@@ -632,8 +632,8 @@ function showNoVid(msg) {
 }
 
 video.addEventListener('ended', ()=>{
-  if(loopAllActive){ selectClip((currentIndex+1)%filteredData.length); }
-  else { video.currentTime=15; video.play().catch(()=>{}); }
+  const next = (currentIndex+1) % filteredData.length;
+  selectClip(next);
 });
 
 // ═══════════════════════════════════════════════════════════
