@@ -17,9 +17,10 @@
     --text:        #111111;
     --text-dim:    #444444;
     --text-mute:   #888888;
+    --vid-h:       calc(60vh - 80px);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; padding-left: 24px; padding-right: 24px; }
+  body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; padding-left: 24px; padding-right: 24px; box-shadow: inset 12px 0 20px -4px rgba(0,0,0,0.25), inset -12px 0 20px -4px rgba(0,0,0,0.25); }
 
   /* HEADER */
   .header { background: #ffffff; border-bottom: 1px solid var(--navy-border); }
@@ -85,9 +86,9 @@
   .b-ph   { background:#f3f4f6; color:#555; border:1px solid #d1d5db; }
 
   /* Video wrapper + overlay controls */
-  .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; min-height:calc(60vh - 80px); border-left:3px solid #fff; border-right:3px solid #fff; box-shadow:-12px 0 24px rgba(0,0,0,0.4), 12px 0 24px rgba(0,0,0,0.4); }
-  .vid-wrap video { width:100%; height:calc(60vh - 80px); max-height:calc(60vh - 80px); display:block; object-fit:contain; }
-  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; box-shadow:none; }
+  .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; height:var(--vid-h); border-left:3px solid #fff; border-right:3px solid #fff; }
+  .vid-wrap video { width:100%; height:var(--vid-h); max-height:var(--vid-h); display:block; object-fit:contain; }
+  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
   .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
   .no-vid { background:#1a1a1a; border:1px dashed #444; border-radius:8px; line-height:1.5; color:#888; }
   .vid-clip-label {
@@ -131,9 +132,12 @@
     flex-shrink:0;
   }
   .ctrl-btn:hover { background:rgba(255,255,255,0.26); border-color:rgba(255,255,255,0.42); }
+  #frame-fwd-btn, #slomo-btn { width:auto; padding:0 10px; }
   .ctrl-loop.active-loop, .ctrl-slomo.active-slomo { background:rgba(255,255,255,0.3) !important; border-color:#fff !important; }
   .ctrl-spacer { flex:1; }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex-shrink:0; }
+  #resize-handle { height:6px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; }
+  #resize-handle:hover, #resize-handle.dragging { background:var(--accent); }
 
   /* PSM tags */
   .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; }
@@ -280,7 +284,7 @@
       <div class="p-3 pb-0">
         <div class="vid-wrap" id="vid-wrap">
           <video id="player" style="display:none;"></video>
-          <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:calc(60vh - 80px); color:var(--text-mute);">
+          <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h); color:var(--text-mute);">
             <div style="font-size:2rem; margin-bottom:8px;">▶</div>
             <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
           </div>
@@ -310,6 +314,8 @@
 
 
     </div><!-- /vpanel -->
+
+    <div id="resize-handle"></div>
 
     <!-- SEQUENCE LIST -->
     <div class="flex flex-col flex-1 overflow-hidden">
@@ -770,6 +776,37 @@ document.addEventListener('keydown',e=>{
   if(e.key===']') document.getElementById('fwd3-btn').click();
   if(e.key==='.') document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mousedown'));
 });
+
+// ── Resizable video panel ──────────────────────────────────────────────────
+(function(){
+  const handle = document.getElementById('resize-handle');
+  let dragging = false, startY = 0, startH = 0;
+
+  handle.addEventListener('mousedown', e => {
+    dragging = true;
+    startY = e.clientY;
+    startH = document.getElementById('vid-wrap').getBoundingClientRect().height;
+    handle.classList.add('dragging');
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const newH = Math.max(120, Math.min(window.innerHeight - 160, startH + (e.clientY - startY)));
+    document.documentElement.style.setProperty('--vid-h', newH + 'px');
+    updateControlsPadding();
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!dragging) return;
+    dragging = false;
+    handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+  });
+})();
 
 init();
 </script>
