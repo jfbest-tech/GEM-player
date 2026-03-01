@@ -43,8 +43,10 @@
   /* SELECT */
   select.sel {
     width:100%; background:#fff; border:1px solid var(--navy-border);
-    color:var(--text); border-radius:5px; padding:4px 7px; font-size:0.69rem; outline:none;
+    color:var(--text); border-radius:5px; padding:4px 24px 4px 7px; font-size:0.69rem; outline:none;
     -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 8px center;
   }
   select.sel:focus { border-color:var(--accent); }
 
@@ -148,10 +150,10 @@
   .ctrl-loop.active-loop, .ctrl-slomo.active-slomo { background:rgba(255,255,255,0.3) !important; border-color:#fff !important; }
   .ctrl-spacer { flex:1; }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex-shrink:0; }
-  #resize-handle { height:8px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; }
+  #resize-handle { height:10px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; }
   #resize-handle:hover, #resize-handle.dragging { background:var(--navy-light); }
-  #resize-handle::after { content:'⌃⌄'; font-size:7px; line-height:1; letter-spacing:-2px; color:var(--text-mute); opacity:0.45; pointer-events:none; }
-  #resize-handle:hover::after, #resize-handle.dragging::after { opacity:0.85; }
+  #resize-handle::after { content:'⌃⌄'; font-size:14px; line-height:1; letter-spacing:-3px; color:var(--text-dim); opacity:0.55; pointer-events:none; }
+  #resize-handle:hover::after, #resize-handle.dragging::after { opacity:1; color:var(--accent); }
 
   /* PSM tags */
   .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; }
@@ -197,10 +199,13 @@
     <div id="f-goalie" class="px-3 pb-2 flex flex-col gap-1"></div>
 
     <div class="section-title">Period</div>
-    <div class="px-3 pb-3 flex gap-1">
-      <span class="chip chip-b" data-f="period" data-v="1">P1</span>
-      <span class="chip chip-b" data-f="period" data-v="2">P2</span>
-      <span class="chip chip-b" data-f="period" data-v="3">P3</span>
+    <div class="px-3 pb-3">
+      <select class="sel" id="f-period">
+        <option value="">All periods</option>
+        <option value="1">P1</option>
+        <option value="2">P2</option>
+        <option value="3">P3</option>
+      </select>
     </div>
 
     <div class="section-title">Attack Type</div>
@@ -375,7 +380,7 @@ let allData = [], filteredData = [];
 let currentIndex = -1, loopAllActive = false, sloMoActive = false;
 
 const filters = {
-  goalie:new Set(), ryg:new Set(), period:new Set(),
+  goalie:new Set(), ryg:new Set(), period:'',
   strength:'', attackType:'',
   save:null, goal:null, ph:null, goalQual:'',
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
@@ -472,7 +477,7 @@ function applyFilters() {
   filteredData = allData.filter(r => {
     if(filters.goalie.size     && !filters.goalie.has(r.goalie))          return false;
     if(filters.ryg.size        && !filters.ryg.has(r.ryg))                return false;
-    if(filters.period.size     && !filters.period.has(String(r.period)))  return false;
+    if(filters.period          && String(r.period)!==filters.period)       return false;
     if(filters.strength        && r.strength!==filters.strength)           return false;
     if(filters.attackType      && r.attackType!==filters.attackType)       return false;
     if(filters.save            && r.save!==filters.save)                   return false;
@@ -780,7 +785,7 @@ document.getElementById('dl-btn').addEventListener('click', async ()=>{
 document.querySelectorAll('.chip[data-f]').forEach(chip=>{
   chip.addEventListener('click',()=>{
     const f=chip.dataset.f, v=chip.dataset.v;
-    if(['ryg','period'].includes(f)){
+    if(['ryg'].includes(f)){
       chip.classList.toggle('on');
       filters[f].has(v)?filters[f].delete(v):filters[f].add(v);
     } else {
@@ -802,7 +807,7 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
   applyFilters();
 });
 
-[['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
+[['f-period','period'],['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
  ['f-shotTech','shotTech'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],
  ['f-svTech','svTech'],['f-game','game']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
@@ -816,7 +821,7 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   });
   // reset null fields properly
   ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
-  ['goalQual','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','svTech','game'].forEach(k=>filters[k]='');
+  ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','svTech','game'].forEach(k=>filters[k]='');
   filters.hasClip=false;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>c.checked=false);
@@ -835,7 +840,10 @@ document.addEventListener('keydown',e=>{
   if(e.key==='m') document.getElementById('mute-btn').click();
   if(e.key==='ArrowLeft'  && e.shiftKey) document.getElementById('back3-btn').click();
   if(e.key==='ArrowRight' && e.shiftKey) document.getElementById('fwd3-btn').click();
-  if(e.key==='e') document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mousedown'));
+  if(e.key==='e' && !e.repeat) document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mousedown'));
+});
+document.addEventListener('keyup',e=>{
+  if(e.key==='e') document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mouseup'));
 });
 
 // ── Resizable video panel ──────────────────────────────────────────────────
