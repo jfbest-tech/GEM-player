@@ -673,22 +673,29 @@ document.getElementById('vid-wrap').addEventListener('click', e=>{ if(!e.target.
 document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.max(0,video.currentTime-3); });
 document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
 // Frame step + hold-to-slow-motion
-let fHoldTimeout = null, fHoldInterval = null;
+let fHoldTimeout = null, fHoldActive = false, fPreMuted = false;
 
 function stopFrameHold() {
-  clearTimeout(fHoldTimeout); clearInterval(fHoldInterval);
-  fHoldTimeout = fHoldInterval = null;
+  clearTimeout(fHoldTimeout); fHoldTimeout = null;
+  if(!fHoldActive) return;          // quick tap — nothing to undo
+  fHoldActive = false;
   if(sloMoActive){ video.playbackRate=0.5; }
-  else { video.playbackRate=1; video.pause(); video.muted=false; }
+  else { video.playbackRate=1; video.pause(); }
+  video.muted = fPreMuted;          // restore whatever the user had set
 }
 
 document.getElementById('frame-fwd-btn').addEventListener('mousedown', ()=>{
   if(video.style.display==='none') return;
-  video.muted=true; video.pause(); video.currentTime=Math.min(video.duration||0,video.currentTime+1/30);
-  fHoldTimeout=setTimeout(()=>{ video.playbackRate=0.15; video.play().catch(()=>{}); },400);
+  video.pause();
+  video.currentTime = Math.min(video.duration||0, video.currentTime + 1/30);
+  fHoldTimeout = setTimeout(()=>{
+    fHoldActive = true;
+    fPreMuted = video.muted;        // save current mute state before overriding
+    video.muted = true; video.playbackRate = 0.15; video.play().catch(()=>{});
+  }, 500);
 });
 ['mouseup','mouseleave','touchend'].forEach(ev=>{
-  document.getElementById('frame-fwd-btn').addEventListener(ev, ()=>{ if(fHoldTimeout||fHoldInterval) stopFrameHold(); });
+  document.getElementById('frame-fwd-btn').addEventListener(ev, stopFrameHold);
 });
 
 // Slo-Mo toggle
