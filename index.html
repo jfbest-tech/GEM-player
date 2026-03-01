@@ -7,16 +7,16 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   :root {
-    --navy-dark:   #0b0f2a;
-    --navy:        #111534;
-    --navy-mid:    #161b3e;
-    --navy-light:  #1c2349;
-    --navy-border: #252d5a;
+    --navy-dark:   #111111;
+    --navy:        #1a1a1a;
+    --navy-mid:    #202020;
+    --navy-light:  #282828;
+    --navy-border: #383838;
     --accent:      #a8b2c0;
     --accent-dim:  #6b7585;
     --text:        #e2e8f0;
     --text-dim:    #a8b2c0;
-    --text-mute:   #4a5260;
+    --text-mute:   #5a5a5a;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; }
@@ -30,12 +30,12 @@
 
   /* CHIPS */
   .chip { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:0.69rem; font-weight:600; cursor:pointer; user-select:none; border:1px solid transparent; transition:all .12s; }
-  .chip-r { background:#3d0a0a; color:#fca5a5; border-color:#5c1010; }
-  .chip-r.on { background:#dc2626; color:#fff; border-color:#dc2626; }
-  .chip-y { background:#3d2a00; color:#fde68a; border-color:#5c3f00; }
-  .chip-y.on { background:#d97706; color:#fff; border-color:#d97706; }
-  .chip-g { background:#0a2e14; color:#86efac; border-color:#0f4620; }
-  .chip-g.on { background:#16a34a; color:#fff; border-color:#16a34a; }
+  .chip-r { background:#252525; color:#b0b0b0; border-color:#3a3a3a; }
+  .chip-r.on { background:#a0a0a0; color:#fff; border-color:#a0a0a0; }
+  .chip-y { background:#1e1e1e; color:#787878; border-color:#333333; }
+  .chip-y.on { background:#606060; color:#fff; border-color:#606060; }
+  .chip-g { background:#0a0830; color:#6b67c4; border-color:#1a166a; }
+  .chip-g.on { background:#0f0c44; color:#fff; border-color:#0f0c44; }
   .chip-b { background:var(--navy-light); color:var(--text-dim); border-color:var(--navy-border); }
   .chip-b.on { background:var(--accent); color:#fff; border-color:var(--accent); }
 
@@ -65,40 +65,83 @@
   .seq-row {
     display:grid; grid-template-columns: 14px 150px 65px 40px 90px 1fr 55px;
     gap:6px; align-items:center;
-    padding:5px 10px; border-bottom:1px solid #13173200; cursor:pointer; transition:background .1s;
+    padding:5px 10px; border-bottom:1px solid transparent; cursor:pointer; transition:background .1s;
   }
   .seq-row:hover { background:var(--navy-light); }
-  .seq-row.active { background:var(--navy-mid); border-left:2px solid var(--accent); padding-left:8px; }
+  .seq-row.active { background:#1a1830; border-left:3px solid #4f46e5; padding-left:7px; }
   .seq-row:nth-child(even) { background:var(--navy); }
   .seq-row:nth-child(even):hover { background:var(--navy-light); }
   .seq-row.active:nth-child(even) { background:var(--navy-mid); }
 
-  /* RYG dot */
+  /* Quality dot */
   .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-  .dot-R { background:#dc2626; } .dot-Y { background:#d97706; } .dot-G { background:#16a34a; }
+  .dot-R { background:#c4c4c4; } .dot-Y { background:#787878; } .dot-G { background:#4f46e5; }
 
   /* Badges */
   .badge { font-size:0.58rem; font-weight:700; padding:1px 5px; border-radius:3px; white-space:nowrap; }
   .b-goal { background:#3d0a0a; color:#fca5a5; }
   .b-save { background:#0a2e14; color:#86efac; }
-  .b-ph   { background:#22273a; color:var(--text-dim); }
+  .b-ph   { background:#2a2a2a; color:var(--text-dim); }
 
-  /* Video */
-  video { background:#000; border-radius:6px; width:100%; }
-  .no-vid { background:var(--navy); border:1px dashed var(--navy-border); border-radius:8px; }
+  /* Video wrapper + overlay controls */
+  .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; line-height:0; }
+  .vid-wrap video { width:100%; max-height:calc(60vh - 80px); display:block; }
+  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; }
+  .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { max-height:100vh; height:100%; object-fit:contain; }
+  .no-vid { background:var(--navy); border:1px dashed var(--navy-border); border-radius:8px; line-height:1.5; }
+  .vid-clip-label {
+    position:absolute; top:10px; right:12px;
+    background:rgba(0,0,0,0.55); backdrop-filter:blur(4px);
+    color:#0f0c44; font-size:0.68rem; font-weight:700;
+    padding:3px 10px; border-radius:5px;
+    max-width:55%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    pointer-events:none;
+  }
+
+  /* Overlay */
+  .vid-controls {
+    position:absolute; bottom:0; left:0; right:0;
+    background:linear-gradient(transparent, rgba(0,0,0,0.82));
+    padding:28px 10px 10px;
+    opacity:0; transition:opacity 0.18s;
+    display:flex; flex-direction:column; gap:7px;
+    pointer-events:none;
+  }
+  .vid-wrap:hover .vid-controls,
+  .vid-wrap:fullscreen .vid-controls,
+  .vid-wrap:-webkit-full-screen .vid-controls { opacity:1; pointer-events:all; }
+
+  /* Progress bar */
+  .prog-bar { height:3px; background:rgba(255,255,255,0.2); border-radius:2px; cursor:pointer; }
+  .prog-bar:hover { height:5px; }
+  .prog-fill { height:100%; background:#fff; border-radius:2px; pointer-events:none; transition:width 0.1s linear; }
+
+  /* Control buttons */
+  .ctrl-row { display:flex; align-items:center; gap:5px; }
+  .ctrl-btn {
+    background:rgba(255,255,255,0.1);
+    border:1px solid rgba(255,255,255,0.18);
+    color:#fff; border-radius:7px;
+    padding:5px 11px; font-size:0.73rem; font-weight:600;
+    cursor:pointer; white-space:nowrap;
+    transition:background 0.1s, border-color 0.1s;
+    backdrop-filter:blur(6px);
+  }
+  .ctrl-btn:hover { background:rgba(255,255,255,0.24); border-color:rgba(255,255,255,0.4); }
+  .ctrl-play { padding:5px 28px; font-size:0.85rem; flex:1; text-align:center; }
+  .ctrl-loop.active-loop { background:rgba(255,255,255,0.28) !important; border-color:#fff !important; }
+  .ctrl-spacer { flex:1; }
+  .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 4px; white-space:nowrap; }
 
   /* PSM tags */
   .psm { background:var(--navy-light); color:#8b96a8; font-size:0.58rem; padding:1px 5px; border-radius:3px; }
 
-  /* Buttons */
+  /* Buttons (header only) */
   .btn { padding:5px 14px; border-radius:5px; font-size:0.72rem; font-weight:600; cursor:pointer; border:1px solid var(--navy-border); color:var(--text-dim); background:var(--navy-light); transition:all .12s; }
   .btn:hover { background:var(--navy-border); color:var(--text); }
-  .btn.primary { background:var(--accent-dim); border-color:var(--accent); color:#fff; }
-  .btn.primary:hover { background:var(--accent); }
-  .btn.active-loop { background:var(--accent) !important; border-color:var(--accent) !important; color:#fff !important; }
 
   /* Setup notice */
-  .notice { background:#0d1f4a; border:1px solid var(--accent-dim); border-radius:6px; }
+  .notice { background:#1e1e1e; border:1px solid var(--navy-border); border-radius:6px; }
 
   ::-webkit-scrollbar { width:4px; }
   ::-webkit-scrollbar-track { background:var(--navy-dark); }
@@ -117,7 +160,6 @@
       <span style="color:var(--text-mute); font-size:0.72rem; margin-left:6px;">Goalie Efficiency Model</span>
     </div>
   </div>
-  <div id="stats-bar" class="flex gap-4" style="font-size:0.7rem;"></div>
   <button class="btn" id="clear-btn">Clear Filters</button>
 </div>
 
@@ -132,9 +174,9 @@
 
     <div class="section-title">Shot Quality</div>
     <div class="px-3 pb-3 flex gap-1 flex-wrap">
-      <span class="chip chip-r" data-f="ryg" data-v="R">Red</span>
-      <span class="chip chip-y" data-f="ryg" data-v="Y">Yellow</span>
-      <span class="chip chip-g" data-f="ryg" data-v="G">Green</span>
+      <span class="chip chip-r" data-f="ryg" data-v="R">LowQ</span>
+      <span class="chip chip-y" data-f="ryg" data-v="Y">MidQ</span>
+      <span class="chip chip-g" data-f="ryg" data-v="G">GrA</span>
     </div>
 
     <div class="section-title">Result</div>
@@ -180,8 +222,8 @@
       <span class="chip chip-b" data-f="screen" data-v="N">No</span>
     </div>
 
-    <div class="section-title">PSM 1 (First Move)</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-psm1"><option value="">Any</option></select></div>
+    <div class="section-title">PSM Contains</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-psm1"><option value="">Any move</option></select></div>
 
     <div class="section-title">Save Technique</div>
     <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
@@ -211,17 +253,37 @@
       <div id="setup-banner" class="notice mx-3 mt-3 p-3 hidden">
         <div class="font-bold mb-1" style="color:var(--text-dim); font-size:0.72rem;">Setup Required</div>
         <div style="color:var(--text-dim); font-size:0.69rem;">
-          Set <code style="background:#132044; padding:1px 5px; border-radius:3px;">CLIP_BASE_URL</code>
+          Set <code style="background:#1e1e1e; padding:1px 5px; border-radius:3px;">CLIP_BASE_URL</code>
           in index.html after uploading clips to Cloudflare R2.
         </div>
       </div>
 
-      <!-- Video -->
-      <div class="p-3 pb-1">
-        <video id="player" style="display:none; max-height:420px;" controls loop></video>
-        <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:380px; color:var(--text-mute);">
-          <div style="font-size:2rem; margin-bottom:8px;">▶</div>
-          <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
+      <!-- Video + overlay controls -->
+      <div class="p-3 pb-0">
+        <div class="vid-wrap" id="vid-wrap">
+          <video id="player" style="display:none;" loop></video>
+          <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:calc(60vh - 80px); color:var(--text-mute);">
+            <div style="font-size:2rem; margin-bottom:8px;">▶</div>
+            <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
+          </div>
+          <div class="vid-clip-label" id="vid-clip-label"></div>
+          <div class="vid-controls" id="vid-controls">
+            <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+            <div class="ctrl-row">
+              <button class="ctrl-btn" id="prev-btn" title="Previous clip (←/P)">⏮</button>
+              <button class="ctrl-btn" id="back3-btn" title="Back 3s ([)">−3s</button>
+              <button class="ctrl-btn" id="frame-back-btn" title="Frame back (,)">◁</button>
+              <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶</button>
+              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame forward (.)">▷</button>
+              <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (])">+3s</button>
+              <button class="ctrl-btn" id="next-btn" title="Next clip (→/N)">⏭</button>
+              <span class="ctrl-spacer"></span>
+              <span class="ctrl-time" id="ctrl-time">0:00</span>
+              <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
+              <button class="ctrl-btn" id="dl-btn" title="Download clip">⬇</button>
+              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen">⛶</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -235,20 +297,6 @@
           <span id="m-result" class="badge"></span>
         </div>
         <div id="m-psm" class="flex flex-wrap gap-1 mt-1"></div>
-      </div>
-
-      <!-- Controls -->
-      <div class="px-3 pt-2 pb-1" style="border-top:1px solid var(--navy-border);">
-        <div class="flex gap-1 items-center mb-1">
-          <button class="btn" id="prev-btn" title="Previous clip (←/P)">⏮ Prev</button>
-          <button class="btn" id="back3-btn" title="Back 3 seconds ([)">−3s</button>
-          <button class="btn" id="frame-back-btn" title="Previous frame (,)">◁</button>
-          <button class="btn primary flex-1" id="play-pause-btn" title="Play / Pause (Space)">▶ Play</button>
-          <button class="btn" id="frame-fwd-btn" title="Next frame (.)">▷</button>
-          <button class="btn" id="fwd3-btn" title="Forward 3 seconds (])">+3s</button>
-          <button class="btn" id="next-btn" title="Next clip (→/N)">Next ⏭</button>
-        </div>
-        <button class="btn w-full" id="loop-btn" style="width:100%;">⟳ Loop All Filtered</button>
       </div>
 
       <div id="nav-info" class="hidden px-3 pb-2 text-center" style="font-size:0.65rem; color:var(--text-mute);">
@@ -374,7 +422,9 @@ function buildFilters() {
   fillSel('f-rushType',    unique('rushType'));
   fillSel('f-shotLocation',unique('shotLocation'));
   fillSel('f-shotTech',    unique('shotTech'));
-  fillSel('f-psm1',        unique('psm',0));
+  const allPsms = new Set();
+  allData.forEach(r => (r.psm||[]).forEach(p => { if(p) allPsms.add(p); }));
+  fillSel('f-psm1', [...allPsms].sort());
   fillSel('f-svTech',      unique('svTech'));
   const ge = document.getElementById('f-game');
   unique('game').forEach(g => {
@@ -402,7 +452,7 @@ function applyFilters() {
     if(filters.shotLocation    && r.shotLocation!==filters.shotLocation)   return false;
     if(filters.shotTech        && r.shotTech!==filters.shotTech)           return false;
     if(filters.screen          && r.screen!==filters.screen)               return false;
-    if(filters.psm1            && (r.psm||[])[0]!==filters.psm1)          return false;
+    if(filters.psm1            && !(r.psm||[]).includes(filters.psm1))     return false;
     if(filters.svTech          && r.svTech!==filters.svTech)               return false;
     if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)       return false;
     if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
@@ -423,13 +473,13 @@ function updateStats() {
   const Y=filteredData.filter(r=>r.ryg==='Y').length;
   const G=filteredData.filter(r=>r.ryg==='G').length;
   const v=filteredData.filter(r=>hasClip(r)).length;
-  document.getElementById('stats-bar').innerHTML =
-    `<span>${t} sequences</span>
-     <span style="color:#f87171">&#9679; Red: ${R}</span>
-     <span style="color:#fbbf24">&#9679; Yellow: ${Y}</span>
-     <span style="color:#4ade80">&#9679; Green: ${G}</span>
-     <span style="color:var(--text-dim)">&#9654; ${v} with video</span>`;
-  document.getElementById('stats-bar').style.display = t ? 'flex' : 'none';
+  document.getElementById('stats-row').innerHTML = t
+    ? `<span>${t} sequences</span>
+       <span style="color:#c4c4c4">&#9679; LowQ: ${R}</span>
+       <span style="color:#787878">&#9679; MidQ: ${Y}</span>
+       <span style="color:#4f46e5">&#9679; GrA: ${G}</span>
+       <span style="color:var(--text-dim)">&#9654; ${v} with video</span>`
+    : '';
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -483,7 +533,8 @@ function selectClip(idx) {
   lb.textContent = '▶ Loop All Filtered';
 
   document.querySelectorAll('.seq-row').forEach((el,i)=>el.classList.toggle('active',i===idx));
-  document.querySelector(`.seq-row[data-i="${idx}"]`)?.scrollIntoView({block:'nearest'});
+  const activeRow = document.querySelector(`.seq-row[data-i="${idx}"]`);
+  if(activeRow) activeRow.scrollIntoView({block:'start', behavior:'smooth'});
 
   const r = filteredData[idx];
   document.getElementById('nav-info').classList.remove('hidden');
@@ -508,6 +559,12 @@ function loadClip(r) {
     return `<span class="psm">${p}${d}</span>`;
   }).join('');
 
+  // Build clip label: PSM sequence + save technique
+  const psmStr = (r.psm||[]).join(' → ') || '';
+  const svStr  = r.svTech || '';
+  const labelParts = [psmStr, svStr].filter(Boolean);
+  document.getElementById('vid-clip-label').textContent = labelParts.join('  |  ');
+
   if(!CLIP_BASE_URL){ showNoVid('Configure CLIP_BASE_URL to enable video playback'); return; }
   if(r.fileClock==null){ showNoVid('No timestamp recorded for this sequence'); return; }
   showVideo(clipUrl(r));
@@ -531,8 +588,8 @@ document.getElementById('loop-btn').addEventListener('click', ()=>{
   if(!filteredData.length) return;
   loopAllActive = !loopAllActive;
   const lb = document.getElementById('loop-btn');
-  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='⏹ Stop Loop'; if(currentIndex<0) selectClip(0); }
-  else             { lb.classList.remove('active-loop'); lb.textContent='⟳ Loop All Filtered'; }
+  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='⏹'; if(currentIndex<0) selectClip(0); }
+  else             { lb.classList.remove('active-loop'); lb.textContent='⟳'; }
 });
 document.getElementById('prev-btn').addEventListener('click', ()=>{ if(currentIndex>0) selectClip(currentIndex-1); });
 document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIndex<filteredData.length-1) selectClip(currentIndex+1); });
@@ -541,8 +598,38 @@ document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.st
 document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
 document.getElementById('frame-back-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.pause(); video.currentTime=Math.max(0,video.currentTime-1/30); } });
 document.getElementById('frame-fwd-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.pause(); video.currentTime=Math.min(video.duration||0,video.currentTime+1/30); } });
-video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸ Pause'; });
-video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶ Play'; });
+video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸'; });
+video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶'; });
+
+// Progress bar + time display
+video.addEventListener('timeupdate', ()=>{
+  if(!video.duration) return;
+  document.getElementById('prog-fill').style.width = (video.currentTime/video.duration*100)+'%';
+  const s=Math.floor(video.currentTime);
+  document.getElementById('ctrl-time').textContent=Math.floor(s/60)+':'+(s%60+'').padStart(2,'0');
+});
+document.getElementById('prog-bar').addEventListener('click', e=>{
+  if(video.duration) video.currentTime=(e.offsetX/e.currentTarget.offsetWidth)*video.duration;
+});
+
+// Fullscreen
+document.getElementById('fullscreen-btn').addEventListener('click', ()=>{
+  const w=document.getElementById('vid-wrap');
+  w.requestFullscreen?w.requestFullscreen():w.webkitRequestFullscreen&&w.webkitRequestFullscreen();
+});
+
+// Download
+document.getElementById('dl-btn').addEventListener('click', async ()=>{
+  if(!video.src||video.style.display==='none') return;
+  try {
+    const res=await fetch(video.src);
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=video.src.split('/').pop();
+    a.click(); URL.revokeObjectURL(url);
+  } catch(e){ window.open(video.src,'_blank'); }
+});
 
 // ═══════════════════════════════════════════════════════════
 //  FILTER WIRING
@@ -563,13 +650,13 @@ document.querySelectorAll('.chip[data-f]').forEach(chip=>{
   });
 });
 
-document.querySelectorAll('input[type=checkbox][data-f]').forEach(cb=>{
-  cb.addEventListener('change',()=>{
-    if(filters[cb.dataset.f] instanceof Set){
-      cb.checked?filters[cb.dataset.f].add(cb.dataset.v):filters[cb.dataset.f].delete(cb.dataset.v);
-    }
-    applyFilters();
-  });
+document.querySelector('.sidebar').addEventListener('change', e=>{
+  const cb=e.target;
+  if(cb.type!=='checkbox'||!cb.dataset.f) return;
+  if(filters[cb.dataset.f] instanceof Set){
+    cb.checked?filters[cb.dataset.f].add(cb.dataset.v):filters[cb.dataset.f].delete(cb.dataset.v);
+  }
+  applyFilters();
 });
 
 [['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
