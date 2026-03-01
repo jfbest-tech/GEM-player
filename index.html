@@ -57,14 +57,14 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 75px 62px;
+    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 75px 62px;
+    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
@@ -85,9 +85,9 @@
   .b-ph   { background:#f3f4f6; color:#555; border:1px solid #d1d5db; }
 
   /* Video wrapper + overlay controls */
-  .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; min-height:calc(60vh - 80px); border-left:3px solid var(--accent); border-right:3px solid var(--accent); }
+  .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; min-height:calc(60vh - 80px); border-left:3px solid #fff; border-right:3px solid #fff; box-shadow:-12px 0 24px rgba(0,0,0,0.4), 12px 0 24px rgba(0,0,0,0.4); }
   .vid-wrap video { width:100%; height:calc(60vh - 80px); max-height:calc(60vh - 80px); display:block; object-fit:contain; }
-  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
+  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; box-shadow:none; }
   .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
   .no-vid { background:#1a1a1a; border:1px dashed #444; border-radius:8px; line-height:1.5; color:#888; }
   .vid-clip-label {
@@ -293,12 +293,11 @@
             <div class="ctrl-row">
               <button class="ctrl-btn" id="prev-btn" title="Previous clip (←/P)">⏮</button>
               <button class="ctrl-btn" id="back3-btn" title="Back 3s ([)">−3s</button>
-              <button class="ctrl-btn" id="frame-back-btn" title="Frame back — hold for slow-mo (,)">|◁</button>
               <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶</button>
-              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame forward — hold for slow-mo (.)">▷|</button>
+              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame by Frame — hold for slow-mo (.)">Frame by Frame</button>
               <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (])">+3s</button>
               <button class="ctrl-btn" id="next-btn" title="Next clip (→/N)">⏭</button>
-              <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow motion ½×">½×</button>
+              <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow motion ½×">Slow-Mo</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
@@ -321,8 +320,7 @@
         <span>Goalie</span>
         <span>Game</span>
         <span>Type</span>
-        <span>Pre-Save Movements</span>
-        <span>Save Tech</span>
+        <span>Pre-Save Movements → Save Tech</span>
         <span>Result</span>
       </div>
 
@@ -469,12 +467,11 @@ function applyFilters() {
     if(filters.hasClip         && !hasClip(r))                             return false;
     return true;
   });
-  const preload = filteredData.length > 0 && video.style.display === 'none';
-  if(preload) currentIndex = 0;
+  currentIndex = filteredData.length > 0 ? 0 : -1;
   renderList();
   updateStats();
   updatePsmCounts();
-  if(preload) loadClip(filteredData[0], false);
+  if(filteredData.length > 0) loadClip(filteredData[0], false);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -529,7 +526,12 @@ function renderList() {
     const psmArr = r.psm||[];
     let psmHtml = psmArr.length
       ? psmArr.map(p=>`<span class="psm">${p}</span>`).join('<span style="color:#aaa;padding:0 2px;">→</span>')
-      : '<span style="color:var(--text-mute)">—</span>';
+      : '';
+    if(r.svTech) {
+      if(psmHtml) psmHtml += '<span style="color:#aaa;padding:0 2px;">→</span>';
+      psmHtml += `<span class="psm-sv">${r.svTech}</span>`;
+    }
+    if(!psmHtml) psmHtml = '<span style="color:var(--text-mute)">—</span>';
     const res  = r.goal==='Y'
       ? `<span class="badge b-goal">GOAL</span>`
       : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
@@ -541,7 +543,6 @@ function renderList() {
       <span style="color:var(--text-dim); font-size:11px;">${opp} P${r.period||'?'}</span>
       <span style="color:var(--text-dim); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
-      <span style="overflow:hidden;">${r.svTech?`<span class="psm-sv">${r.svTech}</span>`:''}</span>
       <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶</span>':''}</span>
     `;
     row.addEventListener('click', ()=>selectClip(i));
@@ -621,23 +622,15 @@ function stopFrameHold() {
   clearTimeout(fHoldTimeout); clearInterval(fHoldInterval);
   fHoldTimeout = fHoldInterval = null;
   if(sloMoActive){ video.playbackRate=0.5; }
-  else { video.playbackRate=1; video.pause(); }
+  else { video.playbackRate=1; video.pause(); video.muted=false; }
 }
 
-document.getElementById('frame-back-btn').addEventListener('mousedown', ()=>{
-  if(video.style.display==='none') return;
-  video.pause(); video.currentTime=Math.max(0,video.currentTime-1/30);
-  fHoldTimeout=setTimeout(()=>{
-    fHoldInterval=setInterval(()=>{ video.currentTime=Math.max(0,video.currentTime-1/30); },80);
-  },400);
-});
 document.getElementById('frame-fwd-btn').addEventListener('mousedown', ()=>{
   if(video.style.display==='none') return;
-  video.pause(); video.currentTime=Math.min(video.duration||0,video.currentTime+1/30);
+  video.muted=true; video.pause(); video.currentTime=Math.min(video.duration||0,video.currentTime+1/30);
   fHoldTimeout=setTimeout(()=>{ video.playbackRate=0.15; video.play().catch(()=>{}); },400);
 });
 ['mouseup','mouseleave','touchend'].forEach(ev=>{
-  document.getElementById('frame-back-btn').addEventListener(ev, ()=>{ if(fHoldTimeout||fHoldInterval) stopFrameHold(); });
   document.getElementById('frame-fwd-btn').addEventListener(ev, ()=>{ if(fHoldTimeout||fHoldInterval) stopFrameHold(); });
 });
 
@@ -646,13 +639,13 @@ document.getElementById('slomo-btn').addEventListener('click', ()=>{
   if(video.style.display==='none') return;
   sloMoActive=!sloMoActive;
   const btn=document.getElementById('slomo-btn');
-  if(sloMoActive){ video.playbackRate=0.5; video.play().catch(()=>{}); btn.classList.add('active-slomo'); }
-  else           { video.playbackRate=1;                                  btn.classList.remove('active-slomo'); }
+  if(sloMoActive){ video.muted=true;  video.playbackRate=0.5; video.play().catch(()=>{}); btn.classList.add('active-slomo'); }
+  else           { video.muted=false; video.playbackRate=1;                                btn.classList.remove('active-slomo'); }
 });
 // Any other ctrl-row button click resets slo-mo
 document.querySelector('.ctrl-row').addEventListener('click', e=>{
   if(sloMoActive && !e.target.closest('#slomo-btn')){
-    sloMoActive=false; video.playbackRate=1;
+    sloMoActive=false; video.playbackRate=1; video.muted=false;
     document.getElementById('slomo-btn').classList.remove('active-slomo');
   }
 }, true);
@@ -775,7 +768,6 @@ document.addEventListener('keydown',e=>{
   if(e.key==='l') document.getElementById('loop-btn').click();
   if(e.key==='[') document.getElementById('back3-btn').click();
   if(e.key===']') document.getElementById('fwd3-btn').click();
-  if(e.key===',') document.getElementById('frame-back-btn').dispatchEvent(new MouseEvent('mousedown'));
   if(e.key==='.') document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mousedown'));
 });
 
