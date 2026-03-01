@@ -27,7 +27,7 @@
 
   /* SIDEBAR */
   .sidebar { background: var(--navy); border-right: 1px solid var(--navy-border); width: 200px; }
-  .section-title { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-mute); padding: 9px 12px 3px; }
+  .section-title { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); padding: 9px 12px 3px; }
 
   /* CHIPS */
   .chip { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:0.69rem; font-weight:600; cursor:pointer; user-select:none; border:1px solid transparent; transition:all .12s; }
@@ -91,6 +91,8 @@
   .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
   .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
   .no-vid { background:#1a1a1a; border:1px dashed #444; border-radius:8px; line-height:1.5; color:#888; }
+  video::-webkit-media-controls-overlay-cast-button { display:none; }
+  video::-webkit-media-controls-cast-button { display:none; }
   .vid-clip-label {
     position:absolute; top:10px; right:10px;
     background:rgba(0,0,0,0.62); backdrop-filter:blur(4px);
@@ -194,7 +196,7 @@
     <div class="section-title">Attack Type</div>
     <div class="px-3 pb-3"><select class="sel" id="f-attackType"><option value="">All types</option></select></div>
 
-    <div class="section-title">PSM Filter</div>
+    <div class="section-title">Pre-Save Movements</div>
     <div class="px-3 pb-3 flex flex-col gap-1">
       <div class="psm-lbl">Move 1 (PSM1)</div>
       <select class="sel" id="f-psm0"><option value="">Any</option></select>
@@ -287,7 +289,7 @@
       <!-- Video + overlay controls -->
       <div class="p-3 pb-0">
         <div class="vid-wrap" id="vid-wrap">
-          <video id="player" style="display:none;"></video>
+          <video id="player" disableRemotePlayback style="display:none;"></video>
           <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h); color:var(--text-mute);">
             <div style="font-size:2rem; margin-bottom:8px;">▶</div>
             <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
@@ -299,15 +301,16 @@
           <div class="vid-controls" id="vid-controls">
             <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
             <div class="ctrl-row">
-              <button class="ctrl-btn" id="prev-btn" title="Previous clip (←/P)">⏮</button>
-              <button class="ctrl-btn" id="back3-btn" title="Back 3s ([)">−3s</button>
+              <button class="ctrl-btn" id="prev-btn" title="Previous clip (P)">⏮</button>
+              <button class="ctrl-btn" id="back3-btn" title="Back 3s (Shift+←)">−3s</button>
               <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶</button>
-              <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (])">+3s</button>
-              <button class="ctrl-btn" id="next-btn" title="Next clip (→/N)">⏭</button>
-              <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow motion ½×">Slow-Mo</button>
-              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame by Frame — hold for slow-mo (.)">Frame by Frame</button>
+              <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (Shift+→)">+3s</button>
+              <button class="ctrl-btn" id="next-btn" title="Next clip (N)">⏭</button>
+              <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
+              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame by Frame — hold for slow-mo (E)">Frame by Frame</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
+              <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)">🔊</button>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
               <button class="ctrl-btn" id="dl-btn" title="Download clip">⬇</button>
               <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen">⛶</button>
@@ -619,7 +622,9 @@ function showVideo(url, autoplay=true) {
     video.src=url; video.load();
     video.addEventListener('loadedmetadata', ()=>{ video.currentTime=15; if(autoplay) video.play().catch(()=>{}); }, {once:true});
   } else {
-    video.currentTime=15; if(autoplay) video.play().catch(()=>{});
+    if(!autoplay) video.pause();
+    video.currentTime=15;
+    if(autoplay) video.play().catch(()=>{});
   }
 }
 function showNoVid(msg) {
@@ -713,19 +718,29 @@ document.addEventListener('webkitfullscreenchange', ()=>{
 });
 
 function updateControlsPadding() {
-  const ctrl = document.getElementById('vid-controls');
-  const wrap = document.getElementById('vid-wrap');
+  const ctrl  = document.getElementById('vid-controls');
+  const label = document.getElementById('vid-clip-label');
+  const wrap  = document.getElementById('vid-wrap');
   if (document.fullscreenElement || document.webkitFullscreenElement || !video.videoWidth || video.style.display === 'none') {
-    ctrl.style.left = ''; ctrl.style.right = ''; return;
+    ctrl.style.left = ''; ctrl.style.right = '';
+    label.style.right = '';
+    return;
   }
   const ar = video.videoWidth / video.videoHeight;
   const side = wrap.clientWidth / wrap.clientHeight > ar
     ? Math.round((wrap.clientWidth - wrap.clientHeight * ar) / 2) : 0;
-  ctrl.style.left = side + 'px';
+  ctrl.style.left  = side + 'px';
   ctrl.style.right = side + 'px';
+  label.style.right = (side + 10) + 'px';
 }
 video.addEventListener('loadedmetadata', updateControlsPadding);
 window.addEventListener('resize', updateControlsPadding);
+
+// Mute toggle
+document.getElementById('mute-btn').addEventListener('click', ()=>{
+  video.muted = !video.muted;
+  document.getElementById('mute-btn').textContent = video.muted ? '🔇' : '🔊';
+});
 
 // Download
 document.getElementById('dl-btn').addEventListener('click', async ()=>{
@@ -793,13 +808,15 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
 
 document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
-  if(e.key==='ArrowRight'||e.key==='n') document.getElementById('next-btn').click();
-  if(e.key==='ArrowLeft' ||e.key==='p') document.getElementById('prev-btn').click();
+  if(e.key==='n') document.getElementById('next-btn').click();
+  if(e.key==='p') document.getElementById('prev-btn').click();
   if(e.key===' '){ e.preventDefault(); document.getElementById('play-pause-btn').click(); }
+  if(e.key==='s') document.getElementById('slomo-btn').click();
   if(e.key==='l') document.getElementById('loop-btn').click();
-  if(e.key==='[') document.getElementById('back3-btn').click();
-  if(e.key===']') document.getElementById('fwd3-btn').click();
-  if(e.key==='.') document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mousedown'));
+  if(e.key==='m') document.getElementById('mute-btn').click();
+  if(e.key==='ArrowLeft'  && e.shiftKey) document.getElementById('back3-btn').click();
+  if(e.key==='ArrowRight' && e.shiftKey) document.getElementById('fwd3-btn').click();
+  if(e.key==='e') document.getElementById('frame-fwd-btn').dispatchEvent(new MouseEvent('mousedown'));
 });
 
 // ── Resizable video panel ──────────────────────────────────────────────────
