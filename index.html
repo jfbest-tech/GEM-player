@@ -319,13 +319,13 @@
               <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (Shift+→)">+3s</button>
               <button class="ctrl-btn" id="next-btn" title="Next clip (N)">⏭</button>
               <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
-              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame by Frame — hold for slow-mo (E)">Frame by Frame</button>
+              <button class="ctrl-btn" id="frame-fwd-btn" title="Frame x Frame — hold for slow-mo (E)">Frame x Frame</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
               <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)">🔊</button>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
               <button class="ctrl-btn" id="dl-btn" title="Download clip">⬇</button>
-              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen">⛶</button>
+              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)">⛶</button>
             </div>
           </div>
         </div>
@@ -695,8 +695,13 @@ document.getElementById('frame-fwd-btn').addEventListener('mousedown', ()=>{
     video.currentTime = Math.min(video.duration||0, video.currentTime + 1/30);
     return;
   }
+  const wasPlaying = !video.paused;
   video.pause();
-  video.currentTime = Math.min(video.duration||0, video.currentTime + 1/30);
+  if(!wasPlaying) {
+    // Already paused: step forward one frame
+    video.currentTime = Math.min(video.duration||0, video.currentTime + 1/30);
+  }
+  // If transitioning from play: just pause cleanly on current frame — no seek lag
   fHoldTimeout = setTimeout(()=>{
     fHoldActive = true;
     fPreMuted = video.muted;        // save current mute state before overriding
@@ -860,6 +865,7 @@ document.addEventListener('keydown',e=>{
   if(e.key===' '){ e.preventDefault(); document.getElementById('play-pause-btn').click(); }
   if(e.key==='s') document.getElementById('slomo-btn').click();
   if(e.key==='l') document.getElementById('loop-btn').click();
+  if(e.key==='f') document.getElementById('fullscreen-btn').click();
   if(e.key==='m') document.getElementById('mute-btn').click();
   if(e.key==='ArrowLeft'  && e.shiftKey) document.getElementById('back3-btn').click();
   if(e.key==='ArrowRight' && e.shiftKey) document.getElementById('fwd3-btn').click();
