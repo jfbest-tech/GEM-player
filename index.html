@@ -308,7 +308,7 @@
           <div id="play-overlay" style="display:none;"></div>
           <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h); color:var(--text-mute);">
             <div style="font-size:2rem; margin-bottom:8px;">▶</div>
-            <div id="no-vid-text" style="font-size:0.78rem;">Select a sequence to play</div>
+            <div id="no-vid-text" style="font-size:0.78rem;">Select a Goalie</div>
           </div>
           <div class="vid-clip-label" id="vid-clip-label">
             <img class="vid-clip-logo" src="SPA_Logo-1 - Square Favicon.png" alt="">
@@ -378,6 +378,7 @@ const CLIP_BASE_URL = 'https://pub-ae6606f2384f4e86b806f43ee755b3bf.r2.dev/';
 // ═══════════════════════════════════════════════════════════
 let allData = [], filteredData = [];
 let currentIndex = -1, loopAllActive = false, sloMoActive = false;
+let initialLoad = true;
 
 const filters = {
   goalie:new Set(), ryg:new Set(), period:'',
@@ -503,7 +504,8 @@ function applyFilters() {
   renderList();
   updateStats();
   updatePsmCounts();
-  if(filteredData.length > 0) loadClip(filteredData[0], false);
+  if(filteredData.length > 0 && !initialLoad) loadClip(filteredData[0], false);
+  initialLoad = false;
 }
 
 // ═══════════════════════════════════════════════════════════
