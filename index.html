@@ -644,7 +644,7 @@ function showNoVid(msg) {
   video.style.display='none'; noVid.style.display='flex'; noTxt.textContent=msg;
   playOverlay.style.display='none';
 }
-playOverlay.addEventListener('click', ()=>{ video.play().catch(()=>{}); });
+playOverlay.addEventListener('click', e=>{ e.stopPropagation(); video.play().catch(()=>{}); });
 
 video.addEventListener('ended', ()=>{
   const next = (currentIndex+1) % filteredData.length;
