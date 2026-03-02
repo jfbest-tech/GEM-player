@@ -76,6 +76,7 @@
   .seq-row:nth-child(even) { background:var(--navy); }
   .seq-row:nth-child(even):hover { background:#eef4ff; }
   .seq-row.active:nth-child(even) { background:#d1d5db; }
+  .seq-row--locked { opacity:0.35; pointer-events:none; cursor:default; }
 
   /* Quality dot */
   .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
@@ -717,9 +718,10 @@ function renderList() {
     return;
   }
 
+  const noGoalie = filters.goalie.size === 0;
   filteredData.forEach((r,i) => {
     const row = document.createElement('div');
-    row.className = 'seq-row' + (i===currentIndex?' active':'');
+    row.className = 'seq-row' + (i===currentIndex?' active':'') + (noGoalie?' seq-row--locked':'');
     row.dataset.i = i;
 
     const has  = hasClip(r);
