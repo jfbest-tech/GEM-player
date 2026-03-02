@@ -370,7 +370,7 @@
       <!-- Video + overlay controls -->
       <div class="p-3 pb-0">
         <div class="vid-wrap" id="vid-wrap">
-          <video id="player" disableRemotePlayback style="display:none;"></video>
+          <video id="player" disableRemotePlayback muted style="display:none;"></video>
           <div id="play-overlay" style="display:none;"></div>
           <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h);">
             <div id="no-vid-text">Select a Goalie</div>
@@ -391,7 +391,7 @@
               <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
-              <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)">🔊</button>
+              <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)" style="filter:grayscale(1);">🔇</button>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
               <button class="ctrl-btn" id="dl-btn" title="Download clip">⬇</button>
               <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)">⛶</button>
@@ -624,7 +624,7 @@ function updatePsmCounts() {
     sel.value = (activeVal && counts.has(activeVal)) ? activeVal : '';
   });
   // Simple field dropdowns — count update only (order stays fixed)
-  [['f-attackType',r=>r.attackType],['f-strength',r=>r.strength]
+  [['f-strength',r=>r.strength]
   ].forEach(([id,fn])=>{
     const sel=document.getElementById(id); if(!sel) return;
     Array.from(sel.options).forEach(opt=>{
@@ -633,8 +633,9 @@ function updatePsmCounts() {
       opt.textContent=`${opt.value} (${n})`;
     });
   });
-  // svTech, ozpPattern, rushType — rebuild sorted by count desc, hide zero-count
-  [['f-svTech',r=>r.svTech,filters.svTech],
+  // attackType, svTech, ozpPattern, rushType — rebuild sorted by count desc, hide zero-count
+  [['f-attackType',r=>r.attackType,filters.attackType],
+   ['f-svTech',r=>r.svTech,filters.svTech],
    ['f-ozpPattern',r=>r.ozpPattern,filters.ozpPattern],
    ['f-rushType',r=>r.rushType,filters.rushType]
   ].forEach(([id,fn,activeVal])=>{
@@ -777,7 +778,7 @@ function showVideo(url, autoplay=true) {
   if(!autoplay) playOverlay.style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
-    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=10; if(autoplay) video.play().catch(()=>{}); }, {once:true});
+    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=10; if(autoplay) video.play().catch(()=>{}); else video.pause(); }, {once:true});
   } else {
     if(!autoplay) video.pause();
     video.currentTime=10;
@@ -818,6 +819,7 @@ let sPreMuted = false; // mute state saved before entering slow-mo
 
 function syncMuteBtn() {
   document.getElementById('mute-btn').textContent = video.muted ? '🔇' : '🔊';
+  document.getElementById('mute-btn').style.filter = 'grayscale(1)';
 }
 
 // Slo-Mo toggle
