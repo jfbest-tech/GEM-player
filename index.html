@@ -996,7 +996,6 @@ video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').
 video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').classList.remove('is-playing'); });
 
 // Progress bar + time display
-function fmtTime(sec){ const s=Math.floor(sec); return Math.floor(s/60)+':'+(s%60+'').padStart(2,'0'); }
 video.addEventListener('timeupdate', ()=>{
   if(!video.duration) return;
   document.getElementById('prog-fill').style.width = (video.currentTime/video.duration*100)+'%';
