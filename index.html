@@ -523,7 +523,10 @@ function buildFilters() {
     btn.textContent = name;
     btn.addEventListener('click', () => {
       filters.goalie = new Set([name]);
+      filters.psmExact = null;
+      filters.ph = null;
       document.querySelectorAll('input[type=checkbox][data-f="goalie"]').forEach(cb => { cb.checked = cb.dataset.v === name; });
+      document.querySelectorAll('.chip[data-f="ph"]').forEach(c=>c.classList.remove('on'));
       applyFilters();
     });
     noVidGoalies.appendChild(btn);
@@ -962,6 +965,11 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
   if(cb.type!=='checkbox'||!cb.dataset.f) return;
   if(filters[cb.dataset.f] instanceof Set){
     cb.checked?filters[cb.dataset.f].add(cb.dataset.v):filters[cb.dataset.f].delete(cb.dataset.v);
+  }
+  if(cb.dataset.f==='goalie'){
+    filters.psmExact=null;
+    filters.ph=null;
+    document.querySelectorAll('.chip[data-f="ph"]').forEach(c=>c.classList.remove('on'));
   }
   applyFilters();
 });
