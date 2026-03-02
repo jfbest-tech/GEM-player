@@ -60,14 +60,14 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
+    display:grid; grid-template-columns: 12px 120px 130px 90px 24px 1fr 28px 28px 28px 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
+    display:grid; grid-template-columns: 12px 120px 130px 90px 24px 1fr 28px 28px 28px 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
@@ -80,6 +80,14 @@
   /* Quality dot */
   .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
   .dot-R { background:#aaaaaa; } .dot-Y { background:#666666; } .dot-G { background:#0c2461; }
+
+  /* Playlist icon badges */
+  .ico { font-size:8px; font-weight:800; padding:1px 3px; border-radius:3px; white-space:nowrap; line-height:1.4; }
+  .ico-scr { background:#e8edf8; color:#2a4080; }
+  .ico-q-R { background:#ebebeb; color:#666; }
+  .ico-q-Y { background:#d8d8d8; color:#444; }
+  .ico-q-G { background:#c8d0e4; color:#0c2461; }
+  .ico-reb { background:#ddeedd; color:#2a5020; }
 
   /* Badges */
   .badge { font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }
@@ -200,10 +208,13 @@
     background: rgba(0,0,0,0.38); z-index: 199;
   }
 
-  /* ═══ MOBILE (≤ 640px) ═══ */
-  @media (max-width: 640px) {
+  /* Safari viewport height fix */
+  body.h-screen { height: 100dvh; }
+
+  /* ═══ TABLET & MOBILE (≤ 1024px) ═══ */
+  @media (max-width: 1024px) {
     body { padding-left: 0; padding-right: 0; box-shadow: none; }
-    :root { --vid-h: 42vh; }
+    :root { --vid-h: 50vh; }
 
     /* Sidebar slides in from left */
     .sidebar {
@@ -233,10 +244,15 @@
 
     /* Playlist: horizontal scroll so nothing wraps */
     .seq-list { overflow-x: auto; }
-    .seq-header-row, .seq-row { min-width: 520px; }
+    .seq-header-row, .seq-row { min-width: 680px; }
 
     /* Hide resize handle (not useful on touch) */
     #resize-handle { display: none; }
+  }
+
+  /* ═══ PHONE ONLY (≤ 640px) ═══ */
+  @media (max-width: 640px) {
+    :root { --vid-h: 42vh; }
   }
 </style>
 </head>
@@ -268,28 +284,30 @@
     <div id="f-goalie" class="px-3 pb-2 flex flex-col gap-1"></div>
 
     <div class="section-title">Attack Type</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-attackType"><option value="">All types</option></select></div>
+    <div class="px-3 pb-3"><select class="sel" id="f-attackType"><option value="">All</option></select></div>
 
-    <div style="margin:4px 8px 6px; border:1px solid #dde3ec; border-radius:6px; background:#f6f8fc;">
+    <div style="margin:4px 8px 6px; border:1px solid #d5d5d5; border-radius:6px; background:#f5f5f5;">
       <div class="section-title">Pre-Save Movements</div>
       <div class="px-3 pb-2 flex flex-col gap-1">
-        <div class="psm-lbl">Move 1 (PSM1)</div>
-        <select class="sel" id="f-psm0"><option value="">Any</option></select>
-        <div class="psm-lbl">Move 2 (PSM2)</div>
-        <select class="sel" id="f-psm1"><option value="">Any</option></select>
-        <div class="psm-lbl">Move 3 (PSM3)</div>
-        <select class="sel" id="f-psm2"><option value="">Any</option></select>
+        <div class="psm-lbl">Move 1</div>
+        <select class="sel" id="f-psm0"><option value="">All</option></select>
+        <div class="psm-lbl">Move 2</div>
+        <select class="sel" id="f-psm1"><option value="">All</option></select>
+        <div class="psm-lbl">Move 3</div>
+        <select class="sel" id="f-psm2"><option value="">All</option></select>
+        <div class="psm-lbl">Move 4</div>
+        <select class="sel" id="f-psm3"><option value="">All</option></select>
       </div>
-      <div style="height:1px; background:#dde3ec; margin:0 10px;"></div>
+      <div style="height:1px; background:#d5d5d5; margin:0 10px;"></div>
       <div class="section-title">Save Technique</div>
       <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
     </div>
 
     <div class="section-title">OZP Pattern</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-ozpPattern"><option value="">All patterns</option></select></div>
+    <div class="px-3 pb-3"><select class="sel" id="f-ozpPattern"><option value="">All</option></select></div>
 
     <div class="section-title">Rush Type</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-rushType"><option value="">All rush types</option></select></div>
+    <div class="px-3 pb-3"><select class="sel" id="f-rushType"><option value="">All</option></select></div>
 
     <div class="section-title">Screen</div>
     <div class="px-3 pb-3 flex gap-1">
@@ -329,7 +347,7 @@
     <div class="section-title">Period</div>
     <div class="px-3 pb-3">
       <select class="sel" id="f-period">
-        <option value="">All periods</option>
+        <option value="">All</option>
         <option value="1">P1</option>
         <option value="2">P2</option>
         <option value="3">P3</option>
@@ -337,14 +355,10 @@
     </div>
 
     <div class="section-title">Strength</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-strength"><option value="">All strengths</option></select></div>
+    <div class="px-3 pb-3"><select class="sel" id="f-strength"><option value="">All</option></select></div>
 
     <div class="section-title">Game</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-game"><option value="">All games</option></select></div>
-
-    <div class="px-3 pb-4">
-      <label class="cb-lbl"><input type="checkbox" id="f-hasClip"> Has video only</label>
-    </div>
+    <div class="px-3 pb-4"><select class="sel" id="f-game"><option value="">All</option></select></div>
 
   </div><!-- /scroll -->
   <div class="flex-shrink-0 px-3 py-2" style="border-top:1px solid var(--navy-border);">
@@ -383,18 +397,18 @@
           <div class="vid-controls" id="vid-controls" style="display:none;">
             <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
             <div class="ctrl-row">
-              <button class="ctrl-btn" id="prev-btn" title="Previous clip (P)">⏮</button>
+              <button class="ctrl-btn" id="prev-btn" title="Previous clip (P)">⏮&#xFE0E;</button>
               <button class="ctrl-btn" id="back3-btn" title="Back 3s (Shift+←)">−3s</button>
-              <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶</button>
+              <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶&#xFE0E;</button>
               <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (Shift+→)">+3s</button>
-              <button class="ctrl-btn" id="next-btn" title="Next clip (N)">⏭</button>
+              <button class="ctrl-btn" id="next-btn" title="Next clip (N)">⏭&#xFE0E;</button>
               <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
               <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)" style="filter:grayscale(1);">🔇</button>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
-              <button class="ctrl-btn" id="dl-btn" title="Download clip">⬇</button>
-              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)">⛶</button>
+              <button class="ctrl-btn" id="dl-btn" title="Download clip">⬇&#xFE0E;</button>
+              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)">⛶&#xFE0E;</button>
             </div>
           </div>
         </div>
@@ -412,9 +426,13 @@
       <div class="seq-header-row flex-shrink-0" style="background:var(--navy);">
         <span></span>
         <span>Goalie</span>
-        <span>Game</span>
-        <span>Type</span>
-        <span style="padding-left:26px;">Pre-Save Movements → Save Tech</span>
+        <span style="text-align:center;">Game</span>
+        <span style="text-align:center;">Type</span>
+        <span style="text-align:center; font-size:11px; opacity:0.6;">▽</span>
+        <span>Pre-Save Movements → Save Tech</span>
+        <span style="text-align:center;">Scr</span>
+        <span style="text-align:center;">Qlty</span>
+        <span style="text-align:center;">Reb</span>
         <span>Result</span>
       </div>
 
@@ -450,9 +468,9 @@ const filters = {
   strength:'', attackType:'',
   save:null, goal:null, ph:null, goalQual:'',
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
-  screen:null, psm0:'', psm1:'', psm2:'', svTech:'',
+  screen:null, psm0:'', psm1:'', psm2:'', psm3:'', svTech:'',
   rebCreated:null, rebAttacked:null,
-  game:'', hasClip:false, psmExact:null,
+  game:'', psmExact:null,
 };
 
 const video  = document.getElementById('player');
@@ -540,6 +558,7 @@ function buildFilters() {
   fillSel('f-psm0', unique('psm', 0));
   fillSel('f-psm1', unique('psm', 1));
   fillSel('f-psm2', unique('psm', 2));
+  fillSel('f-psm3', unique('psm', 3));
   fillSel('f-svTech',      unique('svTech'));
   const ge = document.getElementById('f-game');
   unique('game').forEach(g => {
@@ -574,6 +593,7 @@ function applyFilters() {
     if(filters.psm0            && (r.psm||[])[0] !== filters.psm0)          return false;
     if(filters.psm1            && (r.psm||[])[1] !== filters.psm1)          return false;
     if(filters.psm2            && (r.psm||[])[2] !== filters.psm2)          return false;
+    if(filters.psm3            && (r.psm||[])[3] !== filters.psm3)          return false;
     if(filters.svTech          && r.svTech!==filters.svTech)               return false;
     if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)       return false;
     if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
@@ -585,6 +605,9 @@ function applyFilters() {
     }
     return true;
   });
+  // Sort most recent games first (game field: MM.DD.YYYY_TEAM)
+  const gameDate = g => { const [m,d,y]=(g||'').split('_')[0].split('.'); return y&&m&&d?`${y}${m}${d}`:''; };
+  filteredData.sort((a,b)=>gameDate(b.game).localeCompare(gameDate(a.game)));
   currentIndex = filteredData.length > 0 ? 0 : -1;
   renderList();
   updateStats();
@@ -616,11 +639,11 @@ function updateStats() {
 
 function updatePsmCounts() {
   // PSM dropdowns — rebuild sorted by count desc, hide zero-count options
-  [[0,'f-psm0',filters.psm0],[1,'f-psm1',filters.psm1],[2,'f-psm2',filters.psm2]].forEach(([idx,id,activeVal])=>{
+  [[0,'f-psm0',filters.psm0],[1,'f-psm1',filters.psm1],[2,'f-psm2',filters.psm2],[3,'f-psm3',filters.psm3]].forEach(([idx,id,activeVal])=>{
     const sel = document.getElementById(id);
     const counts = new Map();
     filteredData.forEach(r=>{ const v=(r.psm||[])[idx]; if(v) counts.set(v,(counts.get(v)||0)+1); });
-    sel.innerHTML = '<option value="">Any</option>';
+    sel.innerHTML = '<option value="">All</option>';
     [...counts.entries()].sort((a,b)=>b[1]-a[1]).forEach(([v,n])=>{
       const o=document.createElement('option'); o.value=v; o.textContent=`${v} (${n})`; sel.appendChild(o);
     });
@@ -680,8 +703,17 @@ function renderList() {
 
     const has  = hasClip(r);
     const dc   = `dot dot-${r.ryg||'R'}`;
-    const opp  = (r.game||'').replace(/^\d+\.\d+\.\d+_/,'');
     const psmArr = r.psm||[];
+
+    // Game label: "Oct 11 vs WPG P1"
+    const _mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const [_dp='',_tp=''] = (r.game||'').split('_');
+    const [_mm='0',_dd='0'] = _dp.split('.');
+    const gameLabel = _tp
+      ? `${_mo[+_mm-1]||''} ${+_dd} vs ${_tp} P${r.period||'?'}`
+      : (r.game||'—');
+
+    // PSM HTML (chips only, no radio button)
     let psmHtml = psmArr.length
       ? psmArr.map(p=>`<span class="psm">${p}</span>`).join('<span style="color:#aaa;padding:0 2px;">→</span>')
       : '';
@@ -689,38 +721,49 @@ function renderList() {
       if(psmHtml) psmHtml += '<span style="color:#aaa;padding:0 2px;">→</span>';
       psmHtml += `<span class="psm-sv">${r.svTech}</span>`;
     }
-    if(!psmHtml) {
-      if(r.phType) {
-        const isPhActive = filters.goalie.size===1 && filters.goalie.has(r.goalie) && filters.ph==='Y';
-        psmHtml = `<button class="psm-combo-btn${isPhActive?' active':''}" data-goalie="${r.goalie}" data-ph="1" title="${r.goalie} — filter all PH"></button><span class="badge b-ph">PH</span>`;
-      } else {
-        psmHtml = '<span style="color:var(--text-mute)">—</span>';
-      }
-    }
+    if(!psmHtml) psmHtml = '<span style="color:var(--text-mute)">—</span>';
+
+    // Radio/filter button (separate column)
+    let comboBtnHtml = '';
     if(psmArr.length) {
       const isComboActive = filters.psmExact!==null && filters.goalie.size===1 && filters.goalie.has(r.goalie) &&
-        psmArr.length===filters.psmExact.length && psmArr.every((p,i)=>p===filters.psmExact[i]);
-      // Button goes LEFT of PSMs — PSMs stored tab-delimited (tabs never appear in PSM names)
-      psmHtml = `<button class="psm-combo-btn${isComboActive?' active':''}" data-goalie="${r.goalie}" data-psms="${psmArr.join('\t')}" title="${r.goalie} — filter by this PSM combo"></button>` + psmHtml;
+        psmArr.length===filters.psmExact.length && psmArr.every((p,ii)=>p===filters.psmExact[ii]);
+      comboBtnHtml = `<button class="psm-combo-btn${isComboActive?' active':''}" data-goalie="${r.goalie}" data-psms="${psmArr.join('\t')}" title="${r.goalie} — filter by this PSM combo"></button>`;
+    } else if(r.phType) {
+      const isPhActive = filters.goalie.size===1 && filters.goalie.has(r.goalie) && filters.ph==='Y';
+      comboBtnHtml = `<button class="psm-combo-btn${isPhActive?' active':''}" data-goalie="${r.goalie}" data-ph="1" title="${r.goalie} — filter all PH"></button>`;
+      psmHtml = `<span class="badge b-ph">PH</span>`;
     }
-    const res  = r.goal==='Y'
+
+    const res = r.goal==='Y'
       ? `<span class="badge b-goal">GOAL</span>`
       : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
       : r.phType ? `<span class="badge b-ph">PH</span>` : '—';
 
+    // Icon columns
+    const screenIco = r.screen==='Y' ? '<span class="ico ico-scr">S</span>' : '';
+    const _qm = {R:'Lo',Y:'Mi',G:'Hi'};
+    const qualIco = r.ryg ? `<span class="ico ico-q-${r.ryg}">${_qm[r.ryg]||r.ryg}</span>` : '';
+    const rebText = r.rebCreated==='Y' && r.rebAttacked==='Y' ? 'R'
+      : r.rebCreated==='Y' ? 'RC' : r.rebAttacked==='Y' ? 'RA' : '';
+    const rebIco = rebText ? `<span class="ico ico-reb">${rebText}</span>` : '';
+
     row.innerHTML = `
       <span class="${dc}"></span>
       <span style="color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px;">${r.goalie||'—'}</span>
-      <span style="color:var(--text-dim); font-size:11px;">${opp} P${r.period||'?'}</span>
-      <span style="color:var(--text-dim); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
+      <span style="color:var(--text-dim); font-size:10px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${gameLabel}</span>
+      <span style="color:var(--text-dim); font-size:11px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
+      <span style="display:flex; align-items:center; justify-content:center;">${comboBtnHtml}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
-      <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶</span>':''}</span>
+      <span style="display:flex; align-items:center; justify-content:center;">${screenIco}</span>
+      <span style="display:flex; align-items:center; justify-content:center;">${qualIco}</span>
+      <span style="display:flex; align-items:center; justify-content:center;">${rebIco}</span>
+      <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶\uFE0E</span>':''}</span>
     `;
     const comboBtn = row.querySelector('.psm-combo-btn');
     if(comboBtn && comboBtn.dataset.psms) {
       comboBtn.addEventListener('click', e=>{
         e.stopPropagation();
-        // data-psms is tab-delimited PSM array — safe, no special chars
         const psms = comboBtn.dataset.psms.split('\t').filter(Boolean);
         filterByPsmCombo(comboBtn.dataset.goalie, psms);
       });
@@ -802,7 +845,7 @@ function showVideo(url, autoplay=true) {
   document.getElementById('vid-controls').style.display='flex';
   if(!autoplay) playOverlay.style.display='flex';
   if(video.src!==url){
-    video.src=url; video.load();
+    video.pause(); video.src=url; video.load();
     video.addEventListener('loadedmetadata', ()=>{ video.currentTime=10; if(autoplay) video.play().catch(()=>{}); else video.pause(); }, {once:true});
   } else {
     if(!autoplay) video.pause();
@@ -868,8 +911,8 @@ document.querySelector('.ctrl-row').addEventListener('click', e=>{
     syncMuteBtn();
   }
 }, true);
-video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸'; playOverlay.style.display='none'; });
-video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶'; });
+video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸\uFE0E'; playOverlay.style.display='none'; });
+video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶\uFE0E'; });
 
 // Progress bar + time display
 video.addEventListener('timeupdate', ()=>{
@@ -892,11 +935,11 @@ document.getElementById('fullscreen-btn').addEventListener('click', ()=>{
   }
 });
 document.addEventListener('fullscreenchange', ()=>{
-  document.getElementById('fullscreen-btn').textContent = document.fullscreenElement ? '⊡' : '⛶';
+  document.getElementById('fullscreen-btn').textContent = document.fullscreenElement ? '⊡' : '⛶\uFE0E';
   updateControlsPadding();
 });
 document.addEventListener('webkitfullscreenchange', ()=>{
-  document.getElementById('fullscreen-btn').textContent = document.webkitFullscreenElement ? '⊡' : '⛶';
+  document.getElementById('fullscreen-btn').textContent = document.webkitFullscreenElement ? '⊡' : '⛶\uFE0E';
   updateControlsPadding();
 });
 
@@ -975,10 +1018,9 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
 });
 
 [['f-period','period'],['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],
- ['f-rushType','rushType'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],
+ ['f-rushType','rushType'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],['f-psm3','psm3'],
  ['f-svTech','svTech'],['f-game','game']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
-document.getElementById('f-hasClip').addEventListener('change', e=>{filters.hasClip=e.target.checked;applyFilters();});
 
 document.getElementById('clear-btn').addEventListener('click',()=>{
   Object.keys(filters).forEach(k=>{
@@ -986,13 +1028,11 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   });
   // reset null fields properly
   ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
-  ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','svTech','game'].forEach(k=>filters[k]='');
-  filters.hasClip=false;
+  ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech','game'].forEach(k=>filters[k]='');
   filters.psmExact=null;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>c.checked=false);
   document.querySelectorAll('select.sel').forEach(s=>s.value='');
-  document.getElementById('f-hasClip').checked=false;
   applyFilters();
 });
 
