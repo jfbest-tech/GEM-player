@@ -655,7 +655,8 @@ function renderList() {
     if(psmArr.length) {
       const isComboActive = filters.psmExact!==null && filters.goalie.size===1 && filters.goalie.has(r.goalie) &&
         psmArr.length===filters.psmExact.length && psmArr.every((p,i)=>p===filters.psmExact[i]);
-      psmHtml += `<button class="psm-combo-btn${isComboActive?' active':''}" data-goalie="${r.goalie}" data-p0="${psmArr[0]||''}" data-p1="${psmArr[1]||''}" data-p2="${psmArr[2]||''}" data-len="${psmArr.length}" title="Filter: ${r.goalie} — this PSM combo"></button>`;
+      // Button goes LEFT of PSMs — PSMs stored tab-delimited (tabs never appear in PSM names)
+      psmHtml = `<button class="psm-combo-btn${isComboActive?' active':''}" data-goalie="${r.goalie}" data-psms="${psmArr.join('\t')}" title="${r.goalie} — filter by this PSM combo"></button>` + psmHtml;
     }
     const res  = r.goal==='Y'
       ? `<span class="badge b-goal">GOAL</span>`
@@ -674,7 +675,9 @@ function renderList() {
     if(comboBtn) {
       comboBtn.addEventListener('click', e=>{
         e.stopPropagation();
-        filterByPsmCombo(comboBtn.dataset.goalie, JSON.parse('['+[comboBtn.dataset.p0,comboBtn.dataset.p1,comboBtn.dataset.p2].slice(0,+comboBtn.dataset.len).map(v=>JSON.stringify(v))+']'));
+        // data-psms is tab-delimited PSM array — safe, no special chars
+        const psms = comboBtn.dataset.psms.split('\t').filter(Boolean);
+        filterByPsmCombo(comboBtn.dataset.goalie, psms);
       });
     }
     row.addEventListener('click', ()=>selectClip(i));
@@ -686,15 +689,16 @@ function filterByPsmCombo(goalie, psmArray) {
   const alreadyActive = filters.psmExact!==null && filters.goalie.size===1 && filters.goalie.has(goalie) &&
     psmArray.length===filters.psmExact.length && psmArray.every((p,i)=>p===filters.psmExact[i]);
   if(alreadyActive) {
-    filters.goalie = new Set();
+    // Toggle off: clear PSM combo filter but keep the goalie filter active
     filters.psmExact = null;
   } else {
+    // Toggle on: filter to this goalie + exact PSM combo
     filters.goalie = new Set([goalie]);
     filters.psmExact = [...psmArray];
+    document.querySelectorAll('input[type=checkbox][data-f="goalie"]').forEach(cb=>{
+      cb.checked = filters.goalie.has(cb.dataset.v);
+    });
   }
-  document.querySelectorAll('input[type=checkbox][data-f="goalie"]').forEach(cb=>{
-    cb.checked = filters.goalie.has(cb.dataset.v);
-  });
   applyFilters();
 }
 
