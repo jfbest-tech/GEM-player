@@ -651,7 +651,13 @@ function renderList() {
       if(psmHtml) psmHtml += '<span style="color:#aaa;padding:0 2px;">→</span>';
       psmHtml += `<span class="psm-sv">${r.svTech}</span>`;
     }
-    if(!psmHtml) psmHtml = '<span style="color:var(--text-mute)">—</span>';
+    if(!psmHtml) {
+      if(r.phType) {
+        psmHtml = `<button class="psm-combo-btn" style="opacity:0.35;cursor:default;"></button><span class="badge b-ph">PH</span>`;
+      } else {
+        psmHtml = '<span style="color:var(--text-mute)">—</span>';
+      }
+    }
     if(psmArr.length) {
       const isComboActive = filters.psmExact!==null && filters.goalie.size===1 && filters.goalie.has(r.goalie) &&
         psmArr.length===filters.psmExact.length && psmArr.every((p,i)=>p===filters.psmExact[i]);
@@ -672,7 +678,7 @@ function renderList() {
       <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶</span>':''}</span>
     `;
     const comboBtn = row.querySelector('.psm-combo-btn');
-    if(comboBtn) {
+    if(comboBtn && comboBtn.dataset.psms) {
       comboBtn.addEventListener('click', e=>{
         e.stopPropagation();
         // data-psms is tab-delimited PSM array — safe, no special chars
