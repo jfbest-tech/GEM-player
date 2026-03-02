@@ -136,6 +136,26 @@
   .vid-wrap:fullscreen .vid-clip-logo,
   .vid-wrap:-webkit-full-screen .vid-clip-logo { display:block; }
 
+  /* ── FULLSCREEN controls ── */
+  .vid-wrap:fullscreen .vid-controls,
+  .vid-wrap:-webkit-full-screen .vid-controls { padding:50px 0 24px; align-items:center; }
+  .vid-wrap:fullscreen .prog-bar,
+  .vid-wrap:-webkit-full-screen .prog-bar { width:min(700px,90vw); }
+  .vid-wrap:fullscreen .ctrl-row,
+  .vid-wrap:-webkit-full-screen .ctrl-row { justify-content:center; width:min(700px,90vw); flex-wrap:nowrap; }
+  .vid-wrap:fullscreen .ctrl-spacer,
+  .vid-wrap:-webkit-full-screen .ctrl-spacer { flex:0 0 16px; }
+  .vid-wrap:fullscreen .ctrl-btn,
+  .vid-wrap:-webkit-full-screen .ctrl-btn { width:46px; height:38px; font-size:0.88rem; }
+  .vid-wrap:fullscreen #prev-btn,  .vid-wrap:fullscreen #next-btn,
+  .vid-wrap:-webkit-full-screen #prev-btn, .vid-wrap:-webkit-full-screen #next-btn { width:auto; padding:0 14px; }
+  .vid-wrap:fullscreen #slomo-btn,
+  .vid-wrap:-webkit-full-screen #slomo-btn { width:auto; padding:0 14px; }
+  .vid-wrap:fullscreen .ctrl-play::before,
+  .vid-wrap:-webkit-full-screen .ctrl-play::before { border-width:8px 0 8px 15px; margin-left:3px; }
+  .vid-wrap:fullscreen .ctrl-play.is-playing::before,
+  .vid-wrap:-webkit-full-screen .ctrl-play.is-playing::before { width:13px; height:17px; border-left-width:4px; border-right-width:4px; }
+
   /* Overlay — always visible */
   .vid-controls {
     position:absolute; bottom:0; left:0; right:0;
