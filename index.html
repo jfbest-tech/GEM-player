@@ -996,11 +996,14 @@ video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').
 video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').classList.remove('is-playing'); });
 
 // Progress bar + time display
+function fmtTime(sec){ const s=Math.floor(sec); return Math.floor(s/60)+':'+(s%60+'').padStart(2,'0'); }
 video.addEventListener('timeupdate', ()=>{
   if(!video.duration) return;
   document.getElementById('prog-fill').style.width = (video.currentTime/video.duration*100)+'%';
-  const s=Math.floor(video.currentTime);
-  document.getElementById('ctrl-time').textContent=Math.floor(s/60)+':'+(s%60+'').padStart(2,'0');
+  document.getElementById('ctrl-time').textContent = fmtTime(video.currentTime)+' / '+fmtTime(video.duration);
+});
+video.addEventListener('loadedmetadata', ()=>{
+  document.getElementById('ctrl-time').textContent = '0:00 / '+fmtTime(video.duration);
 });
 document.getElementById('prog-bar').addEventListener('click', e=>{
   if(video.duration) video.currentTime=(e.offsetX/e.currentTarget.offsetWidth)*video.duration;
