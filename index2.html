@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEM v2 – Goalie Efficiency Model | Sports Performance Analysis</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root {
+    --navy-dark:   #ffffff;
+    --navy:        #f9f9f9;
+    --navy-mid:    #f2f2f2;
+    --navy-light:  #e8e8e8;
+    --navy-border: #d5d5d5;
+    --accent:      #0c2461;
+    --accent-dim:  #4a70c8;
+    --text:        #111111;
+    --text-dim:    #444444;
+    --text-mute:   #888888;
+    --vid-h:       calc(100vh - 282px); /* 50px header + 220px filter panel + 12px top padding */
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; padding-left: 24px; padding-right: 24px; box-shadow: inset 12px 0 20px -4px rgba(0,0,0,0.25), inset -12px 0 20px -4px rgba(0,0,0,0.25); }
+
+  /* HEADER */
+  .header { background: #ffffff; border-bottom: 1px solid var(--navy-border); }
+
+  /* CHIPS */
+  .chip { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:0.69rem; font-weight:600; cursor:pointer; user-select:none; border:1px solid transparent; transition:all .12s; }
+  .chip-r { background:#f0f0f0; color:#666; border-color:#d0d0d0; }
+  .chip-r.on { background:#666; color:#fff; border-color:#666; }
+  .chip-y { background:#f0f0f0; color:#666; border-color:#d0d0d0; }
+  .chip-y.on { background:#666; color:#fff; border-color:#666; }
+  .chip-g { background:#f0f0f0; color:#666; border-color:#d0d0d0; }
+  .chip-g.on { background:#666; color:#fff; border-color:#666; }
+  .chip-b { background:#ececec; color:#444; border-color:#d0d0d0; }
+  .chip-b.on { background:#0c2461; color:#fff; border-color:#0c2461; }
+
+  /* SELECT */
+  select.sel {
+    width:100%; background:#fff; border:1px solid var(--navy-border);
+    color:var(--text); border-radius:5px; padding:4px 24px 4px 7px; font-size:0.69rem; outline:none;
+    -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 8px center;
+  }
+  select.sel:focus { border-color:var(--accent); }
+
+  /* CHECKBOX LABEL */
+  .cb-lbl { display:flex; align-items:center; gap:6px; padding:1px 0; cursor:pointer; color:var(--text-dim); font-size:0.72rem; }
+  .cb-lbl:hover { color:var(--text); }
+  input[type=checkbox] { accent-color:var(--accent); flex-shrink:0; }
+
+  /* SEQUENCE TABLE */
+  .seq-header-row {
+    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
+    gap:6px; align-items:center;
+    padding:5px 10px; border-bottom:1px solid var(--navy-border);
+    background:var(--navy-mid);
+    font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-mute);
+  }
+  .seq-row {
+    display:grid; grid-template-columns: 12px 130px 58px 95px 1fr 62px;
+    gap:6px; align-items:center;
+    padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
+  }
+  .seq-row:hover { background:#eef4ff; }
+  .seq-row.active { background:#d1d5db; border-left:3px solid #0c2461; padding-left:7px; }
+  .seq-row:nth-child(even) { background:var(--navy); }
+  .seq-row:nth-child(even):hover { background:#eef4ff; }
+  .seq-row.active:nth-child(even) { background:#d1d5db; }
+
+  /* Quality dot */
+  .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .dot-R { background:#aaaaaa; } .dot-Y { background:#666666; } .dot-G { background:#0c2461; }
+
+  /* Badges */
+  .badge { font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }
+  .b-goal { background:#4b5563; color:#f3f4f6; border:1px solid #374151; }
+  .b-save { background:#0c2461; color:#fff; border:1px solid #0a1d4e; }
+  .b-ph   { background:#f3f4f6; color:#555; border:1px solid #d1d5db; }
+
+  /* Video wrapper + overlay controls */
+  .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; height:var(--vid-h); border-left:3px solid #fff; border-right:3px solid #fff; }
+  .vid-wrap video { width:100%; height:var(--vid-h); max-height:var(--vid-h); display:block; object-fit:contain; }
+  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
+  .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
+  .no-vid { background:#1a1a1a; border:1px dashed #444; border-radius:8px; line-height:1.5; color:#888; }
+  #play-overlay {
+    position:absolute; inset:0; z-index:10;
+    background:rgba(200,200,200,0.35);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+  }
+  #play-overlay::after { content:'▶'; font-size:3.2rem; color:rgba(220,220,220,0.85); }
+  video::-webkit-media-controls-overlay-cast-button { display:none; }
+  video::-webkit-media-controls-cast-button { display:none; }
+  .vid-clip-label {
+    position:absolute; top:10px; right:10px;
+    background:rgba(0,0,0,0.62); backdrop-filter:blur(4px);
+    color:#dde3ec; font-size:0.78rem; font-weight:700;
+    padding:5px 13px; border-radius:5px; letter-spacing:0.01em;
+    max-width:60%; pointer-events:none; display:none;
+    align-items:center; gap:7px;
+  }
+  .vid-clip-label span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .vid-clip-logo { display:none; height:1em; width:auto; flex-shrink:0; }
+  .vid-wrap:fullscreen .vid-clip-logo,
+  .vid-wrap:-webkit-full-screen .vid-clip-logo { display:block; }
+
+  /* Overlay — always visible */
+  .vid-controls {
+    position:absolute; bottom:0; left:0; right:0;
+    background:linear-gradient(transparent, rgba(0,0,0,0.88));
+    padding:24px 6px 8px;
+    display:flex; flex-direction:column; gap:6px;
+  }
+
+  /* Progress bar */
+  .prog-bar { height:3px; background:rgba(255,255,255,0.2); border-radius:2px; cursor:pointer; margin:0 2px; }
+  .prog-bar:hover { height:5px; }
+  .prog-fill { height:100%; background:#fff; border-radius:2px; pointer-events:none; transition:width 0.1s linear; }
+
+  /* Control buttons */
+  .ctrl-row { display:flex; align-items:center; gap:4px; }
+  .ctrl-btn {
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.2);
+    color:#fff; border-radius:6px;
+    width:34px; height:28px; padding:0;
+    font-size:0.76rem; font-weight:600;
+    cursor:pointer; white-space:nowrap;
+    transition:background 0.1s, border-color 0.1s;
+    backdrop-filter:blur(6px);
+    display:inline-flex; align-items:center; justify-content:center;
+    flex-shrink:0; outline:none;
+  }
+  .ctrl-btn:hover { background:rgba(255,255,255,0.26); border-color:rgba(255,255,255,0.42); }
+  #slomo-btn { width:auto; padding:0 10px; }
+  .ctrl-loop.active-loop, .ctrl-slomo.active-slomo { background:rgba(255,255,255,0.3) !important; border-color:#fff !important; }
+  .ctrl-spacer { flex:1; }
+  .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex-shrink:0; }
+
+  /* PSM tags */
+  .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; }
+  .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #9ab0d0; }
+
+  /* Buttons */
+  .btn { padding:5px 14px; border-radius:5px; font-size:0.72rem; font-weight:600; cursor:pointer; border:1px solid var(--navy-border); color:var(--text-dim); background:#fff; transition:all .12s; }
+  .btn:hover { background:var(--navy-light); color:var(--text); }
+
+  /* Setup notice */
+  .notice { background:#fff; border:1px solid var(--navy-border); border-radius:6px; }
+
+  ::-webkit-scrollbar { width:5px; }
+  ::-webkit-scrollbar-track { background:var(--navy-mid); }
+  ::-webkit-scrollbar-thumb { background:#bbb; border-radius:4px; }
+
+  /* ═══ FILTER PANEL (bottom) ═══ */
+  .filter-panel {
+    background:var(--navy); border-top:1px solid var(--navy-border);
+    height:220px; display:flex; flex-direction:column; flex-shrink:0;
+  }
+  .filter-cols { display:flex; flex:1; overflow:hidden; }
+  .filter-col {
+    flex:1; overflow-y:auto; padding:5px 12px 6px;
+    border-right:1px solid var(--navy-border);
+  }
+  .filter-col:last-child { border-right:none; }
+  .filter-footer {
+    flex-shrink:0; padding:5px 12px; text-align:center;
+    border-top:1px solid var(--navy-border); background:var(--navy-mid);
+  }
+
+  /* Filter row: label + control side by side */
+  .f2-row { display:flex; align-items:center; gap:8px; min-height:22px; padding:1px 0; }
+  .f2-label {
+    font-size:0.57rem; font-weight:700; letter-spacing:0.08em;
+    text-transform:uppercase; color:var(--accent);
+    width:70px; flex-shrink:0; line-height:1.2;
+  }
+  .f2-ctrl { flex:1; min-width:0; display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+</style>
+</head>
+<body class="h-screen overflow-hidden flex flex-col">
+
+<!-- ═══ HEADER ═══ -->
+<div class="header flex items-center justify-between px-5 py-2 flex-shrink-0" style="height:50px">
+  <div class="flex items-center gap-4">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAl4AAADMCAYAAACiEK3nAAAACXBIWXMAAAsSAAALEgHS3X78AAAgAElEQVR4nO2dzXHbyNPGn31rryjiH4G4EUgbgegDztJGYDgC0xEYjmDlCAxFsNQZB0MRrBTBUhEsWAjA72GaEpdG43NmAJDPr4ole0jODPE1z3T39Pzy48cPTJEwiFYAQgBXUrSq+NgSwEVNNTsAT8p7+cG/t/ICgKeizIpWnbRIGEQxgFsANwC+FmW29t0HQgghhLjllykILxFZKxiRdYV6MeWLFxgx9gSggBFqRVFmmpDrTBhEtzBi6xbA4ujt3222RQghhJDxGUV4hUG0xJvguPbegeE8wwiyLYwg2xZltm36UhhEVzACc/86FluH/FGU2WZQLwkhhBAyKbwJrwOxtcY0LFoueJS/W3kt5RUCuOxY129txBwhhBBC5oNz4SXutDXmadkajaLMfhm7D4QQQgixy6+uKpZg8QSna91yyWPzRwghhBAyN6wLLwouK2zH7gAhhBBC7GNNeMnKxDt0j2VywX5FYgE9ncQxK/l7hfqgdx9sR26fEEIIIQ4YLLzCIAphLFwfB/emO71WF7ZBhOQSbykufMao5R7bIoQQQohnBgXXS3qEDfy5FZ+lvRwjJDrtmA5iCFzRSAghhJwgvYWXxHJ9s9qbal5gXJibqYkREWL7fGTWXKxc0UgIIYScJr2EVxhEd3DvWnwEkBRlljtuxwrimkww3CX5XJTZVfPHCCGEEDI3Osd4hUGUAnhvvSdvzEpw7ZH+rsIgWgP4c0BVWysdIoQQQsjk+L8uH3YsunYw2+Ss5ia6DinK7A7A7zC/pw/cn5EQQgg5UVoLrzCIErgTXQ8AlqeyN6Fsbr1CP/FF4UUIIYScKK2ElwTSf3bUh09Fmd36XqHoGhFfcY+vbu32hBBCCCFToTG4Xja3foKb1AkfijJLHdQ7GbouROCKRkIIIeR0aWPxSkHR1ZuizNYwKTHa0PZzhBBCCCFkoLLwKq5YIAIAABJRU5ErkJggg==" alt="Sports Performance Analysis" style="height:30px; object-fit:contain;">
+    <div style="width:1px; height:28px; background:var(--navy-border);"></div>
+    <div>
+      <span style="font-size:0.85rem; font-weight:900; letter-spacing:0.05em; color:#111;">GEM</span>
+      <span style="color:var(--text-mute); font-size:0.72rem; margin-left:6px;">Goalie Efficiency Model</span>
+      <span style="color:var(--accent-dim); font-size:0.65rem; font-weight:700; margin-left:8px; background:#e8edf5; border:1px solid #c5d3ea; border-radius:4px; padding:1px 7px;">v2</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BODY ═══ -->
+<div class="flex flex-1 overflow-hidden flex-col">
+
+  <!-- ── TOP ROW: Video + Playlist ── -->
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Video Panel (left) -->
+    <div class="flex-1 flex flex-col overflow-hidden" style="background:#f9f9f9; border-right:1px solid var(--navy-border);">
+
+      <!-- Setup notice -->
+      <div id="setup-banner" class="notice mx-3 mt-3 p-3 hidden">
+        <div class="font-bold mb-1" style="color:var(--text-dim); font-size:0.72rem;">Setup Required</div>
+        <div style="color:var(--text-dim); font-size:0.69rem;">
+          Set <code style="background:#1e1e1e; padding:1px 5px; border-radius:3px;">CLIP_BASE_URL</code>
+          in index2.html after uploading clips to Cloudflare R2.
+        </div>
+      </div>
+
+      <!-- Video + overlay controls -->
+      <div class="p-3 pb-0">
+        <div class="vid-wrap" id="vid-wrap">
+          <video id="player" disableRemotePlayback style="display:none;"></video>
+          <div id="play-overlay" style="display:none;"></div>
+          <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h); color:var(--text-mute);">
+            <div id="no-vid-text" style="font-size:0.78rem;">Select a Goalie</div>
+          </div>
+          <div class="vid-clip-label" id="vid-clip-label">
+            <img class="vid-clip-logo" src="SPA_Logo-1 - Square Favicon.png" alt="">
+            <span id="vid-clip-text"></span>
+          </div>
+          <div class="vid-controls" id="vid-controls">
+            <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+            <div class="ctrl-row">
+              <button class="ctrl-btn" id="prev-btn" title="Previous clip (P)">⏮</button>
+              <button class="ctrl-btn" id="back3-btn" title="Back 3s (Shift+←)">−3s</button>
+              <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶</button>
+              <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (Shift+→)">+3s</button>
+              <button class="ctrl-btn" id="next-btn" title="Next clip (N)">⏭</button>
+              <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
+              <span class="ctrl-spacer"></span>
+              <span class="ctrl-time" id="ctrl-time">0:00</span>
+              <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)">🔊</button>
+              <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
+              <button class="ctrl-btn" id="dl-btn" title="Download clip">⬇</button>
+              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)">⛶</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /video panel -->
+
+    <!-- Playlist (right) -->
+    <div class="flex flex-col flex-shrink-0" style="width:440px; background:var(--navy-dark);">
+
+      <!-- Table header -->
+      <div class="seq-header-row flex-shrink-0">
+        <span></span>
+        <span>Goalie</span>
+        <span>Game</span>
+        <span>Type</span>
+        <span>Pre-Save Movements → Save Tech</span>
+        <span>Result</span>
+      </div>
+
+      <div id="seq-list" class="flex-1 overflow-y-auto"></div>
+
+      <!-- Stats row -->
+      <div id="stats-row" class="flex items-center gap-4 px-3 py-1 flex-shrink-0"
+           style="background:var(--navy-mid); border-top:1px solid var(--navy-border); font-size:0.65rem; color:var(--text-mute);">
+      </div>
+
+    </div><!-- /playlist -->
+
+  </div><!-- /top row -->
+
+  <!-- ── FILTER PANEL (bottom) ── -->
+  <div class="filter-panel" id="filter-panel">
+    <div class="filter-cols">
+
+      <!-- LEFT COLUMN: Shot Quality / Save·Goal·PH / Period / Strength / Game / Goalie -->
+      <div class="filter-col">
+
+        <div class="f2-row" style="align-items:flex-start; padding-top:2px;">
+          <div class="f2-label">Goalie</div>
+          <div id="f-goalie" class="f2-ctrl" style="flex-wrap:wrap; align-items:center;"></div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Shot Quality</div>
+          <div class="f2-ctrl">
+            <span class="chip chip-r" data-f="ryg" data-v="R">LowQ</span>
+            <span class="chip chip-y" data-f="ryg" data-v="Y">MidQ</span>
+            <span class="chip chip-g" data-f="ryg" data-v="G">GrA</span>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Result</div>
+          <div class="f2-ctrl">
+            <span class="chip chip-b" data-f="save" data-v="Y">Save</span>
+            <span class="chip chip-b" data-f="goal" data-v="Y">Goal</span>
+            <span class="chip chip-b" data-f="ph" data-v="Y">PH</span>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Goal Type</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-goalQual">
+              <option value="">All goal types</option>
+              <option>Should've Had</option><option>Could've Had</option><option>No Chance</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Period</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-period">
+              <option value="">All periods</option>
+              <option value="1">P1</option>
+              <option value="2">P2</option>
+              <option value="3">P3</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Strength</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-strength"><option value="">All strengths</option></select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Game</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-game"><option value="">All games</option></select>
+          </div>
+        </div>
+
+      </div><!-- /left col -->
+
+      <!-- RIGHT COLUMN: Attack Type / PSMs / Save Tech / OZP / Rush / Screen / Rebound -->
+      <div class="filter-col">
+
+        <div class="f2-row">
+          <div class="f2-label">Attack Type</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-attackType"><option value="">All types</option></select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">PSM 1</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-psm0"><option value="">Any</option></select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">PSM 2</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-psm1"><option value="">Any</option></select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">PSM 3</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-psm2"><option value="">Any</option></select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Save Tech</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-svTech"><option value="">All</option></select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">OZP Pattern</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-ozpPattern"><option value="">All patterns</option></select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Rush Type</div>
+          <div class="f2-ctrl">
+            <select class="sel" id="f-rushType"><option value="">All rush types</option></select>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Screen</div>
+          <div class="f2-ctrl">
+            <span class="chip chip-b" data-f="screen" data-v="Y">Yes</span>
+            <span class="chip chip-b" data-f="screen" data-v="N">No</span>
+          </div>
+        </div>
+
+        <div class="f2-row">
+          <div class="f2-label">Rebound</div>
+          <div class="f2-ctrl">
+            <span class="chip chip-b" data-f="rebCreated"  data-v="Y">Created</span>
+            <span class="chip chip-b" data-f="rebAttacked" data-v="Y">Attacked</span>
+          </div>
+        </div>
+
+      </div><!-- /right col -->
+
+    </div><!-- /filter-cols -->
+
+    <!-- Clear Filters -->
+    <div class="filter-footer">
+      <button class="btn" id="clear-btn">Clear Filters</button>
+    </div>
+
+  </div><!-- /filter-panel -->
+
+</div><!-- /body -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════
+const CLIP_BASE_URL = 'https://pub-ae6606f2384f4e86b806f43ee755b3bf.r2.dev/';
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let allData = [], filteredData = [];
+let currentIndex = -1, loopAllActive = false, sloMoActive = false;
+let initialLoad = true;
+
+const filters = {
+  goalie:new Set(), ryg:new Set(), period:'',
+  strength:'', attackType:'',
+  save:null, goal:null, ph:null, goalQual:'',
+  ozpPattern:'', rushType:'',
+  screen:null, psm0:'', psm1:'', psm2:'', svTech:'',
+  rebCreated:null, rebAttacked:null,
+  game:'',
+};
+
+const video  = document.getElementById('player');
+const noVid  = document.getElementById('no-vid');
+const noTxt  = document.getElementById('no-vid-text');
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+async function init() {
+  if (!CLIP_BASE_URL) document.getElementById('setup-banner').classList.remove('hidden');
+
+  try {
+    const res = await fetch('data.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    allData = await res.json();
+    allData.forEach(r => {
+      if (r.strength) r.strength = r.strength.toLowerCase();
+      if (r.attackType) r.attackType = r.attackType.replace(/\bOzp\b/g, 'OZP');
+    });
+  } catch(e) {
+    document.getElementById('seq-list').innerHTML =
+      `<div style="padding:24px; color:#f87171; font-size:0.78rem;">Error loading data.json: ${e.message}</div>`;
+    return;
+  }
+
+  buildFilters();
+  applyFilters();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════
+const clipUrl  = r => CLIP_BASE_URL ? CLIP_BASE_URL.replace(/\/$/,'') + '/' + r.id + '.mp4' : null;
+const hasClip  = r => !!CLIP_BASE_URL && r.fileClock != null;
+const fmtTime  = s => s==null ? '--:--' : Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+
+function unique(field, sub) {
+  const s = new Set();
+  allData.forEach(r => { const v = sub!==undefined?(r[field]||[])[sub]:r[field]; if(v) s.add(v); });
+  return [...s].sort();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BUILD FILTER UI
+// ═══════════════════════════════════════════════════════════
+function cbGroup(id, field, values) {
+  const el = document.getElementById(id);
+  values.forEach(v => {
+    const l = document.createElement('label');
+    l.className = 'cb-lbl';
+    l.innerHTML = `<input type="checkbox" data-f="${field}" data-v="${v}"> ${v}`;
+    el.appendChild(l);
+  });
+}
+function fillSel(id, values) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  values.forEach(v => { const o = document.createElement('option'); o.value=o.textContent=v; el.appendChild(o); });
+}
+
+function buildFilters() {
+  cbGroup('f-goalie',     'goalie',     unique('goalie'));
+  fillSel('f-strength',   unique('strength'));
+  fillSel('f-attackType', unique('attackType'));
+  fillSel('f-ozpPattern',  unique('ozpPattern'));
+  fillSel('f-rushType',    unique('rushType'));
+  fillSel('f-psm0', unique('psm', 0));
+  fillSel('f-psm1', unique('psm', 1));
+  fillSel('f-psm2', unique('psm', 2));
+  fillSel('f-svTech',      unique('svTech'));
+  const ge = document.getElementById('f-game');
+  unique('game').forEach(g => {
+    const o = document.createElement('option'); o.value=g;
+    const m = g.match(/^(\d+)\.(\d+)\.\d+_(.+)$/);
+    const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const label = m ? `${months[+m[1]]} ${+m[2]} vs ${m[3]}` : g;
+    o.textContent = label; o.dataset.base = label;
+    ge.appendChild(o);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  FILTER
+// ═══════════════════════════════════════════════════════════
+function applyFilters() {
+  filteredData = allData.filter(r => {
+    if(filters.goalie.size     && !filters.goalie.has(r.goalie))          return false;
+    if(filters.ryg.size        && !filters.ryg.has(r.ryg))                return false;
+    if(filters.period          && String(r.period)!==filters.period)       return false;
+    if(filters.strength        && r.strength!==filters.strength)           return false;
+    if(filters.attackType      && r.attackType!==filters.attackType)       return false;
+    if(filters.save            && r.save!==filters.save)                   return false;
+    if(filters.goal            && r.goal!==filters.goal)                   return false;
+    if(filters.ph              && !r.phType)                               return false;
+    if(filters.goalQual        && r.goalQualitative!==filters.goalQual)   return false;
+    if(filters.ozpPattern      && r.ozpPattern!==filters.ozpPattern)       return false;
+    if(filters.rushType        && r.rushType!==filters.rushType)           return false;
+    if(filters.screen          && r.screen!==filters.screen)               return false;
+    if(filters.psm0            && (r.psm||[])[0] !== filters.psm0)          return false;
+    if(filters.psm1            && (r.psm||[])[1] !== filters.psm1)          return false;
+    if(filters.psm2            && (r.psm||[])[2] !== filters.psm2)          return false;
+    if(filters.svTech          && r.svTech!==filters.svTech)               return false;
+    if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)       return false;
+    if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
+    if(filters.game            && r.game!==filters.game)                   return false;
+    return true;
+  });
+  currentIndex = filteredData.length > 0 ? 0 : -1;
+  renderList();
+  updateStats();
+  updatePsmCounts();
+  if(filteredData.length > 0 && !initialLoad) loadClip(filteredData[0], false);
+  initialLoad = false;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════════════
+function updateStats() {
+  const t=filteredData.length;
+  const R=filteredData.filter(r=>r.ryg==='R').length;
+  const Y=filteredData.filter(r=>r.ryg==='Y').length;
+  const G=filteredData.filter(r=>r.ryg==='G').length;
+  const v=filteredData.filter(r=>hasClip(r)).length;
+  document.getElementById('stats-row').innerHTML = t
+    ? `<span>${t} sequences</span>
+       <span style="color:#999">&#9679; LowQ: ${R}</span>
+       <span style="color:#555">&#9679; MidQ: ${Y}</span>
+       <span style="color:#0c2461">&#9679; GrA: ${G}</span>
+       <span style="color:var(--text-mute)">&#9654; ${v} with video</span>`
+    : '';
+}
+
+function updatePsmCounts() {
+  [[0,'f-psm0'],[1,'f-psm1'],[2,'f-psm2']].forEach(([idx,id])=>{
+    const sel = document.getElementById(id);
+    Array.from(sel.options).forEach(opt=>{
+      if(!opt.value) return;
+      const n = filteredData.filter(r=>(r.psm||[])[idx]===opt.value).length;
+      opt.textContent = `${opt.value} (${n})`;
+    });
+  });
+  [['f-attackType',r=>r.attackType],['f-svTech',r=>r.svTech],
+   ['f-strength',r=>r.strength],['f-ozpPattern',r=>r.ozpPattern],
+   ['f-rushType',r=>r.rushType]
+  ].forEach(([id,fn])=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    Array.from(sel.options).forEach(opt=>{
+      if(!opt.value) return;
+      const n=filteredData.filter(r=>fn(r)===opt.value).length;
+      opt.textContent=`${opt.value} (${n})`;
+    });
+  });
+  const gSel=document.getElementById('f-game');
+  Array.from(gSel.options).forEach(opt=>{
+    if(!opt.value) return;
+    const n=filteredData.filter(r=>r.game===opt.value).length;
+    opt.textContent=`${opt.dataset.base||opt.value} (${n})`;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  SEQUENCE LIST
+// ═══════════════════════════════════════════════════════════
+function renderList() {
+  const list = document.getElementById('seq-list');
+  list.innerHTML = '';
+
+  if(!filteredData.length) {
+    list.innerHTML = `<div style="padding:32px; text-align:center; color:var(--text-mute); font-size:0.78rem;">No sequences match the current filters.</div>`;
+    return;
+  }
+
+  filteredData.forEach((r,i) => {
+    const row = document.createElement('div');
+    row.className = 'seq-row' + (i===currentIndex?' active':'');
+    row.dataset.i = i;
+
+    const has  = hasClip(r);
+    const dc   = `dot dot-${r.ryg||'R'}`;
+    const opp  = (r.game||'').replace(/^\d+\.\d+\.\d+_/,'');
+    const psmArr = r.psm||[];
+    let psmHtml = psmArr.length
+      ? psmArr.map(p=>`<span class="psm">${p}</span>`).join('<span style="color:#aaa;padding:0 2px;">→</span>')
+      : '';
+    if(r.svTech) {
+      if(psmHtml) psmHtml += '<span style="color:#aaa;padding:0 2px;">→</span>';
+      psmHtml += `<span class="psm-sv">${r.svTech}</span>`;
+    }
+    if(!psmHtml) psmHtml = '<span style="color:var(--text-mute)">—</span>';
+    const res  = r.goal==='Y'
+      ? `<span class="badge b-goal">GOAL</span>`
+      : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
+      : r.phType ? `<span class="badge b-ph">PH</span>` : '—';
+
+    row.innerHTML = `
+      <span class="${dc}"></span>
+      <span style="color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px;">${r.goalie||'—'}</span>
+      <span style="color:var(--text-dim); font-size:11px;">${opp} P${r.period||'?'}</span>
+      <span style="color:var(--text-dim); font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
+      <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
+      <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶</span>':''}</span>
+    `;
+    row.addEventListener('click', ()=>selectClip(i));
+    list.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PLAYBACK
+// ═══════════════════════════════════════════════════════════
+function selectClip(idx) {
+  currentIndex = idx;
+  loopAllActive = false;
+  const lb = document.getElementById('loop-btn');
+  lb.classList.remove('active-loop');
+  lb.textContent = '⟳';
+
+  document.querySelectorAll('.seq-row').forEach((el,i)=>el.classList.toggle('active',i===idx));
+  const activeRow = document.querySelector(`.seq-row[data-i="${idx}"]`);
+  if(activeRow) activeRow.scrollIntoView({block:'start', behavior:'smooth'});
+
+  const r = filteredData[idx];
+  loadClip(r);
+}
+
+function loadClip(r, autoplay=true) {
+  const parts = [r.attackType||r.phType, ...(r.psm||[]), r.svTech].filter(Boolean);
+  document.getElementById('vid-clip-text').textContent = parts.join(' → ');
+  document.getElementById('vid-clip-label').style.display = 'flex';
+
+  if(!CLIP_BASE_URL){ showNoVid('Configure CLIP_BASE_URL to enable video playback'); return; }
+  if(r.fileClock==null){ showNoVid('No timestamp recorded for this sequence'); return; }
+  showVideo(clipUrl(r), autoplay);
+}
+
+const playOverlay = document.getElementById('play-overlay');
+function showVideo(url, autoplay=true) {
+  noVid.style.display='none'; video.style.display='block';
+  if(!autoplay) playOverlay.style.display='flex';
+  if(video.src!==url){
+    video.src=url; video.load();
+    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=15; if(autoplay) video.play().catch(()=>{}); }, {once:true});
+  } else {
+    if(!autoplay) video.pause();
+    video.currentTime=15;
+    if(autoplay) video.play().catch(()=>{});
+  }
+}
+function showNoVid(msg) {
+  video.style.display='none'; noVid.style.display='flex'; noTxt.textContent=msg;
+  playOverlay.style.display='none';
+}
+playOverlay.addEventListener('click', e=>{ e.stopPropagation(); video.play().catch(()=>{}); });
+
+video.addEventListener('ended', ()=>{
+  const next = (currentIndex+1) % filteredData.length;
+  selectClip(next);
+});
+
+// ═══════════════════════════════════════════════════════════
+//  CONTROLS
+// ═══════════════════════════════════════════════════════════
+document.getElementById('loop-btn').addEventListener('click', ()=>{
+  if(!filteredData.length) return;
+  loopAllActive = !loopAllActive;
+  const lb = document.getElementById('loop-btn');
+  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='⏹'; if(currentIndex<0) selectClip(0); }
+  else             { lb.classList.remove('active-loop'); lb.textContent='⟳'; }
+});
+document.getElementById('prev-btn').addEventListener('click', ()=>{ if(currentIndex>0) selectClip(currentIndex-1); });
+document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIndex<filteredData.length-1) selectClip(currentIndex+1); });
+document.getElementById('play-pause-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
+document.getElementById('vid-wrap').addEventListener('click', e=>{ if(!e.target.closest('#vid-controls') && video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
+document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.max(0,video.currentTime-3); });
+document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
+
+let sPreMuted = false;
+
+function syncMuteBtn() {
+  document.getElementById('mute-btn').textContent = video.muted ? '🔇' : '🔊';
+}
+
+// Slo-Mo toggle
+document.getElementById('slomo-btn').addEventListener('click', ()=>{
+  if(video.style.display==='none') return;
+  sloMoActive=!sloMoActive;
+  const btn=document.getElementById('slomo-btn');
+  if(sloMoActive){
+    sPreMuted = video.muted;
+    video.muted=true; video.playbackRate=0.5; video.play().catch(()=>{}); btn.classList.add('active-slomo');
+  } else {
+    video.muted=sPreMuted; video.playbackRate=1; btn.classList.remove('active-slomo');
+  }
+  syncMuteBtn();
+});
+// Any other ctrl-row button click resets slo-mo
+document.querySelector('.ctrl-row').addEventListener('click', e=>{
+  if(sloMoActive && !e.target.closest('#slomo-btn')){
+    sloMoActive=false; video.playbackRate=1; video.muted=sPreMuted;
+    document.getElementById('slomo-btn').classList.remove('active-slomo');
+    syncMuteBtn();
+  }
+}, true);
+video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸'; playOverlay.style.display='none'; });
+video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶'; });
+
+// Progress bar + time display
+video.addEventListener('timeupdate', ()=>{
+  if(!video.duration) return;
+  document.getElementById('prog-fill').style.width = (video.currentTime/video.duration*100)+'%';
+  const s=Math.floor(video.currentTime);
+  document.getElementById('ctrl-time').textContent=Math.floor(s/60)+':'+(s%60+'').padStart(2,'0');
+});
+document.getElementById('prog-bar').addEventListener('click', e=>{
+  if(video.duration) video.currentTime=(e.offsetX/e.currentTarget.offsetWidth)*video.duration;
+});
+
+// Fullscreen
+document.getElementById('fullscreen-btn').addEventListener('click', ()=>{
+  if(document.fullscreenElement||document.webkitFullscreenElement){
+    document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen&&document.webkitExitFullscreen();
+  } else {
+    const w=document.getElementById('vid-wrap');
+    w.requestFullscreen?w.requestFullscreen():w.webkitRequestFullscreen&&w.webkitRequestFullscreen();
+  }
+});
+document.addEventListener('fullscreenchange', ()=>{
+  document.getElementById('fullscreen-btn').textContent = document.fullscreenElement ? '⊡' : '⛶';
+  updateControlsPadding();
+});
+document.addEventListener('webkitfullscreenchange', ()=>{
+  document.getElementById('fullscreen-btn').textContent = document.webkitFullscreenElement ? '⊡' : '⛶';
+  updateControlsPadding();
+});
+
+function updateControlsPadding() {
+  const ctrl  = document.getElementById('vid-controls');
+  const label = document.getElementById('vid-clip-label');
+  const wrap  = document.getElementById('vid-wrap');
+  if (document.fullscreenElement || document.webkitFullscreenElement || !video.videoWidth || video.style.display === 'none') {
+    ctrl.style.left = ''; ctrl.style.right = '';
+    label.style.right = '';
+    playOverlay.style.left = ''; playOverlay.style.right = '';
+    return;
+  }
+  const ar = video.videoWidth / video.videoHeight;
+  const side = wrap.clientWidth / wrap.clientHeight > ar
+    ? Math.round((wrap.clientWidth - wrap.clientHeight * ar) / 2) : 0;
+  ctrl.style.left  = side + 'px';
+  ctrl.style.right = side + 'px';
+  label.style.right = (side + 10) + 'px';
+  playOverlay.style.left  = side + 'px';
+  playOverlay.style.right = side + 'px';
+}
+video.addEventListener('loadedmetadata', updateControlsPadding);
+window.addEventListener('resize', updateControlsPadding);
+
+// Mute toggle
+document.getElementById('mute-btn').addEventListener('click', ()=>{
+  video.muted = !video.muted;
+  document.getElementById('mute-btn').textContent = video.muted ? '🔇' : '🔊';
+});
+
+// Download
+document.getElementById('dl-btn').addEventListener('click', async ()=>{
+  if(!video.src||video.style.display==='none') return;
+  try {
+    const res=await fetch(video.src);
+    const blob=await res.blob();
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download=video.src.split('/').pop();
+    a.click(); URL.revokeObjectURL(url);
+  } catch(e){ window.open(video.src,'_blank'); }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  FILTER WIRING
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('.chip[data-f]').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    const f=chip.dataset.f, v=chip.dataset.v;
+    if(['ryg'].includes(f)){
+      chip.classList.toggle('on');
+      filters[f].has(v)?filters[f].delete(v):filters[f].add(v);
+    } else {
+      const was=chip.classList.contains('on');
+      document.querySelectorAll(`.chip[data-f="${f}"]`).forEach(c=>c.classList.remove('on'));
+      filters[f]=was?null:v;
+      if(!was) chip.classList.add('on');
+    }
+    applyFilters();
+  });
+});
+
+document.getElementById('filter-panel').addEventListener('change', e=>{
+  const cb=e.target;
+  if(cb.type!=='checkbox'||!cb.dataset.f) return;
+  if(filters[cb.dataset.f] instanceof Set){
+    cb.checked?filters[cb.dataset.f].add(cb.dataset.v):filters[cb.dataset.f].delete(cb.dataset.v);
+  }
+  applyFilters();
+});
+
+[['f-period','period'],['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],
+ ['f-rushType','rushType'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],
+ ['f-svTech','svTech'],['f-game','game']
+].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
+
+document.getElementById('f-goalQual').addEventListener('change',e=>{filters.goalQual=e.target.value;applyFilters();});
+
+document.getElementById('clear-btn').addEventListener('click',()=>{
+  Object.keys(filters).forEach(k=>{
+    if(filters[k] instanceof Set) filters[k]=new Set();
+    else if(typeof filters[k]==='boolean') filters[k]=false;
+    else filters[k]='';
+  });
+  ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
+  ['goalQual','period','attackType','ozpPattern','rushType','psm0','psm1','psm2','svTech','game','strength'].forEach(k=>filters[k]='');
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>c.checked=false);
+  document.querySelectorAll('select.sel').forEach(s=>s.value='');
+  applyFilters();
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+  if(e.key==='n') document.getElementById('next-btn').click();
+  if(e.key==='p') document.getElementById('prev-btn').click();
+  if(e.key===' '){ e.preventDefault(); document.getElementById('play-pause-btn').click(); }
+  if(e.key==='s') document.getElementById('slomo-btn').click();
+  if(e.key==='l') document.getElementById('loop-btn').click();
+  if(e.key==='f') document.getElementById('fullscreen-btn').click();
+  if(e.key==='m') document.getElementById('mute-btn').click();
+  if(e.key==='ArrowLeft'  && e.shiftKey) document.getElementById('back3-btn').click();
+  if(e.key==='ArrowRight' && e.shiftKey) document.getElementById('fwd3-btn').click();
+});
+
+init();
+</script>
+</body>
+</html>
