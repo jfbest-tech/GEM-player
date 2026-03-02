@@ -688,7 +688,8 @@ function renderList() {
     }
     if(!psmHtml) {
       if(r.phType) {
-        psmHtml = `<button class="psm-combo-btn" style="opacity:0.35;cursor:default;"></button><span class="badge b-ph">PH</span>`;
+        const isPhActive = filters.goalie.size===1 && filters.goalie.has(r.goalie) && filters.ph==='Y';
+        psmHtml = `<button class="psm-combo-btn${isPhActive?' active':''}" data-goalie="${r.goalie}" data-ph="1" title="${r.goalie} — filter all PH"></button><span class="badge b-ph">PH</span>`;
       } else {
         psmHtml = '<span style="color:var(--text-mute)">—</span>';
       }
@@ -720,10 +721,31 @@ function renderList() {
         const psms = comboBtn.dataset.psms.split('\t').filter(Boolean);
         filterByPsmCombo(comboBtn.dataset.goalie, psms);
       });
+    } else if(comboBtn && comboBtn.dataset.ph) {
+      comboBtn.addEventListener('click', e=>{
+        e.stopPropagation();
+        filterByPh(comboBtn.dataset.goalie);
+      });
     }
     row.addEventListener('click', ()=>selectClip(i));
     list.appendChild(row);
   });
+}
+
+function filterByPh(goalie) {
+  const alreadyActive = filters.goalie.size===1 && filters.goalie.has(goalie) && filters.ph==='Y';
+  if(alreadyActive) {
+    filters.ph = null;
+    document.querySelectorAll('.chip[data-f="ph"]').forEach(c=>c.classList.remove('on'));
+  } else {
+    filters.goalie = new Set([goalie]);
+    filters.ph = 'Y';
+    document.querySelectorAll('input[type=checkbox][data-f="goalie"]').forEach(cb=>{
+      cb.checked = cb.dataset.v===goalie;
+    });
+    document.querySelectorAll('.chip[data-f="ph"]').forEach(c=>c.classList.toggle('on', c.dataset.v==='Y'));
+  }
+  applyFilters();
 }
 
 function filterByPsmCombo(goalie, psmArray) {
@@ -778,10 +800,10 @@ function showVideo(url, autoplay=true) {
   if(!autoplay) playOverlay.style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
-    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=10; if(autoplay) video.play().catch(()=>{}); else video.pause(); }, {once:true});
+    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=14; if(autoplay) video.play().catch(()=>{}); else video.pause(); }, {once:true});
   } else {
     if(!autoplay) video.pause();
-    video.currentTime=10;
+    video.currentTime=14;
     if(autoplay) video.play().catch(()=>{});
   }
 }
