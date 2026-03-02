@@ -759,13 +759,12 @@ function selectClip(idx) {
 }
 
 function loadClip(r, autoplay=true) {
+  if(!CLIP_BASE_URL){ showNoVid('Configure CLIP_BASE_URL to enable video playback'); return; }
+  if(r.fileClock==null){ showNoVid('No timestamp recorded for this sequence'); return; }
   // Build clip label: Type → PSMs → Save Tech
   const parts = [r.attackType||r.phType, ...(r.psm||[]), r.svTech].filter(Boolean);
   document.getElementById('vid-clip-text').textContent = parts.join(' → ');
   document.getElementById('vid-clip-label').style.display = 'flex';
-
-  if(!CLIP_BASE_URL){ showNoVid('Configure CLIP_BASE_URL to enable video playback'); return; }
-  if(r.fileClock==null){ showNoVid('No timestamp recorded for this sequence'); return; }
   showVideo(clipUrl(r), autoplay);
 }
 
@@ -783,7 +782,8 @@ function showVideo(url, autoplay=true) {
   }
 }
 function showNoVid(msg) {
-  video.style.display='none'; noVid.style.display='flex'; noTxt.textContent=msg;
+  video.pause(); video.style.display='none';
+  noVid.style.display='flex'; noTxt.textContent=msg;
   playOverlay.style.display='none';
   document.getElementById('vid-clip-label').style.display='none';
 }
