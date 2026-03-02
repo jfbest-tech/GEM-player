@@ -95,11 +95,11 @@
   .no-vid { background:#1a1a1a; border:1px dashed #444; border-radius:8px; line-height:1.5; color:#888; }
   #play-overlay {
     position:absolute; inset:0; z-index:10;
-    background:rgba(200,200,200,0.35);
+    background:rgba(160,160,160,0.42);
     display:flex; align-items:center; justify-content:center;
     cursor:pointer;
   }
-  #play-overlay::after { content:'▶'; font-size:3.2rem; color:rgba(220,220,220,0.85); }
+  #play-overlay::after { content:'▶'; font-size:3.2rem; color:rgba(255,255,255,0.95); text-shadow:0 3px 16px rgba(0,0,0,0.7); }
   video::-webkit-media-controls-overlay-cast-button { display:none; }
   video::-webkit-media-controls-cast-button { display:none; }
   .vid-clip-label {
@@ -161,7 +161,7 @@
     display:inline-flex; align-items:center; justify-content:center;
     width:13px; height:13px; border-radius:50%;
     border:1.5px solid #b0c4de; background:#eef2fa;
-    cursor:pointer; flex-shrink:0; margin-left:5px;
+    cursor:pointer; flex-shrink:0; margin-left:5px; margin-right:8px;
     padding:0; position:relative; transition:all .1s;
   }
   .psm-combo-btn:hover { border-color:#0c2461; background:#dce8f8; }
@@ -408,7 +408,7 @@
         <span>Goalie</span>
         <span>Game</span>
         <span>Type</span>
-        <span>Pre-Save Movements → Save Tech</span>
+        <span style="padding-left:26px;">Pre-Save Movements → Save Tech</span>
         <span>Result</span>
       </div>
 
@@ -737,10 +737,10 @@ function showVideo(url, autoplay=true) {
   if(!autoplay) playOverlay.style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
-    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=15; if(autoplay) video.play().catch(()=>{}); }, {once:true});
+    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=10; if(autoplay) video.play().catch(()=>{}); }, {once:true});
   } else {
     if(!autoplay) video.pause();
-    video.currentTime=15;
+    video.currentTime=10;
     if(autoplay) video.play().catch(()=>{});
   }
 }
