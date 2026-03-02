@@ -92,7 +92,10 @@
   .vid-wrap video { width:100%; height:var(--vid-h); max-height:var(--vid-h); display:block; object-fit:contain; }
   .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
   .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
-  .no-vid { background:#1a1a1a; border:1px dashed #444; border-radius:8px; line-height:1.5; color:#888; }
+  .no-vid { background:#1e1e1e; border-radius:8px; }
+  #no-vid-text { font-size:0.68rem; color:rgba(200,200,200,0.38); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:16px; }
+  .goalie-pick-btn { padding:8px 20px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.16); color:rgba(230,230,230,0.88); border-radius:6px; cursor:pointer; font-size:0.8rem; font-weight:600; transition:all .15s; }
+  .goalie-pick-btn:hover { background:rgba(255,255,255,0.16); border-color:rgba(255,255,255,0.38); }
   #play-overlay {
     position:absolute; inset:0; z-index:10;
     background:rgba(160,160,160,0.42);
@@ -367,8 +370,9 @@
         <div class="vid-wrap" id="vid-wrap">
           <video id="player" disableRemotePlayback style="display:none;"></video>
           <div id="play-overlay" style="display:none;"></div>
-          <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h); color:var(--text-mute);">
-            <div id="no-vid-text" style="font-size:0.78rem;">Select a Goalie</div>
+          <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h);">
+            <div id="no-vid-text">Select a Goalie</div>
+            <div id="no-vid-goalies" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:80%;"></div>
           </div>
           <div class="vid-clip-label" id="vid-clip-label">
             <img class="vid-clip-logo" src="SPA_Logo-1 - Square Favicon.png" alt="">
@@ -510,6 +514,18 @@ function fillSel(id, values) {
 
 function buildFilters() {
   cbGroup('f-goalie',     'goalie',     unique('goalie'));
+  const noVidGoalies = document.getElementById('no-vid-goalies');
+  unique('goalie').forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'goalie-pick-btn';
+    btn.textContent = name;
+    btn.addEventListener('click', () => {
+      filters.goalie = new Set([name]);
+      document.querySelectorAll('input[type=checkbox][data-f="goalie"]').forEach(cb => { cb.checked = cb.dataset.v === name; });
+      applyFilters();
+    });
+    noVidGoalies.appendChild(btn);
+  });
   fillSel('f-strength',   unique('strength'));
   fillSel('f-attackType', unique('attackType'));
   fillSel('f-ozpPattern',  unique('ozpPattern'));
@@ -605,10 +621,8 @@ function updatePsmCounts() {
     });
     sel.value = (activeVal && counts.has(activeVal)) ? activeVal : '';
   });
-  // Simple field dropdowns (value === base label)
-  [['f-attackType',r=>r.attackType],['f-svTech',r=>r.svTech],
-   ['f-strength',r=>r.strength],['f-ozpPattern',r=>r.ozpPattern],
-   ['f-rushType',r=>r.rushType]
+  // Simple field dropdowns — count update only (order stays fixed)
+  [['f-attackType',r=>r.attackType],['f-strength',r=>r.strength]
   ].forEach(([id,fn])=>{
     const sel=document.getElementById(id); if(!sel) return;
     Array.from(sel.options).forEach(opt=>{
@@ -616,6 +630,21 @@ function updatePsmCounts() {
       const n=filteredData.filter(r=>fn(r)===opt.value).length;
       opt.textContent=`${opt.value} (${n})`;
     });
+  });
+  // svTech, ozpPattern, rushType — rebuild sorted by count desc, hide zero-count
+  [['f-svTech',r=>r.svTech,filters.svTech],
+   ['f-ozpPattern',r=>r.ozpPattern,filters.ozpPattern],
+   ['f-rushType',r=>r.rushType,filters.rushType]
+  ].forEach(([id,fn,activeVal])=>{
+    const sel=document.getElementById(id); if(!sel) return;
+    const defaultText=sel.options[0]?sel.options[0].textContent:'All';
+    const counts=new Map();
+    filteredData.forEach(r=>{const v=fn(r);if(v)counts.set(v,(counts.get(v)||0)+1);});
+    sel.innerHTML=`<option value="">${defaultText}</option>`;
+    [...counts.entries()].sort((a,b)=>b[1]-a[1]).forEach(([v,n])=>{
+      const o=document.createElement('option');o.value=v;o.textContent=`${v} (${n})`;sel.appendChild(o);
+    });
+    sel.value=(activeVal&&counts.has(activeVal))?activeVal:'';
   });
   // Game dropdown (formatted label stored in data-base)
   const gSel=document.getElementById('f-game');
@@ -756,6 +785,7 @@ function showVideo(url, autoplay=true) {
 function showNoVid(msg) {
   video.style.display='none'; noVid.style.display='flex'; noTxt.textContent=msg;
   playOverlay.style.display='none';
+  document.getElementById('vid-clip-label').style.display='none';
 }
 playOverlay.addEventListener('click', e=>{ e.stopPropagation(); video.play().catch(()=>{}); });
 
