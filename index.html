@@ -803,10 +803,10 @@ function showVideo(url, autoplay=true) {
   if(!autoplay) playOverlay.style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
-    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=14; if(autoplay) video.play().catch(()=>{}); else video.pause(); }, {once:true});
+    video.addEventListener('loadedmetadata', ()=>{ video.currentTime=10; if(autoplay) video.play().catch(()=>{}); else video.pause(); }, {once:true});
   } else {
     if(!autoplay) video.pause();
-    video.currentTime=14;
+    video.currentTime=10;
     if(autoplay) video.play().catch(()=>{});
   }
 }
