@@ -112,6 +112,15 @@
     cursor:pointer;
   }
   #play-overlay::after { content:'▶'; font-size:3.2rem; color:rgba(255,255,255,0.95); text-shadow:0 3px 16px rgba(0,0,0,0.7); }
+  #seek-toast {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    z-index:20; pointer-events:none;
+    font-size:1.6rem; font-weight:700; color:#fff;
+    text-shadow:0 2px 12px rgba(0,0,0,0.7);
+    opacity:0; transition:opacity 0.08s ease;
+  }
+  #seek-toast.show { opacity:1; }
+  #seek-toast.fade { opacity:0; transition:opacity 0.6s ease; }
   video::-webkit-media-controls-overlay-cast-button { display:none; }
   video::-webkit-media-controls-cast-button { display:none; }
   .vid-clip-label {
@@ -366,6 +375,9 @@
       <span class="chip chip-b" data-f="goalQual" data-v="No Chance">No Chance</span>
     </div>
 
+    <div class="section-title">Game</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-game"><option value="">All</option></select></div>
+
     <div class="section-title">Period</div>
     <div class="px-3 pb-3">
       <select class="sel" id="f-period">
@@ -377,10 +389,7 @@
     </div>
 
     <div class="section-title">Strength</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-strength"><option value="">All</option></select></div>
-
-    <div class="section-title">Game</div>
-    <div class="px-3 pb-4"><select class="sel" id="f-game"><option value="">All</option></select></div>
+    <div class="px-3 pb-4"><select class="sel" id="f-strength"><option value="">All</option></select></div>
 
   </div><!-- /scroll -->
   <div class="flex-shrink-0 px-3 py-2" style="border-top:1px solid var(--navy-border);">
@@ -408,6 +417,7 @@
         <div class="vid-wrap" id="vid-wrap">
           <video id="player" disableRemotePlayback muted style="display:none;"></video>
           <div id="play-overlay" style="display:none;"></div>
+          <div id="seek-toast"></div>
           <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h);">
             <div id="no-vid-text">Select a Goalie</div>
             <div id="no-vid-goalies" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; max-width:80%;"></div>
@@ -904,8 +914,32 @@ document.getElementById('prev-btn').addEventListener('click', ()=>{ if(currentIn
 document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIndex<filteredData.length-1) selectClip(currentIndex+1); });
 document.getElementById('play-pause-btn').addEventListener('click', ()=>{ if(video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
 document.getElementById('vid-wrap').addEventListener('click', e=>{ if(!e.target.closest('#vid-controls') && !e.target.closest('#no-vid') && video.style.display!=='none'){ video.paused?video.play():video.pause(); } });
-document.getElementById('back3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.max(0,video.currentTime-3); });
-document.getElementById('fwd3-btn').addEventListener('click', ()=>{ if(video.style.display!=='none') video.currentTime=Math.min(video.duration||0,video.currentTime+3); });
+let _seekDelta=0, _seekTimer=null;
+let _toastTimer=null;
+function showSeekToast(delta){
+  const toast=document.getElementById('seek-toast');
+  toast.textContent=(delta>0?'+':'')+delta+'s';
+  toast.className='show';
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>{ toast.className='fade'; },700);
+}
+function seekBy(delta){
+  if(video.style.display==='none') return;
+  showSeekToast(delta);
+  if(delta > 0){
+    video.currentTime = Math.min(video.duration||0, video.currentTime + delta);
+  } else {
+    _seekDelta += delta;
+    clearTimeout(_seekTimer);
+    _seekTimer = setTimeout(()=>{
+      const t = Math.max(0, video.currentTime + _seekDelta);
+      if(video.fastSeek) video.fastSeek(t); else video.currentTime = t;
+      _seekDelta = 0;
+    }, 40);
+  }
+}
+document.getElementById('back3-btn').addEventListener('click', ()=>seekBy(-3));
+document.getElementById('fwd3-btn').addEventListener('click',  ()=>seekBy(3));
 let sPreMuted = false; // mute state saved before entering slow-mo
 
 function syncMuteBtn() {
@@ -1068,8 +1102,8 @@ document.addEventListener('keydown',e=>{
   if(e.key==='l') document.getElementById('loop-btn').click();
   if(e.key==='f') document.getElementById('fullscreen-btn').click();
   if(e.key==='m') document.getElementById('mute-btn').click();
-  if(e.key==='ArrowLeft'  && e.shiftKey) document.getElementById('back3-btn').click();
-  if(e.key==='ArrowRight' && e.shiftKey) document.getElementById('fwd3-btn').click();
+  if(e.key==='ArrowLeft'  && e.shiftKey) seekBy(-3);
+  if(e.key==='ArrowRight' && e.shiftKey) seekBy(3);
 });
 document.addEventListener('keyup',e=>{
 });
