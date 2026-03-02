@@ -270,18 +270,20 @@
     <div class="section-title">Attack Type</div>
     <div class="px-3 pb-3"><select class="sel" id="f-attackType"><option value="">All types</option></select></div>
 
-    <div class="section-title">Pre-Save Movements</div>
-    <div class="px-3 pb-3 flex flex-col gap-1">
-      <div class="psm-lbl">Move 1 (PSM1)</div>
-      <select class="sel" id="f-psm0"><option value="">Any</option></select>
-      <div class="psm-lbl">Move 2 (PSM2)</div>
-      <select class="sel" id="f-psm1"><option value="">Any</option></select>
-      <div class="psm-lbl">Move 3 (PSM3)</div>
-      <select class="sel" id="f-psm2"><option value="">Any</option></select>
+    <div style="margin:4px 8px 6px; border:1px solid #dde3ec; border-radius:6px; background:#f6f8fc;">
+      <div class="section-title">Pre-Save Movements</div>
+      <div class="px-3 pb-2 flex flex-col gap-1">
+        <div class="psm-lbl">Move 1 (PSM1)</div>
+        <select class="sel" id="f-psm0"><option value="">Any</option></select>
+        <div class="psm-lbl">Move 2 (PSM2)</div>
+        <select class="sel" id="f-psm1"><option value="">Any</option></select>
+        <div class="psm-lbl">Move 3 (PSM3)</div>
+        <select class="sel" id="f-psm2"><option value="">Any</option></select>
+      </div>
+      <div style="height:1px; background:#dde3ec; margin:0 10px;"></div>
+      <div class="section-title">Save Technique</div>
+      <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
     </div>
-
-    <div class="section-title">Save Technique</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
 
     <div class="section-title">OZP Pattern</div>
     <div class="px-3 pb-3"><select class="sel" id="f-ozpPattern"><option value="">All patterns</option></select></div>
@@ -378,7 +380,7 @@
             <img class="vid-clip-logo" src="SPA_Logo-1 - Square Favicon.png" alt="">
             <span id="vid-clip-text"></span>
           </div>
-          <div class="vid-controls" id="vid-controls">
+          <div class="vid-controls" id="vid-controls" style="display:none;">
             <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
             <div class="ctrl-row">
               <button class="ctrl-btn" id="prev-btn" title="Previous clip (P)">⏮</button>
@@ -771,6 +773,7 @@ function loadClip(r, autoplay=true) {
 const playOverlay = document.getElementById('play-overlay');
 function showVideo(url, autoplay=true) {
   noVid.style.display='none'; video.style.display='block';
+  document.getElementById('vid-controls').style.display='flex';
   if(!autoplay) playOverlay.style.display='flex';
   if(video.src!==url){
     video.src=url; video.load();
@@ -786,6 +789,7 @@ function showNoVid(msg) {
   noVid.style.display='flex'; noTxt.textContent=msg;
   playOverlay.style.display='none';
   document.getElementById('vid-clip-label').style.display='none';
+  document.getElementById('vid-controls').style.display='none';
 }
 playOverlay.addEventListener('click', e=>{ e.stopPropagation(); video.play().catch(()=>{}); });
 
