@@ -149,12 +149,24 @@
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex-shrink:0; }
   #resize-handle { height:14px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; }
   #resize-handle:hover, #resize-handle.dragging { background:var(--navy-light); }
-  #resize-handle::after { content:'↑↓'; width:22px; height:22px; border-radius:50%; background:var(--navy-mid); border:1px solid var(--navy-border); font-size:10px; line-height:22px; text-align:center; color:var(--text-dim); opacity:0.7; pointer-events:none; letter-spacing:-1px; }
-  #resize-handle:hover::after, #resize-handle.dragging::after { opacity:1; background:var(--navy-light); border-color:var(--accent); color:var(--accent); }
+  #resize-handle::after { content:'▲\A▼'; white-space:pre; text-align:center; line-height:1.15; font-size:7px; color:var(--text-dim); opacity:0.55; pointer-events:none; letter-spacing:0; }
+  #resize-handle:hover::after, #resize-handle.dragging::after { opacity:1; color:var(--accent); }
 
   /* PSM tags */
   .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; }
   .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #9ab0d0; }
+
+  /* PSM combo filter radio button */
+  .psm-combo-btn {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:13px; height:13px; border-radius:50%;
+    border:1.5px solid #b0c4de; background:#eef2fa;
+    cursor:pointer; flex-shrink:0; margin-left:5px;
+    padding:0; position:relative; transition:all .1s;
+  }
+  .psm-combo-btn:hover { border-color:#0c2461; background:#dce8f8; }
+  .psm-combo-btn.active { background:#0c2461; border-color:#0c2461; }
+  .psm-combo-btn.active::before { content:''; position:absolute; width:5px; height:5px; border-radius:50%; background:#fff; }
 
   /* Buttons (header only) */
   .btn { padding:5px 14px; border-radius:5px; font-size:0.72rem; font-weight:600; cursor:pointer; border:1px solid var(--navy-border); color:var(--text-dim); background:#fff; transition:all .12s; }
@@ -252,16 +264,6 @@
     <div class="section-title">Goalie</div>
     <div id="f-goalie" class="px-3 pb-2 flex flex-col gap-1"></div>
 
-    <div class="section-title">Period</div>
-    <div class="px-3 pb-3">
-      <select class="sel" id="f-period">
-        <option value="">All periods</option>
-        <option value="1">P1</option>
-        <option value="2">P2</option>
-        <option value="3">P3</option>
-      </select>
-    </div>
-
     <div class="section-title">Attack Type</div>
     <div class="px-3 pb-3"><select class="sel" id="f-attackType"><option value="">All types</option></select></div>
 
@@ -278,17 +280,16 @@
     <div class="section-title">Save Technique</div>
     <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
 
-    <div class="section-title">Save / Goal</div>
-    <div class="px-3 pb-1 flex gap-1">
-      <span class="chip chip-b" data-f="save" data-v="Y">Save</span>
-      <span class="chip chip-b" data-f="goal" data-v="Y">Goal</span>
-      <span class="chip chip-b" data-f="ph" data-v="Y">PH</span>
-    </div>
-    <div class="px-3 pb-3 mt-2">
-      <select class="sel" id="f-goalQual">
-        <option value="">All goal types</option>
-        <option>Should've Had</option><option>Could've Had</option><option>No Chance</option>
-      </select>
+    <div class="section-title">OZP Pattern</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-ozpPattern"><option value="">All patterns</option></select></div>
+
+    <div class="section-title">Rush Type</div>
+    <div class="px-3 pb-3"><select class="sel" id="f-rushType"><option value="">All rush types</option></select></div>
+
+    <div class="section-title">Screen</div>
+    <div class="px-3 pb-3 flex gap-1">
+      <span class="chip chip-b" data-f="screen" data-v="Y">Yes</span>
+      <span class="chip chip-b" data-f="screen" data-v="N">No</span>
     </div>
 
     <div class="section-title">Rebound</div>
@@ -306,26 +307,32 @@
       <span class="chip chip-g" data-f="ryg" data-v="G">GrA</span>
     </div>
 
+    <div class="section-title">Save / Goal</div>
+    <div class="px-3 pb-1 flex gap-1">
+      <span class="chip chip-b" data-f="save" data-v="Y">Save</span>
+      <span class="chip chip-b" data-f="goal" data-v="Y">Goal</span>
+      <span class="chip chip-b" data-f="ph" data-v="Y">PH</span>
+    </div>
+
+    <div class="section-title">Subjective</div>
+    <div class="px-3 pb-3 flex flex-col gap-1">
+      <span class="chip chip-b" data-f="goalQual" data-v="Should've Had">Shoulda Had</span>
+      <span class="chip chip-b" data-f="goalQual" data-v="Could've Had">Coulda Had</span>
+      <span class="chip chip-b" data-f="goalQual" data-v="No Chance">No Chance</span>
+    </div>
+
+    <div class="section-title">Period</div>
+    <div class="px-3 pb-3">
+      <select class="sel" id="f-period">
+        <option value="">All periods</option>
+        <option value="1">P1</option>
+        <option value="2">P2</option>
+        <option value="3">P3</option>
+      </select>
+    </div>
+
     <div class="section-title">Strength</div>
     <div class="px-3 pb-3"><select class="sel" id="f-strength"><option value="">All strengths</option></select></div>
-
-    <div class="section-title">OZP Pattern</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-ozpPattern"><option value="">All patterns</option></select></div>
-
-    <div class="section-title">Rush Type</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-rushType"><option value="">All rush types</option></select></div>
-
-    <div class="section-title">Shot Location</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-shotLocation"><option value="">All locations</option></select></div>
-
-    <div class="section-title">Shot Technique</div>
-    <div class="px-3 pb-3"><select class="sel" id="f-shotTech"><option value="">All techniques</option></select></div>
-
-    <div class="section-title">Screen</div>
-    <div class="px-3 pb-3 flex gap-1">
-      <span class="chip chip-b" data-f="screen" data-v="Y">Yes</span>
-      <span class="chip chip-b" data-f="screen" data-v="N">No</span>
-    </div>
 
     <div class="section-title">Game</div>
     <div class="px-3 pb-3"><select class="sel" id="f-game"><option value="">All games</option></select></div>
@@ -439,7 +446,7 @@ const filters = {
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
   screen:null, psm0:'', psm1:'', psm2:'', svTech:'',
   rebCreated:null, rebAttacked:null,
-  game:'', hasClip:false,
+  game:'', hasClip:false, psmExact:null,
 };
 
 const video  = document.getElementById('player');
@@ -497,6 +504,7 @@ function cbGroup(id, field, values) {
 }
 function fillSel(id, values) {
   const el = document.getElementById(id);
+  if(!el) return;
   values.forEach(v => { const o = document.createElement('option'); o.value=o.textContent=v; el.appendChild(o); });
 }
 
@@ -550,6 +558,10 @@ function applyFilters() {
     if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
     if(filters.game            && r.game!==filters.game)                   return false;
     if(filters.hasClip         && !hasClip(r))                             return false;
+    if(filters.psmExact !== null) {
+      const rp = r.psm||[];
+      if(rp.length!==filters.psmExact.length || rp.some((p,i)=>p!==filters.psmExact[i])) return false;
+    }
     return true;
   });
   currentIndex = filteredData.length > 0 ? 0 : -1;
@@ -579,20 +591,21 @@ function updateStats() {
 }
 
 function updatePsmCounts() {
-  // PSM dropdowns
-  [[0,'f-psm0'],[1,'f-psm1'],[2,'f-psm2']].forEach(([idx,id])=>{
+  // PSM dropdowns — rebuild sorted by count desc, hide zero-count options
+  [[0,'f-psm0',filters.psm0],[1,'f-psm1',filters.psm1],[2,'f-psm2',filters.psm2]].forEach(([idx,id,activeVal])=>{
     const sel = document.getElementById(id);
-    Array.from(sel.options).forEach(opt=>{
-      if(!opt.value) return;
-      const n = filteredData.filter(r=>(r.psm||[])[idx]===opt.value).length;
-      opt.textContent = `${opt.value} (${n})`;
+    const counts = new Map();
+    filteredData.forEach(r=>{ const v=(r.psm||[])[idx]; if(v) counts.set(v,(counts.get(v)||0)+1); });
+    sel.innerHTML = '<option value="">Any</option>';
+    [...counts.entries()].sort((a,b)=>b[1]-a[1]).forEach(([v,n])=>{
+      const o=document.createElement('option'); o.value=v; o.textContent=`${v} (${n})`; sel.appendChild(o);
     });
+    sel.value = (activeVal && counts.has(activeVal)) ? activeVal : '';
   });
   // Simple field dropdowns (value === base label)
   [['f-attackType',r=>r.attackType],['f-svTech',r=>r.svTech],
    ['f-strength',r=>r.strength],['f-ozpPattern',r=>r.ozpPattern],
-   ['f-rushType',r=>r.rushType],['f-shotLocation',r=>r.shotLocation],
-   ['f-shotTech',r=>r.shotTech]
+   ['f-rushType',r=>r.rushType]
   ].forEach(([id,fn])=>{
     const sel=document.getElementById(id); if(!sel) return;
     Array.from(sel.options).forEach(opt=>{
@@ -639,6 +652,11 @@ function renderList() {
       psmHtml += `<span class="psm-sv">${r.svTech}</span>`;
     }
     if(!psmHtml) psmHtml = '<span style="color:var(--text-mute)">—</span>';
+    if(psmArr.length) {
+      const isComboActive = filters.psmExact!==null && filters.goalie.size===1 && filters.goalie.has(r.goalie) &&
+        psmArr.length===filters.psmExact.length && psmArr.every((p,i)=>p===filters.psmExact[i]);
+      psmHtml += `<button class="psm-combo-btn${isComboActive?' active':''}" data-goalie="${r.goalie}" data-p0="${psmArr[0]||''}" data-p1="${psmArr[1]||''}" data-p2="${psmArr[2]||''}" data-len="${psmArr.length}" title="Filter: ${r.goalie} — this PSM combo"></button>`;
+    }
     const res  = r.goal==='Y'
       ? `<span class="badge b-goal">GOAL</span>`
       : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
@@ -652,9 +670,32 @@ function renderList() {
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
       <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶</span>':''}</span>
     `;
+    const comboBtn = row.querySelector('.psm-combo-btn');
+    if(comboBtn) {
+      comboBtn.addEventListener('click', e=>{
+        e.stopPropagation();
+        filterByPsmCombo(comboBtn.dataset.goalie, JSON.parse('['+[comboBtn.dataset.p0,comboBtn.dataset.p1,comboBtn.dataset.p2].slice(0,+comboBtn.dataset.len).map(v=>JSON.stringify(v))+']'));
+      });
+    }
     row.addEventListener('click', ()=>selectClip(i));
     list.appendChild(row);
   });
+}
+
+function filterByPsmCombo(goalie, psmArray) {
+  const alreadyActive = filters.psmExact!==null && filters.goalie.size===1 && filters.goalie.has(goalie) &&
+    psmArray.length===filters.psmExact.length && psmArray.every((p,i)=>p===filters.psmExact[i]);
+  if(alreadyActive) {
+    filters.goalie = new Set();
+    filters.psmExact = null;
+  } else {
+    filters.goalie = new Set([goalie]);
+    filters.psmExact = [...psmArray];
+  }
+  document.querySelectorAll('input[type=checkbox][data-f="goalie"]').forEach(cb=>{
+    cb.checked = filters.goalie.has(cb.dataset.v);
+  });
+  applyFilters();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -854,12 +895,10 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
   applyFilters();
 });
 
-[['f-period','period'],['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],['f-rushType','rushType'],['f-shotLocation','shotLocation'],
- ['f-shotTech','shotTech'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],
+[['f-period','period'],['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],
+ ['f-rushType','rushType'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],
  ['f-svTech','svTech'],['f-game','game']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
-
-document.getElementById('f-goalQual').addEventListener('change',e=>{filters.goalQual=e.target.value;applyFilters();});
 document.getElementById('f-hasClip').addEventListener('change', e=>{filters.hasClip=e.target.checked;applyFilters();});
 
 document.getElementById('clear-btn').addEventListener('click',()=>{
@@ -870,6 +909,7 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
   ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','svTech','game'].forEach(k=>filters[k]='');
   filters.hasClip=false;
+  filters.psmExact=null;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>c.checked=false);
   document.querySelectorAll('select.sel').forEach(s=>s.value='');
