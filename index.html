@@ -568,7 +568,10 @@ function applyFilters() {
   renderList();
   updateStats();
   updatePsmCounts();
-  if(filteredData.length > 0 && !initialLoad) loadClip(filteredData[0], false);
+  if(!initialLoad) {
+    if(filters.goalie.size === 0) showNoVid('Select a Goalie');
+    else if(filteredData.length > 0) loadClip(filteredData[0], false);
+  }
   initialLoad = false;
 }
 
