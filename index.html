@@ -27,7 +27,7 @@
 
   /* SIDEBAR */
   .sidebar { background: var(--navy); border-right: 1px solid var(--navy-border); width: 200px; }
-  .section-title { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); padding: 9px 12px 3px; }
+  .section-title { font-size: 0.6rem; font-weight: 700; font-family: 'Segoe UI', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); padding: 9px 12px 3px; }
 
   /* CHIPS */
   .chip { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:0.69rem; font-weight:600; cursor:pointer; user-select:none; border:1px solid transparent; transition:all .12s; }
@@ -60,14 +60,14 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 120px 130px 90px 24px 1fr 28px 28px 28px 62px;
+    display:grid; grid-template-columns: 12px 120px 110px 78px 24px 1fr 28px 28px 28px 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 120px 130px 90px 24px 1fr 28px 28px 28px 62px;
+    display:grid; grid-template-columns: 12px 120px 110px 78px 24px 1fr 28px 28px 28px 62px;
     gap:6px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
@@ -157,6 +157,23 @@
   #slomo-btn { width:auto; padding:0 10px; }
   .ctrl-loop.active-loop, .ctrl-slomo.active-slomo { background:rgba(255,255,255,0.3) !important; border-color:#fff !important; }
   .ctrl-spacer { flex:1; }
+  /* CSS play/pause icons */
+  .ctrl-play { font-size:0; }
+  .ctrl-play::before {
+    content:''; display:block;
+    border-style:solid;
+    border-width:7px 0 7px 13px;
+    border-color:transparent transparent transparent rgba(255,255,255,0.9);
+    margin-left:3px;
+  }
+  .ctrl-play.is-playing::before {
+    border:none;
+    width:11px; height:14px;
+    border-left:3.5px solid rgba(255,255,255,0.9);
+    border-right:3.5px solid rgba(255,255,255,0.9);
+    border-radius:1px;
+    margin-left:0;
+  }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex-shrink:0; }
   #resize-handle { height:14px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; }
   #resize-handle:hover, #resize-handle.dragging { background:var(--navy-light); }
@@ -403,7 +420,7 @@
             <div class="ctrl-row">
               <button class="ctrl-btn" id="prev-btn" title="Previous clip (P)" style="width:auto;padding:0 10px;">Prev</button>
               <button class="ctrl-btn" id="back3-btn" title="Back 3s (Shift+←)">&#x2212;3s</button>
-              <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">&#x25BA;</button>
+              <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)"></button>
               <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (Shift+→)">+3s</button>
               <button class="ctrl-btn" id="next-btn" title="Next clip (N)" style="width:auto;padding:0 10px;">Next</button>
               <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
@@ -915,8 +932,8 @@ document.querySelector('.ctrl-row').addEventListener('click', e=>{
     syncMuteBtn();
   }
 }, true);
-video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='\u25AE\u25AE'; playOverlay.style.display='none'; });
-video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='\u25BA'; });
+video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').classList.add('is-playing'); playOverlay.style.display='none'; });
+video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').classList.remove('is-playing'); });
 
 // Progress bar + time display
 video.addEventListener('timeupdate', ()=>{
