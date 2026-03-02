@@ -921,7 +921,7 @@ function showSeekToast(delta){
   toast.textContent=(delta>0?'+':'')+delta+'s';
   toast.className='show';
   clearTimeout(_toastTimer);
-  _toastTimer=setTimeout(()=>{ toast.className='fade'; },700);
+  _toastTimer=setTimeout(()=>{ toast.className='fade'; },750);
 }
 function seekBy(delta){
   if(video.style.display==='none') return;
