@@ -679,6 +679,25 @@ function applyFilters() {
 
 // ═══════════════════════════════════════════════════════════
 //  STATS
+function updateChipCounts() {
+  document.querySelectorAll('.chip[data-f]').forEach(chip => {
+    const countEl = chip.querySelector('.chip-count');
+    if (!countEl) return;
+    const f = chip.dataset.f, v = chip.dataset.v;
+    const n = filteredData.filter(r => {
+      if (f==='screen')      return r.screen === v;
+      if (f==='rebCreated')  return r.rebCreated === v;
+      if (f==='rebAttacked') return r.rebAttacked === v;
+      if (f==='ryg')         return r.ryg === v;
+      if (f==='save')        return r.save === v;
+      if (f==='goal')        return r.goal === v;
+      if (f==='ph')          return !!r.phType;
+      if (f==='goalQual')    return r.goalQualitative === v;
+      return false;
+    }).length;
+    countEl.textContent = n;
+  });
+}
 // ═══════════════════════════════════════════════════════════
 function updateStats() {
   const t=filteredData.length;
