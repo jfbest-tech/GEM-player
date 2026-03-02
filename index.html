@@ -17,7 +17,7 @@
     --text:        #111111;
     --text-dim:    #444444;
     --text-mute:   #888888;
-    --vid-h:       calc(60vh - 80px);
+    --vid-h:       calc(66vh - 80px);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--navy-dark); color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; padding-left: 24px; padding-right: 24px; box-shadow: inset 12px 0 20px -4px rgba(0,0,0,0.25), inset -12px 0 20px -4px rgba(0,0,0,0.25); }
@@ -397,18 +397,18 @@
           <div class="vid-controls" id="vid-controls" style="display:none;">
             <div class="prog-bar" id="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
             <div class="ctrl-row">
-              <button class="ctrl-btn" id="prev-btn" title="Previous clip (P)">⏮&#xFE0E;</button>
-              <button class="ctrl-btn" id="back3-btn" title="Back 3s (Shift+←)">−3s</button>
-              <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">▶&#xFE0E;</button>
+              <button class="ctrl-btn" id="prev-btn" title="Previous clip (P)" style="width:auto;padding:0 10px;">Prev</button>
+              <button class="ctrl-btn" id="back3-btn" title="Back 3s (Shift+←)">&#x2212;3s</button>
+              <button class="ctrl-btn ctrl-play" id="play-pause-btn" title="Play/Pause (Space)">&#x25BA;</button>
               <button class="ctrl-btn" id="fwd3-btn" title="Forward 3s (Shift+→)">+3s</button>
-              <button class="ctrl-btn" id="next-btn" title="Next clip (N)">⏭&#xFE0E;</button>
+              <button class="ctrl-btn" id="next-btn" title="Next clip (N)" style="width:auto;padding:0 10px;">Next</button>
               <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
               <span class="ctrl-spacer"></span>
               <span class="ctrl-time" id="ctrl-time">0:00</span>
               <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)" style="filter:grayscale(1);">🔇</button>
-              <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">⟳</button>
-              <button class="ctrl-btn" id="dl-btn" title="Download clip">⬇&#xFE0E;</button>
-              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)">⛶&#xFE0E;</button>
+              <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">&#x27F3;</button>
+              <button class="ctrl-btn" id="dl-btn" title="Download clip">&#x2193;</button>
+              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)">&#x22A1;</button>
             </div>
           </div>
         </div>
@@ -874,8 +874,8 @@ document.getElementById('loop-btn').addEventListener('click', ()=>{
   if(!filteredData.length) return;
   loopAllActive = !loopAllActive;
   const lb = document.getElementById('loop-btn');
-  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='⏹'; if(currentIndex<0) selectClip(0); }
-  else             { lb.classList.remove('active-loop'); lb.textContent='⟳'; }
+  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='\u25A0'; if(currentIndex<0) selectClip(0); }
+  else             { lb.classList.remove('active-loop'); lb.textContent='\u27F3'; }
 });
 document.getElementById('prev-btn').addEventListener('click', ()=>{ if(currentIndex>0) selectClip(currentIndex-1); });
 document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIndex<filteredData.length-1) selectClip(currentIndex+1); });
@@ -911,8 +911,8 @@ document.querySelector('.ctrl-row').addEventListener('click', e=>{
     syncMuteBtn();
   }
 }, true);
-video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='⏸\uFE0E'; playOverlay.style.display='none'; });
-video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='▶\uFE0E'; });
+video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').textContent='\u25AE\u25AE'; playOverlay.style.display='none'; });
+video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').textContent='\u25BA'; });
 
 // Progress bar + time display
 video.addEventListener('timeupdate', ()=>{
@@ -935,11 +935,11 @@ document.getElementById('fullscreen-btn').addEventListener('click', ()=>{
   }
 });
 document.addEventListener('fullscreenchange', ()=>{
-  document.getElementById('fullscreen-btn').textContent = document.fullscreenElement ? '⊡' : '⛶\uFE0E';
+  document.getElementById('fullscreen-btn').textContent = document.fullscreenElement ? '\u22A0' : '\u22A1';
   updateControlsPadding();
 });
 document.addEventListener('webkitfullscreenchange', ()=>{
-  document.getElementById('fullscreen-btn').textContent = document.webkitFullscreenElement ? '⊡' : '⛶\uFE0E';
+  document.getElementById('fullscreen-btn').textContent = document.webkitFullscreenElement ? '\u22A0' : '\u22A1';
   updateControlsPadding();
 });
 
