@@ -1299,6 +1299,7 @@ document.addEventListener('keyup',e=>{
     if (!dragging) return;
     dragging = false;
     handle.classList.remove('dragging');
+    document.body.classList.remove('resizing');
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
   });
