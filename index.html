@@ -963,6 +963,25 @@ function filterByPsmCombo(goalie, psmArray) {
 }
 
 // ═══════════════════════════════════════════════════════════
+//  SMOOTH SCROLL
+// ═══════════════════════════════════════════════════════════
+let _scrollRaf = null;
+function smoothScroll(el, target, duration = 320) {
+  if (_scrollRaf) { cancelAnimationFrame(_scrollRaf); _scrollRaf = null; }
+  const start = el.scrollTop;
+  const delta = Math.max(0, target) - start;
+  if (Math.abs(delta) < 1) { el.scrollTop = Math.max(0, target); return; }
+  const t0 = performance.now();
+  function ease(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2,3)/2; }
+  function step(now) {
+    const t = Math.min((now - t0) / duration, 1);
+    el.scrollTop = start + delta * ease(t);
+    _scrollRaf = t < 1 ? requestAnimationFrame(step) : null;
+  }
+  _scrollRaf = requestAnimationFrame(step);
+}
+
+// ═══════════════════════════════════════════════════════════
 //  PLAYBACK
 // ═══════════════════════════════════════════════════════════
 function selectClip(idx) {
@@ -978,9 +997,8 @@ function selectClip(idx) {
     const list = document.getElementById('seq-list');
     const rowRect = activeRow.getBoundingClientRect();
     const listRect = list.getBoundingClientRect();
-    // Scroll active clip to just below the header with a small gap
     const offset = idx === 0 ? 0 : 6;
-    list.scrollTo({ top: Math.max(0, list.scrollTop + rowRect.top - listRect.top - offset), behavior: 'smooth' });
+    smoothScroll(list, list.scrollTop + rowRect.top - listRect.top - offset);
   }
 
   const r = filteredData[idx];
