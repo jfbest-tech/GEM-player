@@ -1290,8 +1290,10 @@ document.addEventListener('keyup',e=>{
 
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
-    const newH = Math.max(120, Math.min(window.innerHeight - 160, startH + (e.clientY - startY)));
-    document.documentElement.style.setProperty('--vid-h', newH + 'px');
+    const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+    const rawH = startH + (e.clientY - startY);
+    const clampH = Math.max(120 * zoom, Math.min(window.innerHeight - 160 * zoom, rawH));
+    document.documentElement.style.setProperty('--vid-h', (clampH / zoom) + 'px');
     updateControlsPadding();
   });
 
