@@ -251,7 +251,7 @@
     display:inline-flex; align-items:center; justify-content:center;
     width:13px; height:13px; border-radius:50%;
     border:1.5px solid #b0c4de; background:#eef2fa;
-    cursor:pointer; flex-shrink:0; margin-left:5px; margin-right:8px;
+    cursor:pointer; flex-shrink:0; margin:0;
     padding:0; position:relative; transition:all .1s;
   }
   .psm-combo-btn:hover { border-color:#0c2461; background:#dce8f8; }
@@ -401,15 +401,20 @@
     <div class="section-title">Attack Type</div>
     <div class="px-3 pb-1"><select class="sel" id="f-attackType"><option value="">All</option></select></div>
 
-    <div class="section-title">OZP Pattern</div>
-    <div class="px-3 pb-1"><select class="sel" id="f-ozpPattern"><option value="">All</option></select></div>
-
-    <div class="section-title">Rush Type</div>
-    <div class="px-3 pb-1"><select class="sel" id="f-rushType"><option value="">All</option></select></div>
+    <div style="display:flex; gap:6px; padding:0 8px 4px;">
+      <div style="flex:1; min-width:0;">
+        <div class="section-title" style="padding-left:0;">OZP Pattern</div>
+        <select class="sel" id="f-ozpPattern"><option value="">All</option></select>
+      </div>
+      <div style="flex:1; min-width:0;">
+        <div class="section-title" style="padding-left:0;">Rush Type</div>
+        <select class="sel" id="f-rushType"><option value="">All</option></select>
+      </div>
+    </div>
 
     <div style="margin:4px 8px 4px; border:1px solid #d5d5d5; border-radius:6px; background:#f5f5f5;">
       <div class="section-title">Pre-Save Movements</div>
-      <div class="px-3 pb-2 flex flex-col gap-1">
+      <div class="px-3 pb-1 flex flex-col gap-1">
         <div class="psm-lbl">First Move</div>
         <select class="sel" id="f-psm0"><option value="">All</option></select>
         <div id="psm1-wrap" class="psm-cascade">
@@ -425,9 +430,9 @@
           <select class="sel" id="f-psm3"><option value="">All</option></select>
         </div>
       </div>
-      <div style="height:1px; background:#d5d5d5; margin:4px 10px 6px;"></div>
+      <div style="height:1px; background:#d5d5d5; margin:2px 10px 2px;"></div>
       <div class="section-title">Save Technique</div>
-      <div class="px-3 pb-3"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
+      <div class="px-3 pb-2"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
     </div>
 
     <div class="section-title" style="text-align:center;">Shot Danger</div>
@@ -787,8 +792,8 @@ function updateStats() {
   if(svpctEl) svpctEl.textContent = _tot>0 ? (_sv===_tot ? '1.000' : '.'+Math.round(_sv/_tot*1000).toString().padStart(3,'0')) : '--';
   document.getElementById('stats-row').innerHTML = t
     ? `<span>${t} Sequences</span>
-       <span style="color:#999">&#9679; LowQ: ${R}</span>
-       <span style="color:#555">&#9679; MidQ: ${Y}</span>
+       <span style="color:#999">&#9679; lowQ: ${R}</span>
+       <span style="color:#555">&#9679; midQ: ${Y}</span>
        <span style="color:#0c2461">&#9679; GrA: ${G}</span>`
     : '';
 }
