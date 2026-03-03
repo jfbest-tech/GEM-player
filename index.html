@@ -592,7 +592,7 @@ async function init() {
 //  HELPERS
 // ═══════════════════════════════════════════════════════════
 const clipUrl  = r => CLIP_BASE_URL ? CLIP_BASE_URL.replace(/\/$/,'') + '/' + r.id + '.mp4' : null;
-const hasClip  = r => !!CLIP_BASE_URL && r.fileClock != null;
+const hasClip  = r => !!CLIP_BASE_URL && r.video === true;
 const fmtTime  = s => { if(s==null||isNaN(s)) return '--:--'; const t=Math.floor(s); return Math.floor(t/60)+':'+String(t%60).padStart(2,'0'); };
 
 function unique(field, sub) {
