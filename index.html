@@ -646,7 +646,7 @@ function buildFilters() {
     });
     noVidGoalies.appendChild(btn);
   });
-  fillSel('f-strength',   unique('strength'));
+  fillSel('f-strength', unique('strength').sort((a,b)=>{ const [a1,a2]=a.toLowerCase().split('v').map(Number); const [b1,b2]=b.toLowerCase().split('v').map(Number); return a1-b1||a2-b2; }));
   fillSel('f-attackType', unique('attackType'));
   fillSel('f-ozpPattern',  unique('ozpPattern'));
   fillSel('f-rushType',    unique('rushType'));
