@@ -678,7 +678,7 @@ function buildFilters() {
     const ga = shots.filter(r => r.goal === 'Y').length;
     const tot = sv + ga;
     const el = document.getElementById('svpct-' + ryg);
-    if(el) el.textContent = tot > 0 ? 'sv% ' + (sv/tot*100).toFixed(1)+'%' : '--';
+    if(el) el.textContent = tot > 0 ? '.' + Math.round(sv/tot*1000).toString().padStart(3,'0') : '--';
   });
 }
 
