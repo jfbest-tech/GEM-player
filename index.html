@@ -843,10 +843,9 @@ function renderList() {
     return;
   }
 
-  const noGoalie = filters.goalie.size === 0;
   filteredData.forEach((r,i) => {
     const row = document.createElement('div');
-    row.className = 'seq-row' + (i===currentIndex?' active':'') + (noGoalie?' seq-row--locked':'');
+    row.className = 'seq-row' + (i===currentIndex?' active':'');
     row.dataset.i = i;
 
     const has  = hasClip(r);
