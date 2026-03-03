@@ -979,7 +979,7 @@ function selectClip(idx) {
     const rowRect = activeRow.getBoundingClientRect();
     const listRect = list.getBoundingClientRect();
     // Scroll active clip to just below the header with a small gap
-    const offset = idx === 0 ? 0 : 5;
+    const offset = idx === 0 ? 0 : 6;
     list.scrollTo({ top: Math.max(0, list.scrollTop + rowRect.top - listRect.top - offset), behavior: 'smooth' });
   }
 
