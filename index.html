@@ -685,7 +685,7 @@ function applyFilters() {
     if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)       return false;
     if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
     if(filters.game            && r.game!==filters.game)                   return false;
-    if(filters.hasClip         && !hasClip(r))                             return false;
+    if(!hasClip(r))                                                         return false;
     if(filters.psmExact !== null) {
       const rp = r.psm||[];
       if(rp.length!==filters.psmExact.length || rp.some((p,i)=>p!==filters.psmExact[i])) return false;
