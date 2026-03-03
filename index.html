@@ -805,6 +805,7 @@ function updatePsmCounts() {
 function renderList() {
   const list = document.getElementById('seq-list');
   list.innerHTML = '';
+  list.scrollTop = 0;
 
   if(!filteredData.length) {
     list.innerHTML = `<div style="padding:32px; text-align:center; color:var(--text-mute); font-size:0.78rem;">No sequences match the current filters.</div>`;
