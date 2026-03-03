@@ -1282,6 +1282,7 @@ document.addEventListener('keyup',e=>{
     startY = e.clientY;
     startH = document.getElementById('vid-wrap').getBoundingClientRect().height;
     handle.classList.add('dragging');
+    document.body.classList.add('resizing');
     document.body.style.cursor = 'ns-resize';
     document.body.style.userSelect = 'none';
     e.preventDefault();
