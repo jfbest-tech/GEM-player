@@ -970,9 +970,7 @@ function selectClip(idx) {
     const list = document.getElementById('seq-list');
     const rowRect = activeRow.getBoundingClientRect();
     const listRect = list.getBoundingClientRect();
-    const rowMid = rowRect.top + rowRect.height / 2 - listRect.top;
-    const targetTop = list.scrollTop + rowMid - list.clientHeight / 2;
-    list.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    list.scrollTo({ top: list.scrollTop + rowRect.top - listRect.top - 3, behavior: 'smooth' });
   }
 
   const r = filteredData[idx];
