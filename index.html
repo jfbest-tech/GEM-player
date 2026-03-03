@@ -674,7 +674,8 @@ function buildFilters() {
   fillSel('f-psm3', unique('psm', 3));
   fillSel('f-svTech',      unique('svTech'));
   const ge = document.getElementById('f-game');
-  unique('game').forEach(g => {
+  const _gd = g => { const [mm,dd,yyyy]=(g||'').split('_')[0].split('.'); return yyyy&&mm&&dd?`${yyyy}${mm}${dd}`:''; };
+  unique('game').sort((a,b)=>_gd(b).localeCompare(_gd(a))).forEach(g => {
     const o = document.createElement('option'); o.value=g;
     const m = g.match(/^(\d+)\.(\d+)\.\d+_(.+)$/);
     const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
