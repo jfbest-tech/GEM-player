@@ -1021,6 +1021,7 @@ playOverlay.addEventListener('click', e=>{ e.stopPropagation(); video.play().cat
 const _preloadVid = document.createElement('video');
 _preloadVid.preload = 'auto';
 _preloadVid.muted   = true;
+_preloadVid.style.display = 'none';
 document.body.appendChild(_preloadVid);
 
 function preloadNext(idx) {
