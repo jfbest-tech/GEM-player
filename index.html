@@ -21,7 +21,7 @@
     --vid-h:       calc(53vh - 80px);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #ffffff; color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; padding-left: 24px; padding-right: 24px; }
+  body { background: #f9f9f9; color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; padding-left: 24px; padding-right: 24px; }
   body::before, body::after { content:''; position:fixed; top:0; bottom:0; width:1px; background:var(--navy-border); pointer-events:none; z-index:9999; }
   body::before { left:24px;  box-shadow: -1px 0 5px rgba(0,0,0,0.65); clip-path: inset(0 0 0 -20px); }
   body::after  { right:24px; box-shadow:  1px 0 5px rgba(0,0,0,0.65); clip-path: inset(0 -20px 0 0); }
@@ -725,41 +725,17 @@ function applyFilters() {
   filteredData.sort((a,b)=>gameDate(b.game).localeCompare(gameDate(a.game)));
   currentIndex = filteredData.length > 0 ? 0 : -1;
 
-  // Shot danger save% — all active filters except ryg
-  (function() {
-    const base = allData.filter(r => {
-      if(filters.goalie.size     && !filters.goalie.has(r.goalie))        return false;
-      if(filters.period          && String(r.period)!==filters.period)    return false;
-      if(filters.strength        && r.strength!==filters.strength)        return false;
-      if(filters.attackType      && r.attackType!==filters.attackType)    return false;
-      if(filters.save            && r.save!==filters.save)                return false;
-      if(filters.goal            && r.goal!==filters.goal)                return false;
-      if(filters.ph              && !r.phType)                            return false;
-      if(filters.goalQual        && r.goalQualitative!==filters.goalQual) return false;
-      if(filters.ozpPattern      && r.ozpPattern!==filters.ozpPattern)    return false;
-      if(filters.rushType        && r.rushType!==filters.rushType)        return false;
-      if(filters.screen          && r.screen!==filters.screen)            return false;
-      if(filters.psm0            && (r.psm||[])[0]!==filters.psm0)       return false;
-      if(filters.psm1            && (r.psm||[])[1]!==filters.psm1)       return false;
-      if(filters.psm2            && (r.psm||[])[2]!==filters.psm2)       return false;
-      if(filters.psm3            && (r.psm||[])[3]!==filters.psm3)       return false;
-      if(filters.svTech          && r.svTech!==filters.svTech)            return false;
-      if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)    return false;
-      if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)  return false;
-      if(filters.game            && r.game!==filters.game)                return false;
-      return true;
-    });
-    ['R','Y','G'].forEach(ryg => {
-      const shots = base.filter(r => r.ryg === ryg);
-      const sv = shots.filter(r => r.save === 'Y').length;
-      const ga = shots.filter(r => r.goal === 'Y').length;
-      const tot = sv + ga;
-      const el = document.getElementById('svpct-' + ryg);
-      if(el) el.textContent = tot > 0
-        ? (sv === tot ? '1.000' : '0.' + Math.round(sv/tot*1000).toString().padStart(3,'0'))
-        : '--';
-    });
-  })();
+  // Shot danger save% — same as filteredData but split by ryg (ryg filter ignored)
+  ['R','Y','G'].forEach(ryg => {
+    const shots = filteredData.filter(r => r.ryg === ryg);
+    const sv = shots.filter(r => r.save === 'Y').length;
+    const ga = shots.filter(r => r.goal === 'Y').length;
+    const tot = sv + ga;
+    const el = document.getElementById('svpct-' + ryg);
+    if(el) el.textContent = tot > 0
+      ? (sv === tot ? '1.000' : '.' + Math.round(sv/tot*1000).toString().padStart(3,'0'))
+      : '--';
+  });
 
   renderList();
   updateStats();
@@ -808,13 +784,12 @@ function updateStats() {
   const _ga=filteredData.filter(r=>r.goal==='Y').length;
   const _tot=_sv+_ga;
   const svpctEl=document.getElementById('svpct-overall-val');
-  if(svpctEl) svpctEl.textContent = _tot>0 ? (_sv===_tot ? '1.000' : '0.'+Math.round(_sv/_tot*1000).toString().padStart(3,'0')) : '--';
+  if(svpctEl) svpctEl.textContent = _tot>0 ? (_sv===_tot ? '1.000' : '.'+Math.round(_sv/_tot*1000).toString().padStart(3,'0')) : '--';
   document.getElementById('stats-row').innerHTML = t
-    ? `<span>${t} sequences</span>
+    ? `<span>${t} Sequences</span>
        <span style="color:#999">&#9679; LowQ: ${R}</span>
        <span style="color:#555">&#9679; MidQ: ${Y}</span>
-       <span style="color:#0c2461">&#9679; GrA: ${G}</span>
-       <span style="color:var(--text-mute)">&#9654; ${v} with video</span>`
+       <span style="color:#0c2461">&#9679; GrA: ${G}</span>`
     : '';
 }
 
