@@ -1021,6 +1021,7 @@ function seekBy(delta){
 }
 document.getElementById('back3-btn').addEventListener('click', ()=>seekBy(-3));
 document.getElementById('fwd3-btn').addEventListener('click',  ()=>seekBy(3));
+document.getElementById('frame-btn').addEventListener('click', ()=>stepFrame());
 let sPreMuted = false; // mute state saved before entering slow-mo
 
 function syncMuteBtn() {
