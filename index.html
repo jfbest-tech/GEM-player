@@ -700,6 +700,11 @@ function applyFilters() {
   updateStats();
   updatePsmCounts();
   updateChipCounts();
+  const anyFilter = filters.goalie.size>0 || filters.ryg.size>0 ||
+    ['save','goal','ph','screen','rebCreated','rebAttacked','goalQual'].some(k=>filters[k]!==null&&filters[k]!=='') ||
+    ['period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech','game'].some(k=>filters[k]!=='') ||
+    filters.psmExact!==null;
+  document.getElementById('clear-btn').classList.toggle('active', anyFilter);
   if(!initialLoad) {
     if(filters.goalie.size === 0) showNoVid('Select a Goalie');
     else if(filteredData.length > 0) loadClip(filteredData[0], false);
