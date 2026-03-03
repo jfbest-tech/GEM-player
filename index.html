@@ -1272,12 +1272,11 @@ document.addEventListener('keyup',e=>{
 // ── Resizable video panel ──────────────────────────────────────────────────
 (function(){
   const handle = document.getElementById('resize-handle');
-  let dragging = false, startY = 0, startH = 0, pendingY = null, rafId = null;
+  let dragging = false, vidTop = 0;
 
   handle.addEventListener('mousedown', e => {
     dragging = true;
-    startY = e.clientY;
-    startH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vid-h')) || document.getElementById('vid-wrap').getBoundingClientRect().height;
+    vidTop = document.getElementById('vid-wrap').getBoundingClientRect().top;
     handle.classList.add('dragging');
     document.body.style.cursor = 'ns-resize';
     document.body.style.userSelect = 'none';
@@ -1286,13 +1285,8 @@ document.addEventListener('keyup',e=>{
 
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
-    pendingY = e.clientY;
-    if (rafId) return;
-    rafId = requestAnimationFrame(() => {
-      rafId = null;
-      const newH = Math.max(120, Math.min(window.innerHeight - 160, startH + (pendingY - startY)));
-      document.documentElement.style.setProperty('--vid-h', newH + 'px');
-    });
+    const newH = Math.max(120, Math.min(window.innerHeight - 160, e.clientY - vidTop));
+    document.documentElement.style.setProperty('--vid-h', newH + 'px');
   });
 
   document.addEventListener('mouseup', () => {
