@@ -435,23 +435,28 @@
       <span class="chip chip-b" data-f="ph" data-v="Y">PH<span class="chip-count"></span></span>
     </div>
 
-    <div class="px-3 pb-2" style="display:flex; align-items:stretch;">
-      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding-right:5px; border-right:1px solid #c8c8c8;">
-        <div class="section-title" style="padding:4px 0 2px; text-align:center;">Screen</div>
-        <span class="chip chip-b" style="width:100%;text-align:center;" data-f="screen" data-v="Y">Yes<span class="chip-count"></span></span>
-        <span class="chip chip-b" style="width:100%;text-align:center;" data-f="screen" data-v="N">No<span class="chip-count"></span></span>
+    <div class="px-3 pb-2 flex gap-3 justify-center">
+      <div>
+        <div class="section-title" style="text-align:center;">Screen</div>
+        <div class="flex flex-col gap-1 items-center pt-1">
+          <span class="chip chip-b" style="width:72px;text-align:center;" data-f="screen" data-v="Y">Yes<span class="chip-count"></span></span>
+          <span class="chip chip-b" style="width:72px;text-align:center;" data-f="screen" data-v="N">No<span class="chip-count"></span></span>
+        </div>
       </div>
-      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding:0 5px; border-right:1px solid #c8c8c8;">
-        <div class="section-title" style="padding:4px 0 2px; text-align:center;">Rebound</div>
-        <span class="chip chip-b" style="width:100%;text-align:center;" data-f="rebCreated" data-v="Y">Given Up<span class="chip-count"></span></span>
-        <span class="chip chip-b" style="width:100%;text-align:center;" data-f="rebAttacked" data-v="Y">Attacked<span class="chip-count"></span></span>
+      <div>
+        <div class="section-title" style="text-align:center;">Rebound</div>
+        <div class="flex flex-col gap-1 items-center pt-1">
+          <span class="chip chip-b" style="width:72px;text-align:center;" data-f="rebCreated" data-v="Y">Given Up<span class="chip-count"></span></span>
+          <span class="chip chip-b" style="width:72px;text-align:center;" data-f="rebAttacked" data-v="Y">Attacked<span class="chip-count"></span></span>
+        </div>
       </div>
-      <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; padding-left:5px;">
-        <div class="section-title" style="padding:4px 0 2px; text-align:center;">Subj.</div>
-        <span class="chip chip-b" style="width:100%;text-align:center;font-size:0.6rem;padding:2px 2px;" data-f="goalQual" data-v="Should've Had">Shoulda<span class="chip-count"></span></span>
-        <span class="chip chip-b" style="width:100%;text-align:center;font-size:0.6rem;padding:2px 2px;" data-f="goalQual" data-v="Could've Had">Coulda<span class="chip-count"></span></span>
-        <span class="chip chip-b" style="width:100%;text-align:center;font-size:0.6rem;padding:2px 2px;" data-f="goalQual" data-v="No Chance">No Chc<span class="chip-count"></span></span>
-      </div>
+    </div>
+
+    <div class="section-title" style="text-align:center;">Subjective</div>
+    <div class="px-3 pb-2 flex gap-1 justify-center flex-wrap">
+      <span class="chip chip-b" data-f="goalQual" data-v="Should've Had">Shoulda Had<span class="chip-count"></span></span>
+      <span class="chip chip-b" data-f="goalQual" data-v="Could've Had">Coulda Had<span class="chip-count"></span></span>
+      <span class="chip chip-b" data-f="goalQual" data-v="No Chance">No Chance<span class="chip-count"></span></span>
     </div>
 
 
