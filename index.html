@@ -736,8 +736,7 @@ function applyFilters() {
     filters.psmExact!==null;
   document.getElementById('clear-btn').classList.toggle('active', anyFilter);
   if(!initialLoad) {
-    if(filters.goalie.size === 0) showNoVid('Select a Goalie');
-    else if(filteredData.length > 0) loadClip(filteredData[0], false);
+    if(filteredData.length > 0) loadClip(filteredData[0], false);
   }
   initialLoad = false;
 }
