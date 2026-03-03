@@ -262,6 +262,8 @@
 
   /* PSM sub-label */
   .psm-lbl { font-size:0.58rem; color:var(--text-mute); margin-top:3px; margin-bottom:2px; }
+  .psm-cascade { max-height:0; overflow:hidden; opacity:0; transition:max-height 0.25s ease, opacity 0.2s ease; }
+  .psm-cascade.open { max-height:80px; opacity:1; }
 
   /* Setup notice */
   .notice { background:#fff; border:1px solid var(--navy-border); border-radius:6px; }
