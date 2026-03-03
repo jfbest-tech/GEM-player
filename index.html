@@ -1292,7 +1292,6 @@ document.addEventListener('keyup',e=>{
       rafId = null;
       const newH = Math.max(120, Math.min(window.innerHeight - 160, startH + (pendingY - startY)));
       document.documentElement.style.setProperty('--vid-h', newH + 'px');
-      updateControlsPadding();
     });
   });
 
@@ -1302,6 +1301,7 @@ document.addEventListener('keyup',e=>{
     handle.classList.remove('dragging');
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
+    updateControlsPadding();
   });
 })();
 
