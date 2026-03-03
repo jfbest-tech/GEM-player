@@ -1151,6 +1151,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='m') document.getElementById('mute-btn').click();
   if(e.key==='ArrowLeft'  && e.shiftKey) seekBy(-3);
   if(e.key==='ArrowRight' && e.shiftKey) seekBy(3);
+  if(e.key==='e' && video.style.display!=='none'){ video.pause(); video.currentTime=Math.min(video.duration||0, video.currentTime+1/30); }
 });
 document.addEventListener('keyup',e=>{
 });
