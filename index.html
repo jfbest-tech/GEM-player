@@ -230,8 +230,12 @@
   #resize-handle:hover::after, #resize-handle.dragging::after { opacity:1; color:var(--accent); }
 
   /* PSM tags */
-  .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; }
-  .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #9ab0d0; }
+  .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; cursor:pointer; transition:all .1s; }
+  .psm:hover { background:#d4dff5; border-color:#2a4070; }
+  .psm.active { background:#2a4070; color:#fff; border-color:#1a2e5a; }
+  .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #9ab0d0; cursor:pointer; transition:all .1s; }
+  .psm-sv:hover { background:#a8c0d8; border-color:#1a2e5a; }
+  .psm-sv.active { background:#1a2e5a; color:#fff; border-color:#0c1f40; }
 
   /* PSM combo filter radio button */
   .psm-combo-btn {
