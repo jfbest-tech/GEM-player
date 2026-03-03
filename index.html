@@ -167,6 +167,9 @@
     transition:padding 0.4s ease;
   }
 
+  /* Suppress transitions while resizing */
+  body.resizing * { transition: none !important; }
+
   /* Progress bar */
   .prog-bar { height:3px; background:rgba(255,255,255,0.2); border-radius:2px; cursor:pointer; margin:0 2px; transition:width 0.4s ease; }
   .prog-bar:hover { height:5px; }
