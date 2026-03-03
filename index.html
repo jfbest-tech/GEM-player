@@ -1277,7 +1277,7 @@ document.addEventListener('keyup',e=>{
   handle.addEventListener('mousedown', e => {
     dragging = true;
     startY = e.clientY;
-    startH = document.getElementById('vid-wrap').getBoundingClientRect().height;
+    startH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--vid-h')) || document.getElementById('vid-wrap').getBoundingClientRect().height;
     handle.classList.add('dragging');
     document.body.style.cursor = 'ns-resize';
     document.body.style.userSelect = 'none';
