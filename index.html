@@ -191,6 +191,22 @@
   .ctrl-spacer { flex:1; }
   /* CSS play/pause icons */
   .ctrl-play { font-size:0; }
+  /* Frame-step button icon (VLC style: triangle + bar) */
+  #frame-btn { font-size:0; }
+  #frame-btn::before {
+    content:''; display:inline-block;
+    border-style:solid;
+    border-width:5px 0 5px 9px;
+    border-color:transparent transparent transparent rgba(255,255,255,0.9);
+    margin-right:2px;
+  }
+  #frame-btn::after {
+    content:''; display:inline-block;
+    width:2.5px; height:11px;
+    background:rgba(255,255,255,0.9);
+    border-radius:1px;
+    vertical-align:middle;
+  }
   .ctrl-play::before {
     content:''; display:block;
     border-style:solid;
