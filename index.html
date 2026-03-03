@@ -968,12 +968,9 @@ function selectClip(idx) {
   const activeRow = document.querySelector(`.seq-row[data-i="${idx}"]`);
   if(activeRow) {
     const list = document.getElementById('seq-list');
-    const rowTop = activeRow.offsetTop;
-    const rowH = activeRow.offsetHeight;
-    const listH = list.clientHeight;
-    if(rowTop < list.scrollTop || rowTop + rowH > list.scrollTop + listH) {
-      list.scrollTop = rowTop - Math.max(0, (listH - rowH) / 2);
-    }
+    const rowRect = activeRow.getBoundingClientRect();
+    const listRect = list.getBoundingClientRect();
+    list.scrollTop += rowRect.top - listRect.top;
   }
 
   const r = filteredData[idx];
