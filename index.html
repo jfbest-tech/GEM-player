@@ -1365,9 +1365,22 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
 });
 
 [['f-period','period'],['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],
- ['f-rushType','rushType'],['f-psm0','psm0'],['f-psm1','psm1'],['f-psm2','psm2'],['f-psm3','psm3'],
- ['f-svTech','svTech'],['f-game','game']
+ ['f-rushType','rushType'],['f-svTech','svTech'],['f-game','game']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
+
+function updatePsmVisibility() {
+  document.getElementById('psm1-wrap').classList.toggle('open', !!filters.psm0);
+  document.getElementById('psm2-wrap').classList.toggle('open', !!filters.psm1);
+  document.getElementById('psm3-wrap').classList.toggle('open', !!filters.psm2);
+}
+[[0,1,2,3],[1,2,3],[2,3],[3]].forEach(([idx,...rest])=>{
+  document.getElementById('f-psm'+idx).addEventListener('change', e=>{
+    filters['psm'+idx] = e.target.value;
+    rest.forEach(i=>{ filters['psm'+i]=''; document.getElementById('f-psm'+i).value=''; });
+    updatePsmVisibility();
+    applyFilters();
+  });
+});
 
 document.getElementById('clear-btn').addEventListener('click',()=>{
   Object.keys(filters).forEach(k=>{
