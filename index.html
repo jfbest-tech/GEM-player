@@ -406,12 +406,18 @@
       <div class="px-3 pb-2 flex flex-col gap-1">
         <div class="psm-lbl">First Move</div>
         <select class="sel" id="f-psm0"><option value="">All</option></select>
-        <div class="psm-lbl">Second Move</div>
-        <select class="sel" id="f-psm1"><option value="">All</option></select>
-        <div class="psm-lbl">Third Move</div>
-        <select class="sel" id="f-psm2"><option value="">All</option></select>
-        <div class="psm-lbl">Fourth Move</div>
-        <select class="sel" id="f-psm3"><option value="">All</option></select>
+        <div id="psm1-wrap" class="psm-cascade">
+          <div class="psm-lbl">Second Move</div>
+          <select class="sel" id="f-psm1"><option value="">All</option></select>
+        </div>
+        <div id="psm2-wrap" class="psm-cascade">
+          <div class="psm-lbl">Third Move</div>
+          <select class="sel" id="f-psm2"><option value="">All</option></select>
+        </div>
+        <div id="psm3-wrap" class="psm-cascade">
+          <div class="psm-lbl">Fourth Move</div>
+          <select class="sel" id="f-psm3"><option value="">All</option></select>
+        </div>
       </div>
       <div style="height:1px; background:#d5d5d5; margin:0 10px;"></div>
       <div class="section-title">Save Technique</div>
