@@ -894,6 +894,13 @@ function renderList() {
         filterByPh(comboBtn.dataset.goalie);
       });
     }
+    const phBadge = row.querySelector('.badge.b-ph[data-ph-goalie]');
+    if(phBadge) {
+      phBadge.addEventListener('click', e=>{
+        e.stopPropagation();
+        filterByPh(phBadge.dataset.phGoalie);
+      });
+    }
     row.querySelectorAll('.psm[data-psm-idx]').forEach(chip=>{
       chip.addEventListener('click', e=>{
         e.stopPropagation();
