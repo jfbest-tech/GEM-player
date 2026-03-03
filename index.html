@@ -1393,6 +1393,7 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
   document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>c.checked=false);
   document.querySelectorAll('select.sel').forEach(s=>s.value='');
+  updatePsmVisibility();
   applyFilters();
 });
 
