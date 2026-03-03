@@ -1014,6 +1014,26 @@ function showNoVid(msg) {
 }
 playOverlay.addEventListener('click', e=>{ e.stopPropagation(); video.play().catch(()=>{}); });
 
+// ── PRELOAD NEXT CLIP ──────────────────────────────────────
+// Warms the browser cache so the next clip loads instantly.
+// Tip: re-encode videos with HandBrake "Web Optimized" (moov atom
+// at front) so seeking starts before the full file downloads.
+const _preloadVid = document.createElement('video');
+_preloadVid.preload = 'auto';
+_preloadVid.muted   = true;
+document.body.appendChild(_preloadVid);
+
+function preloadNext(idx) {
+  if(!CLIP_BASE_URL) return;
+  const nextR = filteredData[idx + 1];
+  if(!nextR || !hasClip(nextR)) return;
+  const nextUrl = clipUrl(nextR);
+  if(_preloadVid.src !== nextUrl) {
+    _preloadVid.src = nextUrl;
+    _preloadVid.load();
+  }
+}
+
 video.addEventListener('ended', ()=>{
   const next = (currentIndex+1) % filteredData.length;
   selectClip(next);
