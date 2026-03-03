@@ -1180,11 +1180,22 @@ document.querySelector('.ctrl-row').addEventListener('click', e=>{
 video.addEventListener('play',  ()=>{ document.getElementById('play-pause-btn').classList.add('is-playing'); playOverlay.style.display='none'; });
 video.addEventListener('pause', ()=>{ document.getElementById('play-pause-btn').classList.remove('is-playing'); });
 
-// Progress bar + time display
+// Progress bar — driven by requestAnimationFrame for smooth 60fps movement
+const _progFill = document.getElementById('prog-fill');
+const _ctrlTime = document.getElementById('ctrl-time');
+let _progRaf = null;
+function _updateProg() {
+  if(video.duration) _progFill.style.width = (video.currentTime/video.duration*100)+'%';
+  if(!video.paused && !video.ended) _progRaf = requestAnimationFrame(_updateProg);
+  else _progRaf = null;
+}
+video.addEventListener('play',   ()=>{ if(!_progRaf) _progRaf = requestAnimationFrame(_updateProg); });
+video.addEventListener('pause',  ()=>{ if(_progRaf){ cancelAnimationFrame(_progRaf); _progRaf=null; } _updateProg(); });
+video.addEventListener('seeked', ()=>_updateProg());
+// Time text only needs per-second precision — keep on timeupdate
 video.addEventListener('timeupdate', ()=>{
   if(!video.duration) return;
-  document.getElementById('prog-fill').style.width = (video.currentTime/video.duration*100)+'%';
-  document.getElementById('ctrl-time').textContent = fmtTime(video.currentTime)+' / '+fmtTime(video.duration);
+  _ctrlTime.textContent = fmtTime(video.currentTime)+' / '+fmtTime(video.duration);
 });
 video.addEventListener('loadedmetadata', ()=>{
   document.getElementById('ctrl-time').textContent = '0:00 / '+fmtTime(video.duration);
