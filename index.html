@@ -814,11 +814,15 @@ function renderList() {
 
     // PSM HTML (chips only, no radio button)
     let psmHtml = psmArr.length
-      ? psmArr.map(p=>`<span class="psm">${p}</span>`).join('<span style="color:#aaa;padding:0 2px;">→</span>')
+      ? psmArr.map((p,idx)=>{
+          const isActive = filters[`psm${idx}`]===p;
+          return `<span class="psm${isActive?' active':''}" data-psm-idx="${idx}" data-psm-val="${p}">${p}</span>`;
+        }).join('<span style="color:#aaa;padding:0 2px;">→</span>')
       : '';
     if(r.svTech) {
       if(psmHtml) psmHtml += '<span style="color:#aaa;padding:0 2px;">→</span>';
-      psmHtml += `<span class="psm-sv">${r.svTech}</span>`;
+      const isSvActive = filters.svTech===r.svTech;
+      psmHtml += `<span class="psm-sv${isSvActive?' active':''}" data-svtech="${r.svTech}">${r.svTech}</span>`;
     }
     if(!psmHtml) psmHtml = '<span style="color:var(--text-mute)">—</span>';
 
