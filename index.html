@@ -876,6 +876,29 @@ function renderList() {
         filterByPh(comboBtn.dataset.goalie);
       });
     }
+    row.querySelectorAll('.psm[data-psm-idx]').forEach(chip=>{
+      chip.addEventListener('click', e=>{
+        e.stopPropagation();
+        const idx = +chip.dataset.psmIdx;
+        const val = chip.dataset.psmVal;
+        const key = `psm${idx}`;
+        filters[key] = filters[key]===val ? '' : val;
+        const sel = document.getElementById(`f-psm${idx}`);
+        if(sel) sel.value = filters[key];
+        applyFilters();
+      });
+    });
+    const svChip = row.querySelector('.psm-sv[data-svtech]');
+    if(svChip) {
+      svChip.addEventListener('click', e=>{
+        e.stopPropagation();
+        const val = svChip.dataset.svtech;
+        filters.svTech = filters.svTech===val ? '' : val;
+        const sel = document.getElementById('f-svTech');
+        if(sel) sel.value = filters.svTech;
+        applyFilters();
+      });
+    }
     row.addEventListener('click', ()=>selectClip(i));
     list.appendChild(row);
   });
