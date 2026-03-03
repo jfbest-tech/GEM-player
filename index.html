@@ -447,21 +447,15 @@
       <span class="chip chip-b" data-f="ph" data-v="Y">PH<span class="chip-count"></span></span>
     </div>
 
-    <div class="px-3 pb-2 flex gap-3 justify-center">
-      <div>
-        <div class="section-title" style="text-align:center;">Screen</div>
-        <div class="flex flex-col gap-1 items-center pt-1">
-          <span class="chip chip-b" style="width:72px;text-align:center;" data-f="screen" data-v="Y">Yes<span class="chip-count"></span></span>
-          <span class="chip chip-b" style="width:72px;text-align:center;" data-f="screen" data-v="N">No<span class="chip-count"></span></span>
-        </div>
-      </div>
-      <div>
-        <div class="section-title" style="text-align:center;">Rebound</div>
-        <div class="flex flex-col gap-1 items-center pt-1">
-          <span class="chip chip-b" style="width:72px;text-align:center;" data-f="rebCreated" data-v="Y">Given Up<span class="chip-count"></span></span>
-          <span class="chip chip-b" style="width:72px;text-align:center;" data-f="rebAttacked" data-v="Y">Attacked<span class="chip-count"></span></span>
-        </div>
-      </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 12px 4px;">
+      <div class="section-title" style="text-align:center;">Screens</div>
+      <div class="section-title" style="text-align:center;">Rebounds</div>
+    </div>
+    <div class="px-3 pb-2 flex gap-1 justify-center" style="flex-wrap:nowrap;">
+      <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.65rem;padding:3px 2px;min-width:0;" data-f="screen" data-v="Y">Yes<span class="chip-count"></span></span>
+      <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.65rem;padding:3px 2px;min-width:0;" data-f="screen" data-v="N">No<span class="chip-count"></span></span>
+      <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.65rem;padding:3px 2px;min-width:0;" data-f="rebCreated" data-v="Y">Given Up<span class="chip-count"></span></span>
+      <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.65rem;padding:3px 2px;min-width:0;" data-f="rebAttacked" data-v="Y">Attacked<span class="chip-count"></span></span>
     </div>
 
     <div class="section-title" style="text-align:center;">Subjective</div>
