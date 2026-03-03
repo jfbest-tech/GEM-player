@@ -677,15 +677,6 @@ function buildFilters() {
     o.textContent = label; o.dataset.base = label;
     ge.appendChild(o);
   });
-  // Fixed overall save% per shot danger (uses allData, never changes with filters)
-  ['R','Y','G'].forEach(ryg => {
-    const shots = allData.filter(r => r.ryg === ryg);
-    const sv = shots.filter(r => r.save === 'Y').length;
-    const ga = shots.filter(r => r.goal === 'Y').length;
-    const tot = sv + ga;
-    const el = document.getElementById('svpct-' + ryg);
-    if(el) el.textContent = tot > 0 ? '.' + Math.round(sv/tot*1000).toString().padStart(3,'0') : '--';
-  });
 }
 
 // ═══════════════════════════════════════════════════════════
