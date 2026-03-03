@@ -725,9 +725,30 @@ function applyFilters() {
   filteredData.sort((a,b)=>gameDate(b.game).localeCompare(gameDate(a.game)));
   currentIndex = filteredData.length > 0 ? 0 : -1;
 
-  // Shot danger save% — goalie filter only, runs first so errors below can't block it
+  // Shot danger save% — all active filters except ryg
   (function() {
-    const base = allData.filter(r => !filters.goalie.size || filters.goalie.has(r.goalie));
+    const base = allData.filter(r => {
+      if(filters.goalie.size     && !filters.goalie.has(r.goalie))        return false;
+      if(filters.period          && String(r.period)!==filters.period)    return false;
+      if(filters.strength        && r.strength!==filters.strength)        return false;
+      if(filters.attackType      && r.attackType!==filters.attackType)    return false;
+      if(filters.save            && r.save!==filters.save)                return false;
+      if(filters.goal            && r.goal!==filters.goal)                return false;
+      if(filters.ph              && !r.phType)                            return false;
+      if(filters.goalQual        && r.goalQualitative!==filters.goalQual) return false;
+      if(filters.ozpPattern      && r.ozpPattern!==filters.ozpPattern)    return false;
+      if(filters.rushType        && r.rushType!==filters.rushType)        return false;
+      if(filters.screen          && r.screen!==filters.screen)            return false;
+      if(filters.psm0            && (r.psm||[])[0]!==filters.psm0)       return false;
+      if(filters.psm1            && (r.psm||[])[1]!==filters.psm1)       return false;
+      if(filters.psm2            && (r.psm||[])[2]!==filters.psm2)       return false;
+      if(filters.psm3            && (r.psm||[])[3]!==filters.psm3)       return false;
+      if(filters.svTech          && r.svTech!==filters.svTech)            return false;
+      if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)    return false;
+      if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)  return false;
+      if(filters.game            && r.game!==filters.game)                return false;
+      return true;
+    });
     ['R','Y','G'].forEach(ryg => {
       const shots = base.filter(r => r.ryg === ryg);
       const sv = shots.filter(r => r.save === 'Y').length;
