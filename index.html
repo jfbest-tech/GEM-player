@@ -726,6 +726,16 @@ function applyFilters() {
     ['period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech','game'].some(k=>filters[k]!=='') ||
     filters.psmExact!==null;
   document.getElementById('clear-btn').classList.toggle('active', anyFilter);
+  // Shot danger save% — respects goalie filter only
+  const goalieBase = allData.filter(r => !filters.goalie.size || filters.goalie.has(r.goalie));
+  ['R','Y','G'].forEach(ryg => {
+    const shots = goalieBase.filter(r => r.ryg === ryg);
+    const sv = shots.filter(r => r.save === 'Y').length;
+    const ga = shots.filter(r => r.goal === 'Y').length;
+    const tot = sv + ga;
+    const el = document.getElementById('svpct-' + ryg);
+    if(el) el.textContent = tot > 0 ? '.' + Math.round(sv/tot*1000).toString().padStart(3,'0') : '--';
+  });
   if(!initialLoad) {
     if(filteredData.length > 0) loadClip(filteredData[0], false);
   }
