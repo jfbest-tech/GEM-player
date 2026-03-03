@@ -1199,9 +1199,41 @@ video.addEventListener('timeupdate', ()=>{
 video.addEventListener('loadedmetadata', ()=>{
   document.getElementById('ctrl-time').textContent = '0:00 / '+fmtTime(video.duration);
 });
-document.getElementById('prog-bar').addEventListener('click', e=>{
-  if(video.duration) video.currentTime=(e.offsetX/e.currentTarget.offsetWidth)*video.duration;
-});
+// Progress bar scrubbing — uses clientX/getBoundingClientRect (works with CSS zoom)
+(function(){
+  const bar = document.getElementById('prog-bar');
+  let dragging = false, wasPlaying = false;
+  function seekTo(clientX) {
+    if(!video.duration) return;
+    const rect = bar.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    video.currentTime = ratio * video.duration;
+  }
+  bar.addEventListener('mousedown', e=>{
+    if(!video.duration) return;
+    dragging = true; wasPlaying = !video.paused;
+    if(wasPlaying) video.pause();
+    seekTo(e.clientX); e.preventDefault();
+  });
+  window.addEventListener('mousemove', e=>{ if(dragging) seekTo(e.clientX); });
+  window.addEventListener('mouseup',   e=>{
+    if(!dragging) return; dragging = false;
+    seekTo(e.clientX);
+    if(wasPlaying) video.play().catch(()=>{});
+  });
+  bar.addEventListener('touchstart', e=>{
+    if(!video.duration) return;
+    dragging = true; wasPlaying = !video.paused;
+    if(wasPlaying) video.pause();
+    seekTo(e.touches[0].clientX); e.preventDefault();
+  }, {passive:false});
+  window.addEventListener('touchmove',  e=>{ if(dragging) seekTo(e.touches[0].clientX); }, {passive:true});
+  window.addEventListener('touchend',   e=>{
+    if(!dragging) return; dragging = false;
+    if(e.changedTouches[0]) seekTo(e.changedTouches[0].clientX);
+    if(wasPlaying) video.play().catch(()=>{});
+  });
+})();
 
 // Fullscreen — toggle enter/exit
 document.getElementById('fullscreen-btn').addEventListener('click', ()=>{
