@@ -1258,7 +1258,7 @@ document.addEventListener('keyup',e=>{
 // ── Resizable video panel ──────────────────────────────────────────────────
 (function(){
   const handle = document.getElementById('resize-handle');
-  let dragging = false, startY = 0, startH = 0;
+  let dragging = false, startY = 0, startH = 0, pendingY = null, rafId = null;
 
   handle.addEventListener('mousedown', e => {
     dragging = true;
@@ -1272,9 +1272,14 @@ document.addEventListener('keyup',e=>{
 
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
-    const newH = Math.max(120, Math.min(window.innerHeight - 160, startH + (e.clientY - startY)));
-    document.documentElement.style.setProperty('--vid-h', newH + 'px');
-    updateControlsPadding();
+    pendingY = e.clientY;
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      const newH = Math.max(120, Math.min(window.innerHeight - 160, startH + (pendingY - startY)));
+      document.documentElement.style.setProperty('--vid-h', newH + 'px');
+      updateControlsPadding();
+    });
   });
 
   document.addEventListener('mouseup', () => {
