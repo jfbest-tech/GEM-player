@@ -878,7 +878,7 @@ function renderList() {
       <span style="display:flex; align-items:center; justify-content:center;">${screenIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${qualIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${rebIco}</span>
-      <span style="font-size:11px;">${res} ${has?'<span style="color:#0c2461;font-size:0.65rem;">▶\uFE0E</span>':''}</span>
+      <span style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:3px;">${res}${has?'<span style="color:#0c2461;font-size:0.65rem;">▶\uFE0E</span>':''}</span>
     `;
     const comboBtn = row.querySelector('.psm-combo-btn');
     if(comboBtn && comboBtn.dataset.psms) {
