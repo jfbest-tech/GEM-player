@@ -1085,7 +1085,8 @@ function seekBy(delta){
   if(video.style.display==='none') return;
   showSeekToast(delta);
   if(delta > 0){
-    video.currentTime = Math.min(video.duration||0, video.currentTime + delta);
+    const t = Math.min(video.duration||0, video.currentTime + delta);
+    if(video.fastSeek) video.fastSeek(t); else video.currentTime = t;
   } else {
     _seekDelta += delta;
     clearTimeout(_seekTimer);
