@@ -765,6 +765,11 @@ function updateStats() {
   const Y=filteredData.filter(r=>r.ryg==='Y').length;
   const G=filteredData.filter(r=>r.ryg==='G').length;
   const v=filteredData.filter(r=>hasClip(r)).length;
+  const _sv=filteredData.filter(r=>r.save==='Y').length;
+  const _ga=filteredData.filter(r=>r.goal==='Y').length;
+  const _tot=_sv+_ga;
+  const svpctEl=document.getElementById('svpct-overall-val');
+  if(svpctEl) svpctEl.textContent = _tot>0 ? '.'+Math.round(_sv/_tot*1000).toString().padStart(3,'0') : '--';
   document.getElementById('stats-row').innerHTML = t
     ? `<span>${t} sequences</span>
        <span style="color:#999">&#9679; LowQ: ${R}</span>
