@@ -853,7 +853,7 @@ function renderList() {
     } else if(r.phType) {
       const isPhActive = filters.goalie.size===1 && filters.goalie.has(r.goalie) && filters.ph==='Y';
       comboBtnHtml = `<button class="psm-combo-btn${isPhActive?' active':''}" data-goalie="${r.goalie}" data-ph="1" title="${r.goalie} — filter all PH"></button>`;
-      psmHtml = `<span class="badge b-ph">PH</span>`;
+      psmHtml = `<span class="badge b-ph" data-ph-goalie="${r.goalie}" style="cursor:pointer;">PH</span>`;
     }
 
     const res = r.goal==='Y'
