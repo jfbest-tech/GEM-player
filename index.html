@@ -978,8 +978,8 @@ function selectClip(idx) {
     const list = document.getElementById('seq-list');
     const rowRect = activeRow.getBoundingClientRect();
     const listRect = list.getBoundingClientRect();
-    // Position active clip as 2nd visible row (subtract one row height so the row above shows)
-    const offset = idx === 0 ? 0 : activeRow.offsetHeight;
+    // Scroll active clip to just below the header with a small gap
+    const offset = idx === 0 ? 0 : 5;
     list.scrollTo({ top: Math.max(0, list.scrollTop + rowRect.top - listRect.top - offset), behavior: 'smooth' });
   }
 
