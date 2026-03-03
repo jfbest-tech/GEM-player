@@ -23,8 +23,8 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: #ffffff; color: var(--text); font-family: 'Segoe UI Semibold', 'Segoe UI', system-ui, sans-serif; font-size: 13px; padding-left: 24px; padding-right: 24px; }
   body::before, body::after { content:''; position:fixed; top:0; bottom:0; width:1px; background:var(--navy-border); pointer-events:none; z-index:9999; }
-  body::before { left:24px;  box-shadow: -4px 0 6px rgba(0,0,0,0.18); }
-  body::after  { right:24px; box-shadow:  4px 0 6px rgba(0,0,0,0.18); }
+  body::before { left:24px;  box-shadow: -6px 0 10px rgba(0,0,0,0.35); }
+  body::after  { right:24px; box-shadow:  6px 0 10px rgba(0,0,0,0.35); }
 
   /* HEADER */
   .header { background: #ffffff; border-bottom: 1px solid var(--navy-border); }
@@ -44,6 +44,8 @@
   .chip-g.on { background:#0c2461; color:#fff; border-color:#0a1d4e; }
   .chip-b { background:#ececec; color:#0c2461; border-color:#d0d0d0; }
   .chip-b.on { background:#0c2461; color:#fff; border-color:#0c2461; }
+  .chip-w { background:#fff; color:#0c2461; border-color:#d0d0d0; }
+  .chip-w.on { background:#0c2461; color:#fff; border-color:#0c2461; }
 
   /* SELECT */
   select.sel {
@@ -445,10 +447,9 @@
     </div>
 
     <div class="px-3 pb-1 flex gap-1 justify-center">
-      <span class="chip chip-b" id="svpct-overall" style="cursor:default;">Sv%<span class="chip-count" id="svpct-overall-val"></span></span>
-      <span class="chip chip-b" data-f="save" data-v="Y">Saves<span class="chip-count"></span></span>
-      <span class="chip chip-b" data-f="goal" data-v="Y">Goals<span class="chip-count"></span></span>
-      <span class="chip chip-b" data-f="ph" data-v="Y">PH<span class="chip-count"></span></span>
+      <span class="chip chip-w" id="svpct-overall" style="cursor:default;">Sv%<span class="chip-count" id="svpct-overall-val"></span></span>
+      <span class="chip chip-w" data-f="save" data-v="Y">Saves<span class="chip-count"></span></span>
+      <span class="chip chip-w" data-f="goal" data-v="Y">Goals<span class="chip-count"></span></span>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 12px 4px;">
@@ -465,9 +466,9 @@
 
     <div class="section-title" style="text-align:center;">Subjective</div>
     <div class="px-3 pb-1 flex gap-1 justify-center" style="flex-wrap:nowrap;">
-      <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:3px 2px;min-width:0;" data-f="goalQual" data-v="Should've Had">Shoulda Had<span class="chip-count"></span></span>
-      <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:3px 2px;min-width:0;" data-f="goalQual" data-v="Could've Had">Coulda Had<span class="chip-count"></span></span>
-      <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:3px 2px;min-width:0;" data-f="goalQual" data-v="No Chance">No Chance<span class="chip-count"></span></span>
+      <span class="chip chip-w" style="flex:1;text-align:center;font-size:0.6rem;padding:3px 2px;min-width:0;" data-f="goalQual" data-v="Should've Had">Shoulda Had<span class="chip-count"></span></span>
+      <span class="chip chip-w" style="flex:1;text-align:center;font-size:0.6rem;padding:3px 2px;min-width:0;" data-f="goalQual" data-v="Could've Had">Coulda Had<span class="chip-count"></span></span>
+      <span class="chip chip-w" style="flex:1;text-align:center;font-size:0.6rem;padding:3px 2px;min-width:0;" data-f="goalQual" data-v="No Chance">No Chance<span class="chip-count"></span></span>
     </div>
 
 
