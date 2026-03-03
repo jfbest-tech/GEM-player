@@ -1021,7 +1021,30 @@ function seekBy(delta){
 }
 document.getElementById('back3-btn').addEventListener('click', ()=>seekBy(-3));
 document.getElementById('fwd3-btn').addEventListener('click',  ()=>seekBy(3));
-document.getElementById('frame-btn').addEventListener('click', ()=>stepFrame());
+const frameBtn = document.getElementById('frame-btn');
+let _frameBtnHold = false, _frameBtnTimer = null;
+function _frameBtnStart(){
+  _frameBtnTimer = setTimeout(()=>{
+    _frameBtnHold = true;
+    video.playbackRate = 0.25;
+    video.play().catch(()=>{});
+  }, 200);
+}
+function _frameBtnEnd(){
+  clearTimeout(_frameBtnTimer);
+  if(_frameBtnHold){
+    _frameBtnHold = false;
+    video.pause();
+    video.playbackRate = 1;
+  } else {
+    stepFrame();
+  }
+}
+frameBtn.addEventListener('mousedown',  _frameBtnStart);
+frameBtn.addEventListener('mouseup',    _frameBtnEnd);
+frameBtn.addEventListener('mouseleave', ()=>{ if(_frameBtnHold){ _frameBtnHold=false; video.pause(); video.playbackRate=1; } clearTimeout(_frameBtnTimer); });
+frameBtn.addEventListener('touchstart', e=>{ e.preventDefault(); _frameBtnStart(); }, {passive:false});
+frameBtn.addEventListener('touchend',   e=>{ e.preventDefault(); _frameBtnEnd(); },   {passive:false});
 let sPreMuted = false; // mute state saved before entering slow-mo
 
 function syncMuteBtn() {
