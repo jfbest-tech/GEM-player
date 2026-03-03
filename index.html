@@ -295,7 +295,8 @@
 
   /* ═══ TABLET & MOBILE (≤ 1024px) ═══ */
   @media (max-width: 1024px) {
-    body { padding-left: 0; padding-right: 0; box-shadow: none; }
+    body { padding-left: 0; padding-right: 0; }
+    body::before, body::after { display: none; }
     :root { --vid-h: 50vh; }
 
     /* Sidebar slides in from left */
