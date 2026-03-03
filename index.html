@@ -1384,13 +1384,20 @@ document.addEventListener('keyup',e=>{
     e.preventDefault();
   });
 
+  let _rafPending = false, _pendingY = 0;
   document.addEventListener('mousemove', e => {
     if (!dragging) return;
-    const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
-    const rawH = startH + (e.clientY - startY);
-    const clampH = Math.max(120 * zoom, Math.min(window.innerHeight - 160 * zoom, rawH));
-    document.documentElement.style.setProperty('--vid-h', (clampH / zoom) + 'px');
-    updateControlsPadding();
+    _pendingY = e.clientY;
+    if (_rafPending) return;
+    _rafPending = true;
+    requestAnimationFrame(() => {
+      _rafPending = false;
+      const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+      const rawH = startH + (_pendingY - startY);
+      const clampH = Math.max(120 * zoom, Math.min(window.innerHeight - 160 * zoom, rawH));
+      document.documentElement.style.setProperty('--vid-h', (clampH / zoom) + 'px');
+      updateControlsPadding();
+    });
   });
 
   document.addEventListener('mouseup', () => {
