@@ -34,7 +34,7 @@
   .section-title { font-size: 0.6rem; font-weight: 700; font-family: 'Segoe UI', sans-serif; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); padding: 3px 12px 1px; }
 
   /* CHIPS */
-  .chip { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; padding:2px 10px; font-size:0.6rem; border-radius:5px; font-size:0.69rem; font-weight:600; cursor:pointer; user-select:none; border:1px solid transparent; transition:all .12s; }
+  .chip { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; padding:2px 10px; font-size:0.6rem; border-radius:5px; font-weight:600; cursor:pointer; user-select:none; border:1px solid transparent; transition:all .12s; }
   .chip-count { font-size:0.58rem; font-weight:700; opacity:0.65; line-height:1; margin-top:1px; }
   .chip-r { background:#e2e2e2; color:#555555; border-color:#c8c8c8; }
   .chip-r.on { background:#999999; color:#fff; border-color:#777777; }
@@ -67,15 +67,15 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 120px 110px 78px 24px 1fr 28px 28px 28px 62px;
-    gap:6px; align-items:center;
+    display:grid; grid-template-columns: 12px 105px 110px 78px 24px 1fr 24px 24px 24px 62px;
+    gap:5px; align-items:center;
     padding:5px 10px; padding-right:15px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 120px 110px 78px 24px 1fr 28px 28px 28px 62px;
-    gap:6px; align-items:center;
+    display:grid; grid-template-columns: 12px 105px 110px 78px 24px 1fr 24px 24px 24px 62px;
+    gap:5px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
   .seq-row:hover { background:#eef4ff; }
@@ -87,10 +87,10 @@
 
   /* Quality dot */
   .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-  .dot-R { background:#aaaaaa; } .dot-Y { background:#666666; } .dot-G { background:#0c2461; }
+  .dot-R { background:#999999; } .dot-Y { background:#8898bb; } .dot-G { background:#3a5a90; }
 
   /* Playlist icon badges */
-  .ico { font-size:8px; font-weight:800; padding:1px 3px; border-radius:3px; white-space:nowrap; line-height:1.4; }
+  .ico { font-size:0.6rem; font-weight:800; padding:1px 3px; border-radius:3px; white-space:nowrap; line-height:1.4; }
   .ico-scr { background:#e8edf8; color:#2a4080; }
   .ico-q-R { background:#ebebeb; color:#666; }
   .ico-q-Y { background:#d8d8d8; color:#444; }
@@ -239,10 +239,10 @@
   #resize-handle:hover #resize-arrows, #resize-handle.dragging #resize-arrows { opacity:1; color:var(--accent); }
 
   /* PSM tags */
-  .psm { background:#e8edf5; color:#2a4070; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #c5d3ea; cursor:pointer; transition:all .1s; white-space:nowrap; flex-shrink:0; }
+  .psm { background:#e8edf5; color:#2a4070; font-size:0.6rem; font-weight:600; padding:1px 5px; border-radius:4px; border:1px solid #c5d3ea; cursor:pointer; transition:all .1s; white-space:nowrap; flex-shrink:0; }
   .psm:hover { background:#d4dff5; border-color:#2a4070; }
   .psm.active { background:#2a4070; color:#fff; border-color:#1a2e5a; }
-  .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.62rem; font-weight:600; padding:2px 7px; border-radius:4px; border:1px solid #9ab0d0; cursor:pointer; transition:all .1s; white-space:nowrap; flex-shrink:0; }
+  .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.6rem; font-weight:600; padding:1px 5px; border-radius:4px; border:1px solid #9ab0d0; cursor:pointer; transition:all .1s; white-space:nowrap; flex-shrink:0; }
   .psm-sv:hover { background:#a8c0d8; border-color:#1a2e5a; }
   .psm-sv.active { background:#1a2e5a; color:#fff; border-color:#0c1f40; }
 
@@ -369,12 +369,12 @@
   <div class="sidebar flex-shrink-0 flex flex-col" style="overflow:hidden;">
   <div class="flex-1 overflow-y-auto" style="min-height:0;">
 
-    <div style="margin:2px 8px 2px; border:1px solid #d5d5d5; border-radius:6px; background:#fff;">
+    <div style="margin:4px 8px 4px; border:1px solid #d5d5d5; border-radius:6px; background:#fff;">
       <div class="section-title">Goalie</div>
       <div id="f-goalie" class="px-3 pb-1 flex flex-col" style="gap:2px;"></div>
     </div>
 
-    <div class="px-3 pb-0">
+    <div class="px-3 pb-1">
       <div style="display:grid; grid-template-columns:1fr 64px 72px; gap:6px; align-items:end;">
         <div>
           <div class="section-title" style="padding-left:0;">Game</div>
@@ -396,12 +396,12 @@
       </div>
     </div>
 
-    <div style="height:1px; background:var(--navy-border); margin:3px 12px 0;"></div>
+    <div style="height:1px; background:var(--navy-border); margin:4px 12px 4px;"></div>
 
     <div class="section-title">Attack Type</div>
-    <div class="px-3 pb-0"><select class="sel" id="f-attackType"><option value="">All</option></select></div>
+    <div class="px-3 pb-1"><select class="sel" id="f-attackType"><option value="">All</option></select></div>
 
-    <div style="display:flex; gap:6px; padding:0 8px 2px;">
+    <div style="display:flex; gap:6px; padding:0 8px 4px;">
       <div style="flex:1; min-width:0;">
         <div class="section-title" style="padding-left:0;">OZP Pattern</div>
         <select class="sel" id="f-ozpPattern"><option value="">All</option></select>
@@ -412,7 +412,7 @@
       </div>
     </div>
 
-    <div style="margin:2px 8px 2px; border:1px solid #d5d5d5; border-radius:6px; background:#ececec;">
+    <div style="margin:2px 8px 5px; border:1px solid #d5d5d5; border-radius:6px; background:#ececec;">
       <div class="section-title">Pre-Save Movements</div>
       <div class="px-3 pb-0 flex flex-col gap-1">
         <div class="psm-lbl">First Move</div>
@@ -434,8 +434,8 @@
       <div class="px-3 pb-1"><select class="sel" id="f-svTech"><option value="">All</option></select></div>
     </div>
 
-    <div class="section-title" style="text-align:center;">Shot Danger</div>
-    <div class="px-3 pb-0 flex gap-1 justify-center">
+    <div class="section-title" style="text-align:center; padding-top:4px;">Shot Danger</div>
+    <div class="px-3 pb-1 flex gap-1 justify-center">
       <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
         <span class="chip chip-r" style="width:62px;text-align:center;" data-f="ryg" data-v="R">lowQ<span class="chip-count"></span></span>
         <span style="font-size:0.58rem;color:var(--text-mute);" id="svpct-R">--</span>
@@ -450,17 +450,17 @@
       </div>
     </div>
 
-    <div class="px-3 pb-0 flex gap-1 justify-center">
-      <span class="chip chip-w" style="width:62px;text-align:center;cursor:default;color:#aaaaaa;" id="svpct-overall">Sv%<span class="chip-count" id="svpct-overall-val"></span></span>
+    <div class="px-3 pb-1 flex gap-1 justify-center">
+      <span class="chip chip-w" style="width:62px;text-align:center;cursor:default;" id="svpct-overall">Sv%<span class="chip-count" id="svpct-overall-val"></span></span>
       <span class="chip chip-w" style="width:62px;text-align:center;" data-f="save" data-v="Y">Saves<span class="chip-count"></span></span>
       <span class="chip chip-w" style="width:62px;text-align:center;" data-f="goal" data-v="Y">Goals<span class="chip-count"></span></span>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 12px 1px;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:3px 12px 2px;">
       <div class="section-title" style="text-align:center;">Screens</div>
       <div class="section-title" style="text-align:center;">Rebounds</div>
     </div>
-    <div class="px-3 pb-0 flex gap-1 justify-center" style="flex-wrap:nowrap;">
+    <div class="px-3 pb-1 flex gap-1 justify-center" style="flex-wrap:nowrap;">
       <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 4px;white-space:nowrap;" data-f="screen" data-v="Y">Yes<span class="chip-count"></span></span>
       <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 4px;white-space:nowrap;" data-f="screen" data-v="N">No<span class="chip-count"></span></span>
       <div style="width:1px;background:var(--navy-border);align-self:stretch;margin:0 2px;flex-shrink:0;"></div>
@@ -468,8 +468,8 @@
       <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 4px;white-space:nowrap;" data-f="rebAttacked" data-v="Y">Attacked<span class="chip-count"></span></span>
     </div>
 
-    <div class="section-title" style="text-align:center;">Subjective</div>
-    <div class="px-3 pb-0 flex gap-1 justify-center" style="flex-wrap:nowrap;">
+    <div class="section-title" style="text-align:center; padding-top:4px;">Subjective</div>
+    <div class="px-3 pb-1 flex gap-1 justify-center" style="flex-wrap:nowrap;">
       <span class="chip chip-w" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 2px;min-width:0;" data-f="goalQual" data-v="Should've Had">Shoulda Had<span class="chip-count"></span></span>
       <span class="chip chip-w" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 2px;min-width:0;" data-f="goalQual" data-v="Could've Had">Coulda Had<span class="chip-count"></span></span>
       <span class="chip chip-w" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 2px;min-width:0;" data-f="goalQual" data-v="No Chance">No Chance<span class="chip-count"></span></span>
@@ -915,15 +915,15 @@ function renderList() {
 
     row.innerHTML = `
       <span class="${dc}"></span>
-      <span style="color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:11px;">${r.goalie||'—'}</span>
-      <span style="color:var(--text-dim); font-size:10px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${gameLabel}</span>
-      <span style="color:var(--text-dim); font-size:11px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
+      <span style="color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.6rem;">${r.goalie||'—'}</span>
+      <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${gameLabel}</span>
+      <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${comboBtnHtml}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${screenIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${qualIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${rebIco}</span>
-      <span style="font-size:11px;display:flex;align-items:center;justify-content:center;gap:3px;">${res}${has?'<span style="color:#0c2461;font-size:0.65rem;">▶\uFE0E</span>':''}</span>
+      <span style="font-size:0.6rem;display:flex;align-items:center;justify-content:center;gap:3px;">${res}${has?'<span style="color:#0c2461;font-size:0.6rem;">▶\uFE0E</span>':''}</span>
     `;
     const comboBtn = row.querySelector('.psm-combo-btn');
     if(comboBtn && comboBtn.dataset.psms) {
