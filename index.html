@@ -1443,8 +1443,9 @@ document.addEventListener('keyup',e=>{
     startH = wrapEl.getBoundingClientRect().height;
     _zoom  = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
     _wrapW = wrapEl.clientWidth; // cache width — constant during vertical drag
-    // Min height = controls panel height + small buffer so buttons never spill out
-    _minH  = Math.max(120, (_ctrl.offsetHeight || 0) + 16) * _zoom;
+    // Controls are display:none before video loads so offsetHeight may be 0 — use 90px fallback
+    const ctrlH = _ctrl.offsetHeight > 0 ? _ctrl.offsetHeight : 90;
+    _minH = Math.max(160, ctrlH + 40) * _zoom;
     dragging = true;
     handle.classList.add('dragging');
     document.body.classList.add('resizing');
