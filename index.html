@@ -67,14 +67,14 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 105px 110px 78px 24px 1fr 24px 24px 24px 62px;
+    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 24px 24px 24px 62px;
     gap:5px; align-items:center;
     padding:5px 10px; padding-right:15px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 105px 110px 78px 24px 1fr 24px 24px 24px 62px;
+    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 24px 24px 24px 62px;
     gap:5px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
@@ -329,7 +329,7 @@
 
     /* Playlist: horizontal scroll so nothing wraps */
     .seq-list { overflow-x: auto; }
-    .seq-header-row, .seq-row { min-width: 680px; }
+    .seq-header-row, .seq-row { min-width: 720px; }
 
     /* Hide resize handle (not useful on touch) */
     #resize-handle { display: none; }
@@ -549,6 +549,7 @@
         <span></span>
         <span>Goalie</span>
         <span style="text-align:center;">Game</span>
+        <span style="text-align:center;">Str</span>
         <span style="text-align:center;">Type</span>
         <span style="display:flex;align-items:center;justify-content:center; font-size:11px; opacity:0.6;">▽</span>
         <span>Pre-Save Movements → Save Tech</span>
@@ -921,6 +922,7 @@ function renderList() {
       <span class="${dc}"></span>
       <span style="color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.6rem;">${r.goalie||'—'}</span>
       <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${gameLabel}</span>
+      <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.strength||'—'}</span>
       <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${comboBtnHtml}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
