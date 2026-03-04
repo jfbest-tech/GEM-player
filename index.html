@@ -1460,7 +1460,7 @@ document.addEventListener('keyup',e=>{
       const rawH = startH + (_pendingY - startY);
       const clampH = Math.max(120 * zoom, Math.min(window.innerHeight - 160 * zoom, rawH));
       document.documentElement.style.setProperty('--vid-h', (clampH / zoom) + 'px');
-      updateControlsPadding();
+      // Skip updateControlsPadding during drag to avoid layout thrashing
     });
   });
 
@@ -1471,6 +1471,7 @@ document.addEventListener('keyup',e=>{
     document.body.classList.remove('resizing');
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
+    updateControlsPadding(); // Recalculate once after drag ends
   });
 })();
 
