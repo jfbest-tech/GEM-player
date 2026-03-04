@@ -95,7 +95,15 @@
   .ico-q-R { background:#f6f6f6; color:#555555; }
   .ico-q-Y { background:#8898bb; color:#fff; }
   .ico-q-G { background:#3a5a90; color:#fff; }
-  .ico-reb { background:#ddeedd; color:#2a5020; }
+  .ico-reb { background:rgba(220,60,60,0.10); color:#b03030; border:1px solid rgba(200,50,50,0.18); }
+
+  /* Strength icons */
+  .str-ico { display:inline-flex; align-items:center; justify-content:center; font-size:0.55rem; font-weight:800; padding:1px 4px; border-radius:3px; white-space:nowrap; cursor:pointer; transition:all .1s; border:1px solid transparent; line-height:1.4; }
+  .str-ico:hover { filter:brightness(0.88); }
+  .str-ev { background:#e8e8e8; color:#555555; border-color:#cccccc; }
+  .str-pp { background:#dbeafe; color:#1d4ed8; border-color:#93c5fd; }
+  .str-pk { background:#fee2e2; color:#b91c1c; border-color:#fca5a5; }
+  .str-ico.str-active { box-shadow:0 0 0 2px currentColor; }
 
   /* Badges */
   .badge { font-size:0.6rem; font-weight:700; padding:2px 6px; border-radius:3px; white-space:nowrap; }
@@ -359,7 +367,19 @@
       <span style="color:var(--text-mute); font-size:0.72rem; margin-left:6px;">Goalie Efficiency Model</span>
     </div>
   </div>
-  <img src="wave5.png" alt="" aria-hidden="true" style="position:absolute; bottom:0; left:280px; right:0; height:300%; width:calc(100% - 280px); object-fit:cover; object-position:center bottom; opacity:0.15; pointer-events:none; user-select:none;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 50" preserveAspectRatio="none"
+       style="position:absolute; bottom:0; left:280px; right:0; width:calc(100% - 280px); height:100%; pointer-events:none; user-select:none;" aria-hidden="true">
+    <!-- Far water body -->
+    <path d="M0 34 C150 24 300 44 450 34 C600 24 750 44 900 34 C1050 24 1200 44 1200 44 L1200 50 L0 50 Z" fill="#1a5fa0" opacity="0.06"/>
+    <!-- Main water body -->
+    <path d="M0 38 C200 28 400 48 600 38 C800 28 1000 48 1200 38 L1200 50 L0 50 Z" fill="#0c2461" opacity="0.09"/>
+    <!-- Near surface -->
+    <path d="M0 45 C150 42 300 48 450 45 C600 42 750 48 900 45 C1050 42 1200 47 1200 47 L1200 50 L0 50 Z" fill="#3a7abd" opacity="0.05"/>
+    <!-- Horizon line -->
+    <path d="M0 38 C200 28 400 48 600 38 C800 28 1000 48 1200 38" fill="none" stroke="#0c2461" stroke-width="0.7" opacity="0.20"/>
+    <!-- Secondary far wave line -->
+    <path d="M0 34 C150 24 300 44 450 34 C600 24 750 44 900 34 C1050 24 1200 44 1200 44" fill="none" stroke="#4a8fd0" stroke-width="0.5" opacity="0.12"/>
+  </svg>
   <button id="mobile-filter-btn" title="Filters" style="position:relative;">⊟ Filters</button>
 </div>
 
@@ -911,19 +931,39 @@ function renderList() {
       : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
       : r.phType ? `<span class="badge b-ph">PH</span>` : '—';
 
+    // Strength icon
+    function strClass(s) {
+      if (!s) return 'str-ev';
+      const [a, b] = s.split('v').map(Number);
+      if (a > b) return 'str-pp';
+      if (a < b) return 'str-pk';
+      return 'str-ev';
+    }
+    const isStrActive = filters.strength === r.strength;
+    const strIcoHtml = r.strength
+      ? `<span class="str-ico ${strClass(r.strength)}${isStrActive?' str-active':''}" data-str="${r.strength}">${r.strength}</span>`
+      : '<span style="color:var(--text-mute);font-size:0.6rem;">—</span>';
+
     // Icon columns
-    const screenIco = r.screen==='Y' ? '<span class="ico ico-scr">S</span>' : '';
+    const isScrActive = filters.screen === 'Y';
+    const screenIco = r.screen==='Y'
+      ? `<span class="ico ico-scr${isScrActive?' str-active':''}" style="cursor:pointer;" data-scr="Y">S</span>` : '';
     const _qm = {R:'Lo',Y:'Mi',G:'Hi'};
-    const qualIco = r.ryg ? `<span class="ico ico-q-${r.ryg}">${_qm[r.ryg]||r.ryg}</span>` : '';
+    const isQualActive = filters.ryg.has(r.ryg);
+    const qualIco = r.ryg
+      ? `<span class="ico ico-q-${r.ryg}${isQualActive?' str-active':''}" style="cursor:pointer;" data-qual="${r.ryg}">${_qm[r.ryg]||r.ryg}</span>` : '';
     const rebText = r.rebCreated==='Y' && r.rebAttacked==='Y' ? 'R'
       : r.rebCreated==='Y' ? 'RC' : r.rebAttacked==='Y' ? 'RA' : '';
-    const rebIco = rebText ? `<span class="ico ico-reb">${rebText}</span>` : '';
+    const rebRC = r.rebCreated==='Y', rebRA = r.rebAttacked==='Y';
+    const isRebActive = (rebRC && filters.rebCreated==='Y') || (rebRA && filters.rebAttacked==='Y');
+    const rebIco = rebText
+      ? `<span class="ico ico-reb${isRebActive?' str-active':''}" style="cursor:pointer;" data-reb-created="${r.rebCreated||''}" data-reb-attacked="${r.rebAttacked||''}">${rebText}</span>` : '';
 
     row.innerHTML = `
       <span class="${dc}"></span>
       <span style="color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.6rem;">${r.goalie||'—'}</span>
       <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${gameLabel}</span>
-      <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.strength||'—'}</span>
+      <span style="display:flex; align-items:center; justify-content:center;">${strIcoHtml}</span>
       <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${comboBtnHtml}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
@@ -975,6 +1015,63 @@ function renderList() {
         applyFilters();
       });
     }
+
+    // Strength icon click
+    const strIcon = row.querySelector('.str-ico[data-str]');
+    if(strIcon) {
+      strIcon.addEventListener('click', e=>{
+        e.stopPropagation();
+        const val = strIcon.dataset.str;
+        filters.strength = filters.strength===val ? '' : val;
+        const sel = document.getElementById('f-strength');
+        if(sel) sel.value = filters.strength;
+        applyFilters();
+      });
+    }
+
+    // Screen icon click
+    const scrIcon = row.querySelector('.ico-scr[data-scr]');
+    if(scrIcon) {
+      scrIcon.addEventListener('click', e=>{
+        e.stopPropagation();
+        filters.screen = filters.screen==='Y' ? null : 'Y';
+        applyFilters();
+      });
+    }
+
+    // Quality icon click
+    const qualIcon = row.querySelector('.ico[data-qual]');
+    if(qualIcon) {
+      qualIcon.addEventListener('click', e=>{
+        e.stopPropagation();
+        const val = qualIcon.dataset.qual;
+        if(filters.ryg.has(val) && filters.ryg.size===1) filters.ryg.clear();
+        else { filters.ryg.clear(); filters.ryg.add(val); }
+        document.querySelectorAll('.chip[data-f="ryg"]').forEach(c=>c.classList.toggle('on', filters.ryg.has(c.dataset.v)));
+        applyFilters();
+      });
+    }
+
+    // Rebound icon click
+    const rebIcon = row.querySelector('.ico-reb[data-reb-created]');
+    if(rebIcon) {
+      rebIcon.addEventListener('click', e=>{
+        e.stopPropagation();
+        const rc = rebIcon.dataset.rebCreated==='Y';
+        const ra = rebIcon.dataset.rebAttacked==='Y';
+        // Toggle: if both match current filters, clear; else set
+        const alreadyRC = rc && filters.rebCreated==='Y';
+        const alreadyRA = ra && filters.rebAttacked==='Y';
+        if(alreadyRC || alreadyRA) {
+          filters.rebCreated = null; filters.rebAttacked = null;
+        } else {
+          filters.rebCreated = rc ? 'Y' : null;
+          filters.rebAttacked = ra ? 'Y' : null;
+        }
+        applyFilters();
+      });
+    }
+
     row.addEventListener('click', ()=>selectClip(i));
     list.appendChild(row);
   });
@@ -1447,7 +1544,7 @@ document.addEventListener('keyup',e=>{
     _zoom  = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
     _wrapW = wrapEl.clientWidth;
     const ctrlH = _ctrl.offsetHeight > 0 ? _ctrl.offsetHeight : 70;
-    _minH = Math.max(220, ctrlH + 100) * _zoom;
+    _minH = Math.max(300, ctrlH + 140) * _zoom;
     dragging = true;
     handle.classList.add('dragging');
     document.body.classList.add('resizing');
