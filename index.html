@@ -1435,18 +1435,26 @@ document.addEventListener('keyup',e=>{
 // ── Resizable video panel ──────────────────────────────────────────────────
 (function(){
   const handle = document.getElementById('resize-handle');
-  let dragging = false, startY = 0, startH = 0;
+  let dragging = false, startY = 0, startH = 0, _zoom = 1, _wrapW = 0, _minH = 120;
 
   handle.addEventListener('mousedown', e => {
-    dragging = true;
+    const wrapEl = document.getElementById('vid-wrap');
     startY = e.clientY;
-    startH = document.getElementById('vid-wrap').getBoundingClientRect().height;
+    startH = wrapEl.getBoundingClientRect().height;
+    _zoom  = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+    _wrapW = wrapEl.clientWidth; // cache width — constant during vertical drag
+    // Min height = controls panel height + small buffer so buttons never spill out
+    _minH  = Math.max(120, (_ctrl.offsetHeight || 0) + 16) * _zoom;
+    dragging = true;
     handle.classList.add('dragging');
     document.body.classList.add('resizing');
     document.body.style.cursor = 'ns-resize';
     document.body.style.userSelect = 'none';
     e.preventDefault();
   });
+
+  const _ctrl  = document.getElementById('vid-controls');
+  const _label = document.getElementById('vid-clip-label');
 
   let _rafPending = false, _pendingY = 0;
   document.addEventListener('mousemove', e => {
@@ -1456,11 +1464,21 @@ document.addEventListener('keyup',e=>{
     _rafPending = true;
     requestAnimationFrame(() => {
       _rafPending = false;
-      const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
-      const rawH = startH + (_pendingY - startY);
-      const clampH = Math.max(120 * zoom, Math.min(window.innerHeight - 160 * zoom, rawH));
-      document.documentElement.style.setProperty('--vid-h', (clampH / zoom) + 'px');
-      // Skip updateControlsPadding during drag to avoid layout thrashing
+      const rawH  = startH + (_pendingY - startY);
+      const clampH = Math.max(_minH, Math.min(window.innerHeight - 160 * _zoom, rawH));
+      const newH  = clampH / _zoom;
+      document.documentElement.style.setProperty('--vid-h', newH + 'px');
+      // Update letterbox offsets using cached values — no layout reads
+      if (video.videoWidth && video.style.display !== 'none' &&
+          !document.fullscreenElement && !document.webkitFullscreenElement) {
+        const ar   = video.videoWidth / video.videoHeight;
+        const side = _wrapW / newH > ar ? Math.round((_wrapW - newH * ar) / 2) : 0;
+        _ctrl.style.left  = side + 'px';
+        _ctrl.style.right = side + 'px';
+        _label.style.right = (side + 10) + 'px';
+        playOverlay.style.left  = side + 'px';
+        playOverlay.style.right = side + 'px';
+      }
     });
   });
 
@@ -1471,7 +1489,7 @@ document.addEventListener('keyup',e=>{
     document.body.classList.remove('resizing');
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
-    updateControlsPadding(); // Recalculate once after drag ends
+    updateControlsPadding();
   });
 })();
 
