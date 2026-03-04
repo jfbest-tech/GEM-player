@@ -359,7 +359,7 @@
       <span style="color:var(--text-mute); font-size:0.72rem; margin-left:6px;">Goalie Efficiency Model</span>
     </div>
   </div>
-  <img src="wave5.png" alt="" aria-hidden="true" style="position:absolute; bottom:0; left:280px; right:0; height:100%; width:calc(100% - 280px); object-fit:cover; object-position:left bottom; opacity:0.12; pointer-events:none; user-select:none;">
+  <img src="wave5.png" alt="" aria-hidden="true" style="position:absolute; bottom:0; left:280px; right:0; height:300%; width:calc(100% - 280px); object-fit:cover; object-position:center bottom; opacity:0.15; pointer-events:none; user-select:none;">
   <button id="mobile-filter-btn" title="Filters" style="position:relative;">⊟ Filters</button>
 </div>
 
@@ -1444,9 +1444,9 @@ document.addEventListener('keyup',e=>{
     startH = wrapEl.getBoundingClientRect().height;
     _zoom  = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
     _wrapW = wrapEl.clientWidth; // cache width — constant during vertical drag
-    // Controls are display:none before video loads so offsetHeight may be 0 — use 90px fallback
-    const ctrlH = _ctrl.offsetHeight > 0 ? _ctrl.offsetHeight : 90;
-    _minH = Math.max(160, ctrlH + 40) * _zoom;
+    // Controls are display:none before video loads so offsetHeight may be 0 — use 70px (CSS-calculated) fallback
+    const ctrlH = _ctrl.offsetHeight > 0 ? _ctrl.offsetHeight : 70;
+    _minH = Math.max(220, ctrlH + 100) * _zoom;
     dragging = true;
     handle.classList.add('dragging');
     document.body.classList.add('resizing');
