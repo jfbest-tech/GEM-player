@@ -1436,41 +1436,36 @@ document.addEventListener('keyup',e=>{
 // ── Resizable video panel ──────────────────────────────────────────────────
 (function(){
   const handle = document.getElementById('resize-handle');
-  let dragging = false, startY = 0, startH = 0, _zoom = 1, _wrapW = 0, _minH = 120;
+  const _ctrl  = document.getElementById('vid-controls');
+  const _label = document.getElementById('vid-clip-label');
+  let dragging = false, startY = 0, startH = 0, _zoom = 1, _wrapW = 0, _minH = 220;
 
-  handle.addEventListener('mousedown', e => {
+  function dragStart(clientY) {
     const wrapEl = document.getElementById('vid-wrap');
-    startY = e.clientY;
+    startY = clientY;
     startH = wrapEl.getBoundingClientRect().height;
     _zoom  = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
-    _wrapW = wrapEl.clientWidth; // cache width — constant during vertical drag
-    // Controls are display:none before video loads so offsetHeight may be 0 — use 70px (CSS-calculated) fallback
+    _wrapW = wrapEl.clientWidth;
     const ctrlH = _ctrl.offsetHeight > 0 ? _ctrl.offsetHeight : 70;
     _minH = Math.max(220, ctrlH + 100) * _zoom;
     dragging = true;
     handle.classList.add('dragging');
     document.body.classList.add('resizing');
-    document.body.style.cursor = 'ns-resize';
     document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
-
-  const _ctrl  = document.getElementById('vid-controls');
-  const _label = document.getElementById('vid-clip-label');
+  }
 
   let _rafPending = false, _pendingY = 0;
-  document.addEventListener('mousemove', e => {
+  function dragMove(clientY) {
     if (!dragging) return;
-    _pendingY = e.clientY;
+    _pendingY = clientY;
     if (_rafPending) return;
     _rafPending = true;
     requestAnimationFrame(() => {
       _rafPending = false;
-      const rawH  = startH + (_pendingY - startY);
+      const rawH   = startH + (_pendingY - startY);
       const clampH = Math.max(_minH, Math.min(window.innerHeight - 160 * _zoom, rawH));
-      const newH  = clampH / _zoom;
+      const newH   = clampH / _zoom;
       document.documentElement.style.setProperty('--vid-h', newH + 'px');
-      // Update letterbox offsets using cached values — no layout reads
       if (video.videoWidth && video.style.display !== 'none' &&
           !document.fullscreenElement && !document.webkitFullscreenElement) {
         const ar   = video.videoWidth / video.videoHeight;
@@ -1482,9 +1477,9 @@ document.addEventListener('keyup',e=>{
         playOverlay.style.right = side + 'px';
       }
     });
-  });
+  }
 
-  document.addEventListener('mouseup', () => {
+  function dragEnd() {
     if (!dragging) return;
     dragging = false;
     handle.classList.remove('dragging');
@@ -1492,7 +1487,28 @@ document.addEventListener('keyup',e=>{
     document.body.style.cursor = '';
     document.body.style.userSelect = '';
     updateControlsPadding();
+  }
+
+  // Mouse
+  handle.addEventListener('mousedown', e => {
+    dragStart(e.clientY);
+    document.body.style.cursor = 'ns-resize';
+    e.preventDefault();
   });
+  document.addEventListener('mousemove', e => dragMove(e.clientY));
+  document.addEventListener('mouseup', dragEnd);
+
+  // Touch (iPad / mobile)
+  handle.addEventListener('touchstart', e => {
+    dragStart(e.touches[0].clientY);
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchmove', e => {
+    if (!dragging) return;
+    dragMove(e.touches[0].clientY);
+    e.preventDefault();
+  }, { passive: false });
+  document.addEventListener('touchend', dragEnd);
 })();
 
 init();
