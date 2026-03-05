@@ -713,7 +713,7 @@ function applyFilters() {
     if(filters.period          && String(r.period)!==filters.period)       return false;
     if(filters.strength        && r.strength!==filters.strength)           return false;
     if(filters.attackType      && r.attackType!==filters.attackType)       return false;
-    if(filters.save            && r.save!==filters.save)                   return false;
+    if(filters.save            && (r.save!==filters.save || r.goal==='Y'))                   return false;
     if(filters.goal            && r.goal!==filters.goal)                   return false;
     if(filters.ph              && !r.phType)                               return false;
     if(filters.goalQual        && r.goalQualitative!==filters.goalQual)   return false;
