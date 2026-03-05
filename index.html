@@ -372,9 +372,6 @@
   <button id="mobile-filter-btn" title="Filters" style="position:relative;">⊟ Filters</button>
 </div>
 
-<!-- ═══ WAVE BANNER ═══ -->
-<canvas id="wave-banner" style="display:block; width:100%; height:40px; flex-shrink:0; background:#fff;"></canvas>
-
 <!-- ═══ BODY ═══ -->
 <div class="flex flex-1 overflow-hidden">
 
@@ -1639,62 +1636,6 @@ document.getElementById('mobile-filter-btn').addEventListener('click', ()=>{
 document.getElementById('sidebar-backdrop').addEventListener('click', ()=>{
   document.body.classList.remove('sidebar-open');
 });
-</script>
-<script>
-(function(){
-  const canvas = document.getElementById('wave-banner');
-  const ctx = canvas.getContext('2d');
-  function resize(){ canvas.width=canvas.offsetWidth; canvas.height=canvas.offsetHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
-  function noise(x,t){
-    return (
-      Math.sin(x*1.0000+t*0.9)*0.30+
-      Math.sin(x*1.6180+t*1.3)*0.22+
-      Math.sin(x*2.7180+t*0.7)*0.18+
-      Math.sin(x*4.2360+t*1.7)*0.12+
-      Math.sin(x*6.8540+t*0.5)*0.09+
-      Math.sin(x*11.090+t*2.3)*0.05+
-      Math.sin(x*17.944+t*1.1)*0.04
-    );
-  }
-
-  const WAVE_FRONT_SPEED=0.18, SEGMENTS=600;
-  let t=0, waveFront=-0.05, lastTime=null;
-
-  function draw(timestamp){
-    if(!lastTime) lastTime=timestamp;
-    const dt=Math.min((timestamp-lastTime)/1000,0.05);
-    lastTime=timestamp;
-    const W=canvas.width, H=canvas.height, cy=H/2;
-    ctx.clearRect(0,0,W,H);
-    waveFront+=WAVE_FRONT_SPEED*dt;
-    ctx.beginPath();
-    ctx.strokeStyle='#9aa0ab';
-    ctx.lineWidth=1.3;
-    for(let i=0;i<=SEGMENTS;i++){
-      const xNorm=i/SEGMENTS, x=xNorm*W;
-      const distanceBehind=waveFront-xNorm;
-      let y=cy;
-      if(distanceBehind>0){
-        const rampUp=Math.min(distanceBehind/0.08,1.0);
-        const settled=1.0-Math.exp(-distanceBehind*18)*0.25;
-        const envelope=rampUp*settled;
-        const ampBase=14;
-        const ampVariation=Math.sin(xNorm*Math.PI*3.1+0.4)*0.25+0.75;
-        const amp=ampBase*ampVariation*envelope;
-        const n=noise(xNorm*8,t);
-        y=cy+n*amp;
-      }
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    }
-    ctx.stroke();
-    t+=dt*1.2;
-    requestAnimationFrame(draw);
-  }
-  requestAnimationFrame(draw);
-})();
 </script>
 </body>
 </html>
