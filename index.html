@@ -1546,6 +1546,9 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   document.querySelectorAll('select.sel').forEach(s=>s.value='');
   updatePsmVisibility();
   applyFilters();
+  // Reset to landing page
+  showNoVid('Select a Goalie');
+  document.getElementById('no-vid-goalies').style.display='flex';
 });
 
 document.addEventListener('keydown',e=>{
