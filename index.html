@@ -69,14 +69,14 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 88px 88px 32px 52px 24px 1fr 24px 24px 32px 52px;
+    display:grid; grid-template-columns: 20px 88px 88px 32px 52px 24px 1fr 24px 24px 32px 52px;
     gap:5px; align-items:center;
     padding:5px 10px; padding-right:20px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:500; font-family:'DM Mono',monospace; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 88px 88px 32px 52px 24px 1fr 24px 24px 32px 52px;
+    display:grid; grid-template-columns: 20px 88px 88px 32px 52px 24px 1fr 24px 24px 32px 52px;
     gap:5px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
@@ -87,8 +87,8 @@
   .seq-row.active:nth-child(even) { background:#d1d5db; }
   .seq-row--locked { opacity:0.35; pointer-events:none; cursor:default; }
 
-  /* Row play button */
-  .row-play { width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#ececec; border-radius:3px; transition:background 0.1s; }
+  /* Row play button — fills full row height */
+  .row-play { width:20px; align-self:stretch; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#f0f0f0; border-radius:3px; margin:-5px 0; transition:background 0.1s; }
   .row-play::before {
     content:''; display:block;
     border-style:solid; border-width:4px 0 4px 7px;
@@ -96,9 +96,9 @@
     margin-left:2px;
     transition:border-color 0.1s;
   }
-  .seq-row:hover .row-play { background:#ddd; }
-  .seq-row:hover .row-play::before, .seq-row.active .row-play::before { border-left-color:#888; }
-  .seq-row.active .row-play { background:#c5c5c5; }
+  .seq-row:hover .row-play { background:#e2e2e2; }
+  .seq-row:hover .row-play::before, .seq-row.active .row-play::before { border-left-color:#777; }
+  .seq-row.active .row-play { background:#d0d0d0; }
 
   /* Playlist icon badges */
   .ico { font-size:0.6rem; font-weight:600; padding:1px 3px; border-radius:3px; white-space:nowrap; line-height:1.4; }
