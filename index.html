@@ -389,9 +389,13 @@
     .prog-bar { height: 5px; }
     .prog-bar:hover { height: 7px; }
 
-    /* Playlist: dynamic columns using fr units, fill available space */
+    /* Playlist: hide goalie & game columns on tablet */
+    .seq-header-row > :nth-child(2),
+    .seq-header-row > :nth-child(3),
+    .seq-row > :nth-child(2),
+    .seq-row > :nth-child(3) { display: none; }
     .seq-header-row, .seq-row {
-      grid-template-columns: 10px minmax(70px,1fr) minmax(80px,1.2fr) 38px minmax(50px,0.8fr) 22px minmax(60px,2fr) 22px 22px 30px 50px !important;
+      grid-template-columns: 18px 0px 0px 32px 50px 22px 1fr 22px 22px 30px 50px !important;
       min-width: 0;
       gap: 3px;
       font-size: 0.55rem;
