@@ -87,9 +87,15 @@
   .seq-row.active:nth-child(even) { background:#d1d5db; }
   .seq-row--locked { opacity:0.35; pointer-events:none; cursor:default; }
 
-  /* Quality dot */
-  .dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-  .dot-R { background:#999999; } .dot-Y { background:#8898bb; } .dot-G { background:#3a5a90; }
+  /* Row play button */
+  .row-play { width:12px; height:12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .row-play::before {
+    content:''; display:block;
+    border-style:solid; border-width:4px 0 4px 7px;
+    border-color:transparent transparent transparent #bbb;
+    transition:border-color 0.1s;
+  }
+  .seq-row:hover .row-play::before, .seq-row.active .row-play::before { border-left-color:#666; }
 
   /* Playlist icon badges */
   .ico { font-size:0.6rem; font-weight:600; padding:1px 3px; border-radius:3px; white-space:nowrap; line-height:1.4; }
@@ -945,7 +951,7 @@ function renderList() {
     row.dataset.i = i;
 
     const has  = hasClip(r);
-    const dc   = `dot dot-${r.ryg||'R'}`;
+    const dc   = 'row-play';
     const psmArr = r.psm||[];
 
     // Game label: "Oct 11 vs WPG P1"
@@ -1019,7 +1025,7 @@ function renderList() {
       ? `<span class="ico ico-reb${isRebActive?' str-active':''}" style="cursor:pointer;" data-reb-created="${r.rebCreated||''}" data-reb-attacked="${r.rebAttacked||''}">${rebText}</span>` : '';
 
     row.innerHTML = `
-      <span class="${dc}"></span>
+      <span class="${dc}" data-play="1"></span>
       <span style="color:var(--text); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:0.6rem;">${r.goalie||'—'}</span>
       <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${gameLabel}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${strIcoHtml}</span>
