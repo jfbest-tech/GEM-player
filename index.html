@@ -69,14 +69,14 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 32px 24px 62px 24px;
+    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 32px 24px 24px 62px;
     gap:5px; align-items:center;
     padding:5px 10px; padding-right:15px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:500; font-family:'DM Mono',monospace; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 32px 24px 62px 24px;
+    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 32px 24px 24px 62px;
     gap:5px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
@@ -624,8 +624,8 @@
         <span>Pre-Save Movements → Save Tech</span>
         <span style="display:flex;align-items:center;justify-content:center;">Qlty</span>
         <span style="display:flex;align-items:center;justify-content:center;">Scr</span>
-        <span style="display:flex;align-items:center;justify-content:center;">Result</span>
         <span style="display:flex;align-items:center;justify-content:center;">Reb</span>
+        <span style="display:flex;align-items:center;justify-content:center;">Result</span>
       </div>
 
       <div id="seq-list" class="flex-1 overflow-y-auto" style="scrollbar-gutter:stable; position:relative; padding-top:6px;"></div>
@@ -1020,8 +1020,8 @@ function renderList() {
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${qualIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${screenIco}</span>
-      <span style="font-size:0.6rem;display:flex;align-items:center;justify-content:center;gap:3px;">${res}${has?'<span style="color:#1B2A45;font-size:0.6rem;">▶\uFE0E</span>':''}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${rebIco}</span>
+      <span style="font-size:0.6rem;display:flex;align-items:center;gap:1px;"><span style="display:inline-block;min-width:34px;text-align:center;">${res}</span>${has?'<span style="color:#1B2A45;font-size:0.6rem;">&#9654;︎</span>':''}</span>
     `;
     const comboBtn = row.querySelector('.psm-combo-btn');
     if(comboBtn && comboBtn.dataset.psms) {
