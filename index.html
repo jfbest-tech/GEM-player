@@ -249,10 +249,10 @@
   #resize-handle:hover #resize-arrows, #resize-handle.dragging #resize-arrows { opacity:1; color:var(--accent); }
 
   /* PSM tags */
-  .psm { background:#e8edf5; color:#2a4070; font-size:0.6rem; font-weight:600; padding:1px 5px; border-radius:4px; border:1px solid #c5d3ea; cursor:pointer; transition:all .1s; white-space:nowrap; flex-shrink:0; }
+  .psm { background:#e8edf5; color:#2a4070; font-size:0.6rem; font-weight:600; padding:1px 3px; border-radius:4px; border:1px solid #c5d3ea; cursor:pointer; transition:all .1s; white-space:nowrap; flex-shrink:0; }
   .psm:hover { background:#d4dff5; border-color:#2a4070; }
   .psm.active { background:#2a4070; color:#fff; border-color:#1a2e5a; }
-  .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.6rem; font-weight:600; padding:1px 5px; border-radius:4px; border:1px solid #9ab0d0; cursor:pointer; transition:all .1s; white-space:nowrap; flex-shrink:0; }
+  .psm-sv { background:#c5d3ea; color:#1a2e5a; font-size:0.6rem; font-weight:600; padding:1px 3px; border-radius:4px; border:1px solid #9ab0d0; cursor:pointer; transition:all .1s; white-space:nowrap; flex-shrink:0; }
   .psm-sv:hover { background:#a8c0d8; border-color:#1a2e5a; }
   .psm-sv.active { background:#1a2e5a; color:#fff; border-color:#0c1f40; }
 
@@ -919,10 +919,10 @@ function renderList() {
       ? psmArr.map((p,idx)=>{
           const isActive = filters[`psm${idx}`]===p;
           return `<span class="psm${isActive?' active':''}" data-psm-idx="${idx}" data-psm-val="${p}">${p}</span>`;
-        }).join('<span style="color:#aaa;padding:0 2px;">→</span>')
+        }).join('<span style="color:#aaa;font-size:0.5rem;padding:0;">→</span>')
       : '';
     if(r.svTech) {
-      if(psmHtml) psmHtml += '<span style="color:#aaa;padding:0 2px;">→</span>';
+      if(psmHtml) psmHtml += '<span style="color:#aaa;font-size:0.5rem;padding:0;">→</span>';
       const isSvActive = filters.svTech===r.svTech;
       psmHtml += `<span class="psm-sv${isSvActive?' active':''}" data-svtech="${r.svTech}">${r.svTech}</span>`;
     }
@@ -983,7 +983,7 @@ function renderList() {
       <span style="display:flex; align-items:center; justify-content:center;">${strIcoHtml}</span>
       <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${comboBtnHtml}</span>
-      <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
+      <span style="display:flex; align-items:center; gap:1px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${screenIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${rebIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${qualIco}</span>
