@@ -69,14 +69,14 @@
 
   /* SEQUENCE TABLE */
   .seq-header-row {
-    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 32px 24px 24px 62px;
+    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 24px 24px 32px 62px;
     gap:5px; align-items:center;
     padding:5px 10px; padding-right:15px; border-bottom:1px solid var(--navy-border);
     background:var(--navy-mid);
     font-size:0.6rem; font-weight:500; font-family:'DM Mono',monospace; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-mute);
   }
   .seq-row {
-    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 32px 24px 24px 62px;
+    display:grid; grid-template-columns: 12px 105px 100px 44px 72px 24px 1fr 24px 24px 32px 62px;
     gap:5px; align-items:center;
     padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
   }
@@ -582,9 +582,9 @@
         <span style="text-align:center;">Type</span>
         <span style="display:flex;align-items:center;justify-content:center; font-size:11px; opacity:0.6;">▽</span>
         <span>Pre-Save Movements → Save Tech</span>
-        <span style="display:flex;align-items:center;justify-content:center;">Qlty</span>
         <span style="display:flex;align-items:center;justify-content:center;">Scr</span>
         <span style="display:flex;align-items:center;justify-content:center;">Reb</span>
+        <span style="display:flex;align-items:center;justify-content:center;">Qlty</span>
         <span style="display:flex;align-items:center;justify-content:center;">Result</span>
       </div>
 
@@ -978,9 +978,9 @@ function renderList() {
       <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${comboBtnHtml}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
-      <span style="display:flex; align-items:center; justify-content:center;">${qualIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${screenIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${rebIco}</span>
+      <span style="display:flex; align-items:center; justify-content:center;">${qualIco}</span>
       <span style="font-size:0.6rem;display:flex;align-items:center;justify-content:flex-end;gap:2px;"><span style="text-align:center;">${res}</span><span style="width:10px;text-align:center;">${has?'<span style="color:#1B2A45;font-size:0.6rem;">&#9654;︎</span>':''}</span></span>
     `;
     const comboBtn = row.querySelector('.psm-combo-btn');
