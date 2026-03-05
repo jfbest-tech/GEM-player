@@ -243,7 +243,7 @@
     margin-left:0;
   }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex:0 0 88px; overflow:hidden; font-variant-numeric:tabular-nums; font-family:monospace; }
-  #resize-handle { height:16px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; }
+  #resize-handle { height:16px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; touch-action:none; }
   #resize-handle:hover, #resize-handle.dragging { background:var(--navy-light); }
   #resize-arrows { display:flex; flex-direction:column; align-items:center; gap:0px; pointer-events:none; font-size:7px; color:var(--text-dim); opacity:0.55; line-height:1.1; }
   #resize-handle:hover #resize-arrows, #resize-handle.dragging #resize-arrows { opacity:1; color:var(--accent); }
@@ -309,7 +309,7 @@
   @media (max-width: 1024px) {
     body { padding-left: 0; padding-right: 0; }
     body::before, body::after { display: none; }
-    :root { --vid-h: 50vh; }
+    :root { --vid-h: 38vh; }
 
     /* Sidebar slides in from left */
     .sidebar {
@@ -326,32 +326,57 @@
     /* Show filter button in header */
     #mobile-filter-btn { display: flex; }
 
-    /* Video: no side borders on edge-to-edge */
+    /* Video: no side borders, controls always inside */
     .vid-wrap { border-left: none; border-right: none; border-radius: 4px; }
+    .vid-controls { position:absolute; bottom:0; left:0; right:0; }
 
-    /* Control buttons: bigger touch targets */
-    .ctrl-btn { height: 38px; width: 38px; font-size: 0.85rem; }
-    #slomo-btn { width: auto; padding: 0 12px; }
+    /* Control buttons: bigger touch targets, stay inside player */
+    .ctrl-btn { height: 36px; width: 36px; font-size: 0.8rem; }
+    #slomo-btn { width: auto; padding: 0 10px; font-size: 0.75rem; }
+    .ctrl-row { gap: 3px; flex-wrap: nowrap; }
+    .ctrl-time { font-size: 0.6rem; flex: 0 0 74px; padding: 0 3px; }
+
+    /* Play button: CSS triangle like desktop, suppress native controls */
+    video::-webkit-media-controls { display: none !important; }
+    video::-webkit-media-controls-start-playback-button { display: none !important; }
+    .ctrl-play::before { border-width: 7px 0 7px 13px; margin-left: 3px; }
+    #play-overlay { background: rgba(0,0,0,0.35) !important; }
+    #play-overlay::before {
+      content: ''; display: block;
+      border-style: solid;
+      border-width: 18px 0 18px 32px;
+      border-color: transparent transparent transparent rgba(255,255,255,0.9);
+    }
 
     /* Progress bar: taller for easier tapping */
     .prog-bar { height: 5px; }
     .prog-bar:hover { height: 7px; }
 
-    /* Playlist: horizontal scroll so nothing wraps */
-    .seq-list { overflow-x: auto; }
-    .seq-header-row, .seq-row { min-width: 720px; }
+    /* Playlist: dynamic columns using fr units, fill available space */
+    .seq-header-row, .seq-row {
+      grid-template-columns: 10px minmax(70px,1fr) minmax(80px,1.2fr) 38px minmax(50px,0.8fr) 22px minmax(60px,2fr) 22px 22px 30px 50px !important;
+      min-width: 0;
+      gap: 3px;
+      font-size: 0.55rem;
+    }
 
-    /* Hide resize handle (not useful on touch) */
-    #resize-handle { display: none; }
+    /* Resize handle: show but use touch-friendly size */
+    #resize-handle { display: flex; height: 20px; touch-action: none; }
   }
 
   /* ═══ PHONE ONLY (≤ 640px) ═══ */
   @media (max-width: 640px) {
-    :root { --vid-h: 42vh; }
-    .ctrl-row { flex-wrap: wrap; gap: 3px; }
-    .ctrl-spacer { flex: 0 0 100%; height: 0; }
-    .ctrl-btn { height: 34px; width: 34px; font-size: 0.75rem; }
-    #slomo-btn { padding: 0 8px; }
+    :root { --vid-h: 36vh; }
+    .ctrl-row { flex-wrap: nowrap; gap: 2px; }
+    .ctrl-btn { height: 32px; width: 32px; font-size: 0.7rem; }
+    #slomo-btn { padding: 0 6px; font-size: 0.65rem; }
+    .ctrl-time { font-size: 0.55rem; flex: 0 0 64px; }
+    .seq-header-row, .seq-row {
+      grid-template-columns: 8px minmax(60px,1fr) minmax(60px,1fr) 32px minmax(40px,0.7fr) 20px minmax(50px,1.5fr) 20px 20px 28px 44px !important;
+      min-width: 0;
+      gap: 2px;
+      font-size: 0.5rem;
+    }
   }
 </style>
 </head>
@@ -514,7 +539,7 @@
       <!-- Video + overlay controls -->
       <div class="p-3 pb-0">
         <div class="vid-wrap" id="vid-wrap">
-          <video id="player" disableRemotePlayback muted preload="auto" style="display:none;"></video>
+          <video id="player" disableRemotePlayback muted preload="auto" playsinline webkit-playsinline style="display:none;"></video>
           <div id="play-overlay" style="display:none;"></div>
           <div id="seek-toast"></div>
           <div id="no-vid" class="no-vid flex flex-col items-center justify-center" style="height:var(--vid-h);">
@@ -1515,6 +1540,8 @@ function updatePsmVisibility() {
 });
 
 document.getElementById('clear-btn').addEventListener('click',()=>{
+  // Preserve goalie selection
+  const savedGoalie = new Set(filters.goalie);
   Object.keys(filters).forEach(k=>{
     filters[k]=filters[k] instanceof Set?new Set():typeof filters[k]==='boolean'?false:null instanceof Object?null:'';
   });
@@ -1522,14 +1549,20 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
   ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech','game'].forEach(k=>filters[k]='');
   filters.psmExact=null;
+  filters.goalie = savedGoalie;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
-  document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>c.checked=false);
+  document.querySelectorAll('input[type=checkbox][data-f]').forEach(c=>{
+    if(c.dataset.f==='goalie') return; // preserve goalie checkboxes
+    c.checked=false;
+  });
   document.querySelectorAll('select.sel').forEach(s=>s.value='');
   updatePsmVisibility();
   applyFilters();
-  // Reset to landing page
-  showNoVid('Select a Goalie');
-  document.getElementById('no-vid-goalies').style.display='flex';
+  // Show landing if no goalie selected, otherwise just reset filters
+  if(savedGoalie.size===0) {
+    showNoVid('Select a Goalie');
+    document.getElementById('no-vid-goalies').style.display='flex';
+  }
 });
 
 document.addEventListener('keydown',e=>{
