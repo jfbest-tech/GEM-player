@@ -88,14 +88,17 @@
   .seq-row--locked { opacity:0.35; pointer-events:none; cursor:default; }
 
   /* Row play button */
-  .row-play { width:12px; height:12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .row-play { width:18px; height:18px; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#ececec; border-radius:3px; transition:background 0.1s; }
   .row-play::before {
     content:''; display:block;
     border-style:solid; border-width:4px 0 4px 7px;
     border-color:transparent transparent transparent #bbb;
+    margin-left:2px;
     transition:border-color 0.1s;
   }
-  .seq-row:hover .row-play::before, .seq-row.active .row-play::before { border-left-color:#666; }
+  .seq-row:hover .row-play { background:#ddd; }
+  .seq-row:hover .row-play::before, .seq-row.active .row-play::before { border-left-color:#888; }
+  .seq-row.active .row-play { background:#c5c5c5; }
 
   /* Playlist icon badges */
   .ico { font-size:0.6rem; font-weight:600; padding:1px 3px; border-radius:3px; white-space:nowrap; line-height:1.4; }
