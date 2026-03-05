@@ -622,10 +622,10 @@
         <span style="text-align:center;">Type</span>
         <span style="display:flex;align-items:center;justify-content:center; font-size:11px; opacity:0.6;">▽</span>
         <span>Pre-Save Movements → Save Tech</span>
-        <span style="display:flex;align-items:center;justify-content:center;">Scr</span>
         <span style="display:flex;align-items:center;justify-content:center;">Qlty</span>
-        <span style="display:flex;align-items:center;justify-content:center;">Reb</span>
+        <span style="display:flex;align-items:center;justify-content:center;">Scr</span>
         <span style="display:flex;align-items:center;justify-content:center;">Result</span>
+        <span style="display:flex;align-items:center;justify-content:center;">Reb</span>
       </div>
 
       <div id="seq-list" class="flex-1 overflow-y-auto" style="scrollbar-gutter:stable; position:relative; padding-top:6px;"></div>
@@ -999,7 +999,7 @@ function renderList() {
     const isScrActive = filters.screen === 'Y';
     const screenIco = r.screen==='Y'
       ? `<span class="ico ico-scr${isScrActive?' str-active':''}" style="cursor:pointer;" data-scr="Y">S</span>` : '';
-    const _qm = {R:'Lo',Y:'Mi',G:'GrA'};
+    const _qm = {R:'LowQ',Y:'MidQ',G:'GrA'};
     const isQualActive = filters.ryg.has(r.ryg);
     const qualIco = r.ryg
       ? `<span class="ico ico-q-${r.ryg}${isQualActive?' str-active':''}" style="cursor:pointer;" data-qual="${r.ryg}">${_qm[r.ryg]||r.ryg}</span>` : '';
