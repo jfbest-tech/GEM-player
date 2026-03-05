@@ -1018,10 +1018,10 @@ function renderList() {
       <span style="color:var(--text-dim); font-size:0.6rem; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r.attackType||r.phType||'—'}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${comboBtnHtml}</span>
       <span style="display:flex; align-items:center; gap:2px; flex-wrap:nowrap; overflow:hidden;">${psmHtml}</span>
-      <span style="display:flex; align-items:center; justify-content:center;">${screenIco}</span>
       <span style="display:flex; align-items:center; justify-content:center;">${qualIco}</span>
-      <span style="display:flex; align-items:center; justify-content:center;">${rebIco}</span>
+      <span style="display:flex; align-items:center; justify-content:center;">${screenIco}</span>
       <span style="font-size:0.6rem;display:flex;align-items:center;justify-content:center;gap:3px;">${res}${has?'<span style="color:#1B2A45;font-size:0.6rem;">▶\uFE0E</span>':''}</span>
+      <span style="display:flex; align-items:center; justify-content:center;">${rebIco}</span>
     `;
     const comboBtn = row.querySelector('.psm-combo-btn');
     if(comboBtn && comboBtn.dataset.psms) {
