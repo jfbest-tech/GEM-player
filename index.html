@@ -913,10 +913,13 @@ function renderList() {
       psmHtml = `<span class="badge b-ph" data-ph-goalie="${r.goalie}" style="cursor:pointer;">PH</span>`;
     }
 
+    const isGoalActive = filters.goal==='Y';
+    const isSaveActive = filters.save==='Y';
+    const isPhResActive = filters.ph==='Y';
     const res = r.goal==='Y'
-      ? `<span class="badge b-goal">GOAL</span>`
-      : r.save==='Y' ? `<span class="badge b-save">SAVE</span>`
-      : r.phType ? `<span class="badge b-ph">PH</span>` : '—';
+      ? `<span class="badge b-goal${isGoalActive?' str-active':''}" data-result="goal" style="cursor:pointer;">GOAL</span>`
+      : r.save==='Y' ? `<span class="badge b-save${isSaveActive?' str-active':''}" data-result="save" style="cursor:pointer;">SAVE</span>`
+      : r.phType ? `<span class="badge b-ph${isPhResActive?' str-active':''}" data-result="ph" style="cursor:pointer;">PH</span>` : '—';
 
     // Strength icon
     function strClass(s) {
@@ -1055,6 +1058,29 @@ function renderList() {
           filters.rebCreated = rc ? 'Y' : null;
           filters.rebAttacked = ra ? 'Y' : null;
         }
+        applyFilters();
+      });
+    }
+
+    // Result badge click (SAVE/GOAL/PH)
+    const resBadge = row.querySelector('.badge[data-result]');
+    if(resBadge) {
+      resBadge.addEventListener('click', e=>{
+        e.stopPropagation();
+        const type = resBadge.dataset.result;
+        if(type==='goal') {
+          filters.goal = filters.goal==='Y' ? null : 'Y';
+          filters.save = null; filters.ph = null;
+        } else if(type==='save') {
+          filters.save = filters.save==='Y' ? null : 'Y';
+          filters.goal = null; filters.ph = null;
+        } else if(type==='ph') {
+          filters.ph = filters.ph==='Y' ? null : 'Y';
+          filters.goal = null; filters.save = null;
+        }
+        // Sync sidebar chips
+        document.querySelectorAll('.chip[data-f="save"]').forEach(c=>c.classList.toggle('on', filters.save==='Y'));
+        document.querySelectorAll('.chip[data-f="goal"]').forEach(c=>c.classList.toggle('on', filters.goal==='Y'));
         applyFilters();
       });
     }
