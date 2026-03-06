@@ -87,13 +87,18 @@
   .seq-row.active:nth-child(even) { background:#d1d5db; }
   .seq-row--locked { opacity:0.35; pointer-events:none; cursor:default; }
 
-  /* Row play button — fills full row height, flush left */
-  .row-play { width:26px; align-self:stretch; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#f0f0f0; border-radius:3px; margin:-5px -5px -5px -10px; padding-left:8px; transition:background 0.1s; }
+  /* Mute button — SVG speaker icon */
+  #mute-btn { position:relative; }
+  #mute-btn svg { display:block; }
+  #mute-btn.is-unmuted .mute-x { display:none; }
+  #mute-btn.is-unmuted svg { stroke:rgba(255,255,255,0.85); }
+
+    /* Row play button — fills full row height, flush left */
+  .row-play { width:30px; align-self:stretch; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; background:#f0f0f0; border-radius:0; margin:-5px -5px -5px -10px; transition:background 0.1s; }
   .row-play::before {
     content:''; display:block;
     border-style:solid; border-width:4px 0 4px 7px;
     border-color:transparent transparent transparent #bbb;
-    margin-left:2px;
     transition:border-color 0.1s;
   }
   .seq-row:hover .row-play { background:#e2e2e2; }
@@ -331,7 +336,8 @@
 
   /* ═══ TABLET & MOBILE (≤ 1024px) ═══ */
   @media (max-width: 1024px) {
-    body { padding-left: 0; padding-right: 0; }
+    html { zoom: 1 !important; }
+    body { height: 100dvh !important; padding-left: 0; padding-right: 0; }
     body::before, body::after { display: none; }
     :root { --vid-h: 38vh; }
 
@@ -402,7 +408,11 @@
       font-size: 0.55rem;
     }
 
-    /* Resize handle: show but use touch-friendly size */
+    /* Row play button: fix centering on tablet */
+    .row-play { width:22px; padding-left:0; margin:-5px -3px -5px -8px; }
+    .row-play::before { margin-left:0; }
+
+        /* Resize handle: show but use touch-friendly size */
     #resize-handle { display: flex; height: 20px; touch-action: none; }
   }
 
@@ -461,7 +471,7 @@
   <div class="flex-1 overflow-y-auto" style="min-height:0; padding-top:8px; scrollbar-gutter:stable;">
 
     <div style="margin:2px 8px 6px; border:1px solid #d5d5d5; border-radius:6px; background:#fff;">
-      <div class="section-title">Goalie</div>
+      <div class="section-title">Goalie <span id="goalie-clip-count" style="font-weight:400; color:var(--text-mute); font-size:0.55rem; letter-spacing:0.05em;"></span></div>
       <div id="f-goalie" class="px-3 pb-1 flex flex-col" style="gap:2px;"></div>
     </div>
 
@@ -560,6 +570,9 @@
       <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 4px;white-space:nowrap;" data-f="rebCreated" data-v="Y">Given Up<span class="chip-count"></span></span>
       <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 4px;white-space:nowrap;" data-f="rebAttacked" data-v="Y">Attacked<span class="chip-count"></span></span>
     </div>
+    <div style="text-align:center; padding:3px 0 0;">
+      <span id="svpct-filter" style="font-family:'DM Mono',monospace; font-size:0.58rem; color:var(--text-mute); letter-spacing:0.05em;"></span>
+    </div>
 
     <div style="height:1px; background:#ebebeb; margin:6px 12px 1px;"></div>
 
@@ -618,7 +631,7 @@
               <button class="ctrl-btn ctrl-slomo" id="slomo-btn" title="Slow-Mo (S)">Slow-Mo</button>
               <button class="ctrl-btn" id="frame-btn" title="Step one frame (E)"></button>
               <span class="ctrl-spacer"></span>
-              <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)" style="filter:grayscale(1);">🔇</button>
+              <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)"><svg id="mute-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line class="mute-x" x1="23" y1="9" x2="17" y2="15"/><line class="mute-x" x1="17" y1="9" x2="23" y2="15"/></svg></button>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop All (L)">&#x27F3;</button>
               <button class="ctrl-btn" id="dl-btn" title="Download clip">&#x2193;</button>
               <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)"></button>
@@ -841,7 +854,8 @@ function applyFilters() {
   updateStats();
   updatePsmCounts();
   updateChipCounts();
-  const anyFilter = filters.goalie.size>0 || filters.ryg.size>0 ||
+  updateHeaderGoalie();
+  const anyFilter = filters.ryg.size>0 ||
     ['save','goal','ph','screen','rebCreated','rebAttacked','goalQual'].some(k=>filters[k]!==null&&filters[k]!=='') ||
     ['strength','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech','game'].some(k=>filters[k]!=='') ||
     filters.psmExact!==null;
@@ -891,6 +905,34 @@ function updateStats() {
        <span style="color:#555">&#9679; midQ: ${Y}</span>
        <span style="color:#0c2461">&#9679; GrA: ${G}</span>`
     : '';
+}
+
+function updateHeaderGoalie() {
+  const el = document.getElementById('goalie-clip-count');
+  if (filters.goalie.size > 0) {
+    el.textContent = filteredData.length + ' clips';
+  } else {
+    el.textContent = '';
+  }
+  // Gray out unselected goalie labels
+  document.querySelectorAll('#f-goalie .cb-lbl').forEach(lbl => {
+    const cb = lbl.querySelector('input[data-f="goalie"]');
+    if (filters.goalie.size > 0 && !cb.checked) {
+      lbl.style.opacity = '0.35';
+    } else {
+      lbl.style.opacity = '';
+    }
+  });
+  // Sv% below screens/rebounds
+  const svEl = document.getElementById('svpct-filter');
+  const sv = filteredData.filter(r => r.save === 'Y').length;
+  const ga = filteredData.filter(r => r.goal === 'Y').length;
+  const tot = sv + ga;
+  if (tot > 0 && filters.goalie.size > 0) {
+    svEl.textContent = 'Sv% ' + (sv === tot ? '1.000' : '.' + Math.round(sv / tot * 1000).toString().padStart(3, '0'));
+  } else {
+    svEl.textContent = '';
+  }
 }
 
 function updatePsmCounts() {
@@ -1401,8 +1443,15 @@ frameBtn.addEventListener('touchend',   e=>{ e.preventDefault(); _frameBtnEnd();
 let sPreMuted = false; // mute state saved before entering slow-mo
 
 function syncMuteBtn() {
-  document.getElementById('mute-btn').textContent = video.muted ? '🔇' : '🔊';
-  document.getElementById('mute-btn').style.filter = 'grayscale(1)';
+  (()=>{
+    const ico=document.getElementById('mute-ico');
+    if(video.muted){
+      ico.innerHTML='<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+    } else {
+      ico.innerHTML='<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
+    }
+  })();
+  
 }
 
 // Slo-Mo toggle
@@ -1528,7 +1577,14 @@ window.addEventListener('resize', updateControlsPadding);
 // Mute toggle
 document.getElementById('mute-btn').addEventListener('click', ()=>{
   video.muted = !video.muted;
-  document.getElementById('mute-btn').textContent = video.muted ? '🔇' : '🔊';
+  (()=>{
+    const ico=document.getElementById('mute-ico');
+    if(video.muted){
+      ico.innerHTML='<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>';
+    } else {
+      ico.innerHTML='<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>';
+    }
+  })();
 });
 
 // Download
