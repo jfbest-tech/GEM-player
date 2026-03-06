@@ -60,7 +60,7 @@
   select.sel:focus { border-color:var(--accent); }
 
   /* CHECKBOX LABEL */
-  .cb-lbl { display:flex; align-items:baseline; gap:6px; padding:1px 0; cursor:pointer; color:var(--text-dim); font-size:0.72rem; }
+  .cb-lbl { display:flex; align-items:center; gap:6px; padding:1px 0; cursor:pointer; color:var(--text-dim); font-size:0.72rem; }
   .cb-lbl:hover { color:var(--text); }
   input[type=checkbox] { accent-color:var(--accent); flex-shrink:0; }
 
@@ -915,7 +915,7 @@ function updateHeaderGoalie() {
       span.className = 'goalie-count';
       span.style.cssText = 'font-weight:400; color:#6B7A90; font-size:0.55rem; letter-spacing:0.05em; margin-left:4px;';
       const name = cb.dataset.v;
-      span.textContent = filteredData.filter(r => r.goalie === name).length + ' clips';
+      span.textContent = '— ' + filteredData.filter(r => r.goalie === name).length + ' clips';
       lbl.appendChild(span);
     } else if (filters.goalie.size > 0) {
       lbl.style.opacity = '0.35';
