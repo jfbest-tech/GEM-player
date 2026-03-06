@@ -1566,7 +1566,10 @@ document.getElementById('fullscreen-btn').addEventListener('click', ()=>{
     document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen&&document.webkitExitFullscreen();
   } else {
     const w=document.getElementById('vid-wrap');
-    w.requestFullscreen?w.requestFullscreen():w.webkitRequestFullscreen&&w.webkitRequestFullscreen();
+    // iPhone Safari: no Fullscreen API on divs, use video.webkitEnterFullscreen()
+    if(w.requestFullscreen) w.requestFullscreen();
+    else if(w.webkitRequestFullscreen) w.webkitRequestFullscreen();
+    else if(video.webkitEnterFullscreen) video.webkitEnterFullscreen();
   }
 });
 document.addEventListener('fullscreenchange', ()=>{
