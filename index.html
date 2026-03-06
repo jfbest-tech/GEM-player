@@ -866,6 +866,21 @@ function updateStats() {
   const _tot=_sv+_ga;
   const svpctEl=document.getElementById('svpct-overall-val');
   if(svpctEl) svpctEl.textContent = _tot>0 ? (_sv===_tot ? '1.000' : '.'+Math.round(_sv/_tot*1000).toString().padStart(3,'0')) : '--';
+  // Highlight Sv% button faint red if below goalie's overall average
+  const svBtn=document.getElementById('svpct-overall');
+  if(filters.goalie.size>0 && _tot>0){
+    const allGoalieShots=allData.filter(r=>filters.goalie.has(r.goalie));
+    const avgSv=allGoalieShots.filter(r=>r.save==='Y').length;
+    const avgGa=allGoalieShots.filter(r=>r.goal==='Y').length;
+    const avgTot=avgSv+avgGa;
+    const avgPct=avgTot>0?avgSv/avgTot:0;
+    const curPct=_sv/_tot;
+    svBtn.style.background=curPct<avgPct?'rgba(220,60,60,0.06)':'';
+    svBtn.style.color=curPct<avgPct?'#b03030':'';
+  } else {
+    svBtn.style.background='';
+    svBtn.style.color='';
+  }
   document.getElementById('stats-row').innerHTML = t
     ? `<span>${t} Sequences</span>
        <span style="color:#999">&#9679; lowQ: ${R}</span>
