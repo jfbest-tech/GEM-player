@@ -570,9 +570,6 @@
       <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 4px;white-space:nowrap;" data-f="rebCreated" data-v="Y">Given Up<span class="chip-count"></span></span>
       <span class="chip chip-b" style="flex:1;text-align:center;font-size:0.6rem;padding:2px 4px;white-space:nowrap;" data-f="rebAttacked" data-v="Y">Attacked<span class="chip-count"></span></span>
     </div>
-    <div style="text-align:center; padding:3px 0 0;">
-      <span id="svpct-filter" style="font-family:'DM Mono',monospace; font-size:0.58rem; color:var(--text-mute); letter-spacing:0.05em;"></span>
-    </div>
 
     <div style="height:1px; background:#ebebeb; margin:6px 12px 1px;"></div>
 
@@ -923,16 +920,7 @@ function updateHeaderGoalie() {
       lbl.style.opacity = '';
     }
   });
-  // Sv% below screens/rebounds
-  const svEl = document.getElementById('svpct-filter');
-  const sv = filteredData.filter(r => r.save === 'Y').length;
-  const ga = filteredData.filter(r => r.goal === 'Y').length;
-  const tot = sv + ga;
-  if (tot > 0 && filters.goalie.size > 0) {
-    svEl.textContent = 'Sv% ' + (sv === tot ? '1.000' : '.' + Math.round(sv / tot * 1000).toString().padStart(3, '0'));
-  } else {
-    svEl.textContent = '';
-  }
+
 }
 
 function updatePsmCounts() {
