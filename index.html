@@ -156,6 +156,8 @@
   #seek-toast.fade { opacity:0; transition:opacity 0.6s ease; }
   video::-webkit-media-controls-overlay-cast-button { display:none; }
   video::-webkit-media-controls-cast-button { display:none; }
+  video::-webkit-media-controls { display:none !important; }
+  video::-webkit-media-controls-start-playback-button { display:none !important; }
   .vid-clip-label {
     position:absolute; top:10px; right:10px; text-align:center;
     background:rgba(0,0,0,0.62); backdrop-filter:blur(4px);
@@ -362,28 +364,22 @@
   .ctrl-time { font-size: 0.6rem; flex: 0 0 74px; padding: 0 3px; }
 
     /* Play button: CSS triangle like desktop, suppress native controls */
-    video::-webkit-media-controls { display: none !important; }
-    video::-webkit-media-controls-start-playback-button { display: none !important; }
     .ctrl-play::before { border-width: 7px 0 7px 13px; margin-left: 3px; }
     #play-overlay { background: rgba(0,0,0,0.35) !important; }
-    #play-overlay::before {
-      content: ''; display: block;
-      border-style: solid;
-      border-width: 18px 0 18px 32px;
-      border-color: transparent transparent transparent rgba(255,255,255,0.9);
-    }
 
     /* Progress bar: taller for easier tapping */
     .prog-bar { height: 5px; }
     .prog-bar:hover { height: 7px; }
 
-    /* Playlist: hide goalie & game columns on tablet */
+    /* Playlist: hide goalie, game, type columns on tablet */
     .seq-header-row > :nth-child(2),
     .seq-header-row > :nth-child(3),
+    .seq-header-row > :nth-child(5),
     .seq-row > :nth-child(2),
-    .seq-row > :nth-child(3) { display: none; }
+    .seq-row > :nth-child(3),
+    .seq-row > :nth-child(5) { display: none; }
     .seq-header-row, .seq-row {
-      grid-template-columns: 18px 0px 0px 28px 44px 20px 1fr 20px 20px 28px 48px !important;
+      grid-template-columns: 18px 0px 0px 28px 0px 20px 1fr 20px 20px 28px 48px !important;
       min-width: 0;
       gap: 2px;
       font-size: 0.55rem;
