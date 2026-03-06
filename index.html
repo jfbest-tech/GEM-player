@@ -371,9 +371,13 @@
     .prog-bar { height: 5px; }
     .prog-bar:hover { height: 7px; }
 
-    /* Playlist: keep all columns, compact widths, maximize PSM/SvTech */
+    /* Playlist: hide goalie (col2) and game (col3) on tablet */
+    .seq-header-row > :nth-child(2),
+    .seq-header-row > :nth-child(3),
+    .seq-row > :nth-child(2),
+    .seq-row > :nth-child(3) { display: none; }
     .seq-header-row, .seq-row {
-      grid-template-columns: 18px 52px 52px 24px 36px 18px 1fr 18px 18px 26px 40px !important;
+      grid-template-columns: 18px 0 0 24px 36px 18px 1fr 18px 18px 26px 40px !important;
       min-width: 0;
       gap: 2px;
       font-size: 0.55rem;
