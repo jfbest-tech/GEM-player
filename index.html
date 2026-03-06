@@ -914,7 +914,8 @@ function updateHeaderGoalie() {
       const span = document.createElement('span');
       span.className = 'goalie-count';
       span.style.cssText = 'font-weight:400; color:#6B7A90; font-size:0.55rem; letter-spacing:0.05em; margin-left:4px;';
-      span.textContent = filteredData.length + ' clips';
+      const name = cb.dataset.v;
+      span.textContent = filteredData.filter(r => r.goalie === name).length + ' clips';
       lbl.appendChild(span);
     } else if (filters.goalie.size > 0) {
       lbl.style.opacity = '0.35';
