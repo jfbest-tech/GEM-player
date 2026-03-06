@@ -265,8 +265,11 @@
   /* Fullscreen button icon — four corner brackets */
   #fullscreen-btn { font-size:0; position:relative; }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex:0 0 88px; overflow:hidden; font-variant-numeric:tabular-nums; font-family:monospace; }
-  #resize-handle { height:16px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; touch-action:none; }
+  #resize-handle { height:16px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; touch-action:none; -webkit-user-select:none; }
+  #resize-handle::before { content:''; position:absolute; top:-8px; bottom:-8px; left:0; right:0; z-index:1; }
   #resize-handle:hover, #resize-handle.dragging { background:var(--navy-light); }
+  body.resizing #seq-list { overflow:hidden !important; pointer-events:none; }
+  body.resizing { cursor:ns-resize; }
   #resize-arrows { display:flex; flex-direction:column; align-items:center; gap:0px; pointer-events:none; font-size:7px; color:var(--text-dim); opacity:0.55; line-height:1.1; }
   #resize-handle:hover #resize-arrows, #resize-handle.dragging #resize-arrows { opacity:1; color:var(--accent); }
 
@@ -390,7 +393,8 @@
     .row-play::before { margin-left:0; }
 
         /* Resize handle: show but use touch-friendly size */
-    #resize-handle { display: flex; height: 20px; touch-action: none; }
+    #resize-handle { display: flex; height: 28px; touch-action: none; -webkit-touch-callout: none; }
+    #resize-handle * { touch-action: none; -webkit-touch-callout: none; pointer-events: none; }
   }
 
   /* ═══ PHONE ONLY (≤ 640px) ═══ */
