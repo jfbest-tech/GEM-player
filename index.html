@@ -1311,7 +1311,7 @@ function preloadNext(idx) {
 
 video.addEventListener('ended', ()=>{
   if(loopAllActive){
-    video.currentTime = 0;
+    video.currentTime = 10;
     video.play().catch(()=>{});
     return;
   }
@@ -1326,8 +1326,8 @@ document.getElementById('loop-btn').addEventListener('click', ()=>{
   if(!filteredData.length) return;
   loopAllActive = !loopAllActive;
   const lb = document.getElementById('loop-btn');
-  if(loopAllActive){ lb.classList.add('active-loop'); lb.textContent='\u25A0'; if(currentIndex<0) selectClip(0); }
-  else             { lb.classList.remove('active-loop'); lb.textContent='\u27F3'; }
+  if(loopAllActive){ lb.classList.add('active-loop'); if(currentIndex<0) selectClip(0); }
+  else             { lb.classList.remove('active-loop'); }
 });
 document.getElementById('prev-btn').addEventListener('click', ()=>{ if(currentIndex>0) selectClip(currentIndex-1); });
 document.getElementById('next-btn').addEventListener('click', ()=>{ if(currentIndex<filteredData.length-1) selectClip(currentIndex+1); });
