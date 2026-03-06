@@ -1239,8 +1239,7 @@ function selectClip(idx) {
   const activeRow = document.querySelector(`.seq-row[data-i="${idx}"]`);
   if(activeRow) {
     const list = document.getElementById('seq-list');
-    const offset = idx === 0 ? 0 : 6;
-    smoothScroll(list, activeRow.offsetTop - offset);
+    smoothScroll(list, activeRow.offsetTop - list.offsetTop);
   }
 
   const r = filteredData[idx];
