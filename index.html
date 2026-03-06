@@ -447,7 +447,7 @@
       <div style="display:grid; grid-template-columns:1fr 64px 72px; gap:6px; align-items:end;">
         <div>
           <div class="section-title" style="padding-left:0;">Game</div>
-          <select class="sel" id="f-game"><option value="">All</option></select>
+          <div id="f-game" class="flex flex-col" style="max-height:120px; overflow-y:auto; scrollbar-gutter:stable; gap:1px;"></div>
         </div>
         <div>
           <div class="section-title" style="padding-left:0;">Per.</div>
@@ -662,7 +662,7 @@ const filters = {
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
   screen:null, psm0:'', psm1:'', psm2:'', psm3:'', svTech:'',
   rebCreated:null, rebAttacked:null,
-  game:'', psmExact:null,
+  game:new Set(), psmExact:null,
 };
 
 const video  = document.getElementById('player');
@@ -755,12 +755,13 @@ function buildFilters() {
   const ge = document.getElementById('f-game');
   const _gd = g => { const [mm,dd,yyyy]=(g||'').split('_')[0].split('.'); return yyyy&&mm&&dd?`${yyyy}${mm}${dd}`:''; };
   unique('game').sort((a,b)=>_gd(b).localeCompare(_gd(a))).forEach(g => {
-    const o = document.createElement('option'); o.value=g;
     const m = g.match(/^(\d+)\.(\d+)\.\d+_(.+)$/);
     const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const label = m ? `${months[+m[1]]} ${+m[2]} vs ${m[3]}` : g;
-    o.textContent = label; o.dataset.base = label;
-    ge.appendChild(o);
+    const l = document.createElement('label');
+    l.className = 'cb-lbl';
+    l.innerHTML = `<input type="checkbox" data-f="game" data-v="${g}"> <span data-base="${label}">${label}</span>`;
+    ge.appendChild(l);
   });
 }
 
@@ -790,7 +791,7 @@ function applyFilters() {
     if(filters.svTech          && r.svTech!==filters.svTech)               return false;
     if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)       return false;
     if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
-    if(filters.game            && r.game!==filters.game)                   return false;
+    if(filters.game.size        && !filters.game.has(r.game))               return false;
     if(!hasClip(r))                                                         return false;
     if(filters.psmExact !== null) {
       const rp = r.psm||[];
@@ -822,7 +823,8 @@ function applyFilters() {
   updateHeaderGoalie();
   const anyFilter = filters.ryg.size>0 ||
     ['save','goal','ph','screen','rebCreated','rebAttacked','goalQual'].some(k=>filters[k]!==null&&filters[k]!=='') ||
-    ['strength','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech','game'].some(k=>filters[k]!=='') ||
+    ['strength','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech'].some(k=>filters[k]!=='') ||
+    filters.game.size>0 ||
     filters.psmExact!==null;
   document.getElementById('clear-btn').classList.toggle('active', anyFilter);
   if(!initialLoad) {
@@ -931,12 +933,13 @@ function updatePsmCounts() {
     });
     sel.value=(activeVal&&counts.has(activeVal))?activeVal:'';
   });
-  // Game dropdown (formatted label stored in data-base)
-  const gSel=document.getElementById('f-game');
-  Array.from(gSel.options).forEach(opt=>{
-    if(!opt.value) return;
-    const n=filteredData.filter(r=>r.game===opt.value).length;
-    opt.textContent=`${opt.dataset.base||opt.value} (${n})`;
+  // Game checkboxes — update counts
+  document.querySelectorAll('#f-game .cb-lbl').forEach(lbl=>{
+    const cb=lbl.querySelector('input[data-f="game"]');
+    const span=lbl.querySelector('span[data-base]');
+    if(!cb||!span) return;
+    const n=filteredData.filter(r=>r.game===cb.dataset.v).length;
+    span.textContent=`${span.dataset.base} (${n})`;
   });
 }
 
@@ -1606,7 +1609,7 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
 });
 
 [['f-period','period'],['f-strength','strength'],['f-attackType','attackType'],['f-ozpPattern','ozpPattern'],
- ['f-rushType','rushType'],['f-svTech','svTech'],['f-game','game']
+ ['f-rushType','rushType'],['f-svTech','svTech']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
 
 function updatePsmVisibility() {
@@ -1631,7 +1634,9 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   });
   // reset null fields properly
   ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
-  ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech','game'].forEach(k=>filters[k]='');
+  ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech'].forEach(k=>filters[k]='');
+  filters.game=new Set();
+  document.querySelectorAll('input[data-f="game"]').forEach(cb=>cb.checked=false);
   filters.psmExact=null;
   filters.goalie = savedGoalie;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
