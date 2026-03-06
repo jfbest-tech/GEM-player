@@ -132,6 +132,7 @@
   .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; height:var(--vid-h); border-left:3px solid #fff; border-right:3px solid #fff; }
   .vid-wrap video { width:100%; height:var(--vid-h); max-height:var(--vid-h); display:block; object-fit:contain; }
   .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
+  :fullscreen, :-webkit-full-screen { zoom:1 !important; }
   .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
   .no-vid { background:#1e1e1e; border-radius:8px; }
   #no-vid-text { font-family:'DM Mono',monospace; font-size:0.68rem; color:rgba(200,200,200,0.38); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:16px; }
