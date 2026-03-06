@@ -371,11 +371,11 @@
     .prog-bar { height: 5px; }
     .prog-bar:hover { height: 7px; }
 
-    /* Playlist: hide goalie (col2) and game (col3) on tablet */
+    /* Playlist: hide goalie (col2) and game (col3) via 0-width columns */
     .seq-header-row > :nth-child(2),
     .seq-header-row > :nth-child(3),
     .seq-row > :nth-child(2),
-    .seq-row > :nth-child(3) { display: none; }
+    .seq-row > :nth-child(3) { overflow:hidden; visibility:hidden; padding:0 !important; }
     .seq-header-row, .seq-row {
       grid-template-columns: auto 0 0 auto auto auto 1fr auto auto auto auto !important;
       gap: 4px;
@@ -384,10 +384,6 @@
     .seq-header-row { letter-spacing:0.04em !important; }
     /* Str chip: compact on tablet */
     .str-ico { padding:1px 2px !important; font-size:0.5rem !important; }
-    /* Scr/Reb/Qlty columns: center content */
-    .seq-row > :nth-child(8),
-    .seq-row > :nth-child(9),
-    .seq-row > :nth-child(10) { justify-content:center; text-align:center; }
 
     /* Row play button: fix centering on tablet */
     .row-play { width:22px; padding-left:0; margin:-5px -3px -5px -8px; }
