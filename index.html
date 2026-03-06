@@ -371,20 +371,14 @@
     .prog-bar { height: 5px; }
     .prog-bar:hover { height: 7px; }
 
-    /* Playlist: hide goalie, game, type columns on tablet */
-    .seq-header-row > :nth-child(2),
-    .seq-header-row > :nth-child(3),
-    .seq-header-row > :nth-child(5),
-    .seq-row > :nth-child(2),
-    .seq-row > :nth-child(3),
-    .seq-row > :nth-child(5) { display: none; }
+    /* Playlist: keep all columns, compact widths, maximize PSM/SvTech */
     .seq-header-row, .seq-row {
-      grid-template-columns: 18px 0px 0px 28px 0px 20px 1fr 20px 20px 28px 48px !important;
+      grid-template-columns: 18px 52px 52px 24px 36px 18px 1fr 18px 18px 26px 40px !important;
       min-width: 0;
       gap: 2px;
       font-size: 0.55rem;
     }
-    .seq-header-row > span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .seq-header-row > span, .seq-row > span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
     /* Row play button: fix centering on tablet */
     .row-play { width:22px; padding-left:0; margin:-5px -3px -5px -8px; }
