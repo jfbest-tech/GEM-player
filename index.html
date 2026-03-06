@@ -78,7 +78,7 @@
   .seq-row {
     display:grid; grid-template-columns: 20px 88px 88px 32px 52px 24px 1fr 24px 24px 32px 52px;
     gap:5px; align-items:center;
-    padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s;
+    padding:5px 10px; border-bottom:1px solid var(--navy-border); cursor:pointer; transition:background .1s; min-height:28px; max-height:28px; overflow:hidden;
   }
   .seq-row:hover { background:#eef4ff; }
   .seq-row.active { background:#d1d5db; border-left:3px solid #1B2A45; padding-left:7px; transform:translateY(-2px); position:relative; z-index:1; }
