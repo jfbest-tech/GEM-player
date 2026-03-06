@@ -978,10 +978,10 @@ function renderList() {
       ? psmArr.map((p,idx)=>{
           const isActive = filters[`psm${idx}`]===p;
           return `<span class="psm${isActive?' active':''}" data-psm-idx="${idx}" data-psm-val="${p}">${p}</span>`;
-        }).join('<span style="color:#aaa;font-size:0.5rem;padding:0;">→</span>')
+        }).join('<span style="color:#aaa;font-size:0.55rem;padding:0 1px;">→</span>')
       : '';
     if(r.svTech) {
-      if(psmHtml) psmHtml += '<span style="color:#aaa;font-size:0.5rem;padding:0;">→</span>';
+      if(psmHtml) psmHtml += '<span style="color:#aaa;font-size:0.55rem;padding:0 1px;">→</span>';
       const isSvActive = filters.svTech===r.svTech;
       psmHtml += `<span class="psm-sv${isSvActive?' active':''}" data-svtech="${r.svTech}">${r.svTech}</span>`;
     }
