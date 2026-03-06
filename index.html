@@ -131,9 +131,8 @@
   /* Video wrapper + overlay controls */
   .vid-wrap { position:relative; background:#000; border-radius:8px; overflow:hidden; height:var(--vid-h); border-left:3px solid #fff; border-right:3px solid #fff; }
   .vid-wrap video { width:100%; height:var(--vid-h); max-height:var(--vid-h); display:block; object-fit:contain; }
-  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:100vw; height:100vh; border-radius:0; min-height:unset; border:none; }
-  :fullscreen, :-webkit-full-screen { zoom:1 !important; }
-  .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:100vh; max-height:100vh; object-fit:contain; }
+  .vid-wrap:fullscreen, .vid-wrap:-webkit-full-screen { width:calc(100vw / 1.3); height:calc(100vh / 1.3); border-radius:0; min-height:unset; border:none; }
+  .vid-wrap:fullscreen video, .vid-wrap:-webkit-full-screen video { height:calc(100vh / 1.3); max-height:calc(100vh / 1.3); object-fit:contain; }
   .no-vid { background:#1e1e1e; border-radius:8px; }
   #no-vid-text { font-family:'DM Mono',monospace; font-size:0.68rem; color:rgba(200,200,200,0.38); letter-spacing:0.15em; text-transform:uppercase; margin-bottom:16px; }
   .goalie-pick-btn { padding:8px 20px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.16); color:rgba(230,230,230,0.88); border-radius:6px; cursor:pointer; font-family:'Inter',sans-serif; font-size:0.8rem; font-weight:600; transition:all .15s; }
@@ -261,8 +260,7 @@
   }
 
   /* Fullscreen button icon — four corner brackets */
-  #fullscreen-btn { font-size:0.82rem; font-weight:700; width:38px; }
-  #fullscreen-btn::before { content:'F'; }
+  #fullscreen-btn { font-size:0; position:relative; }
   .ctrl-time { color:rgba(255,255,255,0.65); font-size:0.68rem; padding:0 5px; white-space:nowrap; flex:0 0 88px; overflow:hidden; font-variant-numeric:tabular-nums; font-family:monospace; }
   #resize-handle { height:16px; cursor:ns-resize; flex-shrink:0; background:var(--navy-border); position:relative; transition:background 0.15s; user-select:none; display:flex; align-items:center; justify-content:center; touch-action:none; }
   #resize-handle:hover, #resize-handle.dragging { background:var(--navy-light); }
@@ -358,8 +356,7 @@
     .ctrl-row { gap: 3px; flex-wrap: nowrap; }
   
   /* Fullscreen button icon — four corner brackets */
-  #fullscreen-btn { font-size:0.82rem; font-weight:700; width:38px; }
-  #fullscreen-btn::before { content:'F'; }
+  #fullscreen-btn { font-size:0; position:relative; }
   .ctrl-time { font-size: 0.6rem; flex: 0 0 74px; padding: 0 3px; }
 
     /* Play button: CSS triangle like desktop, suppress native controls */
@@ -406,8 +403,7 @@
     #slomo-btn { padding: 0 6px; font-size: 0.65rem; }
   
   /* Fullscreen button icon — four corner brackets */
-  #fullscreen-btn { font-size:0.82rem; font-weight:700; width:38px; }
-  #fullscreen-btn::before { content:'F'; }
+  #fullscreen-btn { font-size:0; position:relative; }
   .ctrl-time { font-size: 0.55rem; flex: 0 0 64px; }
     .seq-header-row, .seq-row {
       grid-template-columns: 8px minmax(60px,1fr) minmax(60px,1fr) 32px minmax(40px,0.7fr) 20px minmax(50px,1.5fr) 20px 20px 28px 44px !important;
@@ -603,7 +599,7 @@
               <button class="ctrl-btn" id="mute-btn" title="Mute/Unmute (M)"><svg id="mute-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line class="mute-x" x1="23" y1="9" x2="17" y2="15"/><line class="mute-x" x1="17" y1="9" x2="23" y2="15"/></svg></button>
               <button class="ctrl-btn ctrl-loop" id="loop-btn" title="Loop Clip (L)">&#x27F3;</button>
               <button class="ctrl-btn" id="dl-btn" title="Download clip">&#x2193;</button>
-              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)"></button>
+              <button class="ctrl-btn" id="fullscreen-btn" title="Fullscreen (F)"><svg id="fs-ico" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
             </div>
           </div>
         </div>
