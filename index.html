@@ -403,9 +403,21 @@
   /* Fullscreen button icon — four corner brackets */
   #fullscreen-btn { font-size:0; position:relative; }
   .ctrl-time { font-size: 0.55rem; flex: 0 0 64px; }
+    /* Hide goalie, game, type, combo, scr, reb on phone — keep str, PSM, qlty, result */
+    .seq-header-row > :nth-child(2),
+    .seq-header-row > :nth-child(3),
+    .seq-header-row > :nth-child(5),
+    .seq-header-row > :nth-child(6),
+    .seq-header-row > :nth-child(8),
+    .seq-header-row > :nth-child(9),
+    .seq-row > :nth-child(2),
+    .seq-row > :nth-child(3),
+    .seq-row > :nth-child(5),
+    .seq-row > :nth-child(6),
+    .seq-row > :nth-child(8),
+    .seq-row > :nth-child(9) { overflow:hidden; visibility:hidden; padding:0 !important; width:0 !important; }
     .seq-header-row, .seq-row {
-      grid-template-columns: 8px minmax(60px,1fr) minmax(60px,1fr) 32px minmax(40px,0.7fr) 20px minmax(50px,1.5fr) 20px 20px 28px 44px !important;
-      min-width: 0;
+      grid-template-columns: 16px 0 0 26px 0 0 1fr 0 0 32px 50px !important;
       gap: 2px;
       font-size: 0.5rem;
     }
