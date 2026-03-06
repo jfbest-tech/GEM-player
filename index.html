@@ -377,11 +377,10 @@
     .seq-row > :nth-child(2),
     .seq-row > :nth-child(3) { display: none; }
     .seq-header-row, .seq-row {
-      grid-template-columns: 18px 0 0 28px 42px 18px 1fr 22px 24px 32px 48px !important;
-      gap: 2px;
+      grid-template-columns: auto 0 0 auto auto auto 1fr auto auto auto auto !important;
+      gap: 4px;
       font-size: 0.55rem;
     }
-    .seq-header-row > span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
     /* Row play button: fix centering on tablet */
     .row-play { width:22px; padding-left:0; margin:-5px -3px -5px -8px; }
