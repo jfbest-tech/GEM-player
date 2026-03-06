@@ -444,10 +444,10 @@
     </div>
 
     <div class="px-3 pb-1">
-      <div style="display:grid; grid-template-columns:1fr 64px 72px; gap:6px; align-items:end;">
+      <div style="display:grid; grid-template-columns:1fr 56px 52px; gap:6px; align-items:end;">
         <div>
           <div class="section-title" style="padding-left:0;">Game</div>
-          <select class="sel" id="f-game" multiple style="height:54px;"><option value="">All</option></select>
+          <select class="sel" id="f-game"><option value="">All</option></select>
         </div>
         <div>
           <div class="section-title" style="padding-left:0;">Per.</div>
@@ -662,7 +662,7 @@ const filters = {
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
   screen:null, psm0:'', psm1:'', psm2:'', psm3:'', svTech:'',
   rebCreated:null, rebAttacked:null,
-  game:new Set(), psmExact:null,
+  game:'', psmExact:null,
 };
 
 const video  = document.getElementById('player');
@@ -790,7 +790,7 @@ function applyFilters() {
     if(filters.svTech          && r.svTech!==filters.svTech)               return false;
     if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)       return false;
     if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
-    if(filters.game.size        && !filters.game.has(r.game))               return false;
+    if(filters.game            && r.game!==filters.game)                   return false;
     if(!hasClip(r))                                                         return false;
     if(filters.psmExact !== null) {
       const rp = r.psm||[];
@@ -823,7 +823,7 @@ function applyFilters() {
   const anyFilter = filters.ryg.size>0 ||
     ['save','goal','ph','screen','rebCreated','rebAttacked','goalQual'].some(k=>filters[k]!==null&&filters[k]!=='') ||
     ['strength','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech'].some(k=>filters[k]!=='') ||
-    filters.game.size>0 ||
+    filters.game!=='' ||
     filters.psmExact!==null;
   document.getElementById('clear-btn').classList.toggle('active', anyFilter);
   if(!initialLoad) {
@@ -1619,17 +1619,9 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
  ['f-rushType','rushType'],['f-svTech','svTech']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
 
-// Game multi-select
-document.getElementById('f-game').addEventListener('change', ()=>{
-  const sel=document.getElementById('f-game');
-  const vals=new Set(Array.from(sel.selectedOptions).map(o=>o.value).filter(v=>v));
-  // If 'All' is selected (empty value), clear selection
-  if(Array.from(sel.selectedOptions).some(o=>!o.value)) {
-    Array.from(sel.options).forEach(o=>o.selected=false);
-    filters.game=new Set();
-  } else {
-    filters.game=vals;
-  }
+// Game dropdown
+document.getElementById('f-game').addEventListener('change', e=>{
+  filters.game=e.target.value;
   applyFilters();
 });
 
@@ -1656,8 +1648,8 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   // reset null fields properly
   ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
   ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech'].forEach(k=>filters[k]='');
-  filters.game=new Set();
-  Array.from(document.getElementById('f-game').options).forEach(o=>o.selected=false);
+  filters.game='';
+  document.getElementById('f-game').value='';
   filters.psmExact=null;
   filters.goalie = savedGoalie;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
