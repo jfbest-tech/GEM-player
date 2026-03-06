@@ -383,11 +383,12 @@
     .seq-row > :nth-child(2),
     .seq-row > :nth-child(3) { display: none; }
     .seq-header-row, .seq-row {
-      grid-template-columns: 18px 0px 0px 32px 50px 22px 1fr 22px 22px 30px 50px !important;
+      grid-template-columns: 18px 0px 0px 28px 44px 20px 1fr 20px 20px 28px 48px !important;
       min-width: 0;
-      gap: 3px;
+      gap: 2px;
       font-size: 0.55rem;
     }
+    .seq-header-row > span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
     /* Row play button: fix centering on tablet */
     .row-play { width:22px; padding-left:0; margin:-5px -3px -5px -8px; }
