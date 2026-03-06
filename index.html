@@ -404,13 +404,13 @@
   /* ═══ PHONE ONLY (≤ 640px) ═══ */
   @media (max-width: 640px) {
     :root { --vid-h: 36vh; }
-    .ctrl-row { flex-wrap: nowrap; gap: 2px; }
-    .ctrl-btn { height: 32px; width: 32px; font-size: 0.7rem; }
-    #slomo-btn { padding: 0 6px; font-size: 0.65rem; }
-  
-  /* Fullscreen button icon — four corner brackets */
-  #fullscreen-btn { font-size:0; position:relative; }
-  .ctrl-time { font-size: 0.55rem; flex: 0 0 64px; }
+    .ctrl-row { flex-wrap: nowrap; gap: 1px; }
+    .ctrl-btn { height: 26px; width: 26px; font-size: 0.6rem; min-height:26px; max-height:26px; }
+    /* Hide non-essential buttons on phone: frame-step, slow-mo, download */
+    #frame-btn, #slomo-btn, #dl-btn { display: none !important; }
+    #fullscreen-btn { font-size:0; position:relative; }
+    .ctrl-time { font-size: 0.5rem; flex: 0 0 56px; padding: 0 2px; }
+    .ctrl-play::before { border-width: 5px 0 5px 9px; margin-left: 2px; }
     /* Hide goalie, game, type, combo, scr, reb on phone — keep str, PSM, qlty, result */
     .seq-header-row > :nth-child(2),
     .seq-header-row > :nth-child(3),
@@ -441,7 +441,7 @@
   <div class="flex items-center gap-4" style="position:relative;">
     <img src="SPA_Wordmark.png" alt="Sports Performance Analysis" style="height:30px; object-fit:contain;">
     <div style="width:1px; height:28px; background:var(--navy-border);"></div>
-    <div>
+    <div style="white-space:nowrap;">
       <span style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:15px; letter-spacing:0.1em; text-transform:uppercase; color:#1B2A45;">GEM</span>
       <span style="font-family:'DM Mono',monospace; font-size:8px; letter-spacing:0.15em; text-transform:uppercase; color:#6B7A90; margin-left:8px;">Goalie Efficiency Model</span>
     </div>
