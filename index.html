@@ -447,7 +447,10 @@
       <div style="display:grid; grid-template-columns:1fr 56px 52px; gap:6px; align-items:end;">
         <div>
           <div class="section-title" style="padding-left:0;">Game</div>
-          <select class="sel" id="f-game"><option value="">All</option></select>
+          <div id="f-game-wrap" style="position:relative;">
+            <button class="sel" id="f-game-btn" type="button" style="width:100%;text-align:left;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">All <span style="font-size:0.5rem;">▼</span></button>
+            <div id="f-game-drop" style="display:none;position:absolute;top:100%;left:0;right:0;z-index:100;background:#fff;border:1px solid #d5d5d5;border-radius:4px;max-height:180px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.15);margin-top:2px;"></div>
+          </div>
         </div>
         <div>
           <div class="section-title" style="padding-left:0;">Per.</div>
@@ -662,7 +665,7 @@ const filters = {
   ozpPattern:'', rushType:'', shotLocation:'', shotTech:'',
   screen:null, psm0:'', psm1:'', psm2:'', psm3:'', svTech:'',
   rebCreated:null, rebAttacked:null,
-  game:'', psmExact:null,
+  game:new Set(), psmExact:null,
 };
 
 const video  = document.getElementById('player');
@@ -752,15 +755,29 @@ function buildFilters() {
   fillSel('f-psm2', unique('psm', 2));
   fillSel('f-psm3', unique('psm', 3));
   fillSel('f-svTech',      unique('svTech'));
-  const ge = document.getElementById('f-game');
+  const geDrop = document.getElementById('f-game-drop');
   const _gd = g => { const [mm,dd,yyyy]=(g||'').split('_')[0].split('.'); return yyyy&&mm&&dd?`${yyyy}${mm}${dd}`:''; };
   unique('game').sort((a,b)=>_gd(b).localeCompare(_gd(a))).forEach(g => {
-    const o = document.createElement('option'); o.value=g;
     const m = g.match(/^(\d+)\.(\d+)\.\d+_(.+)$/);
     const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const label = m ? `${months[+m[1]]} ${+m[2]} vs ${m[3]}` : g;
-    o.textContent = label; o.dataset.base = label;
-    ge.appendChild(o);
+    const l = document.createElement('label');
+    l.style.cssText = 'display:flex;align-items:center;gap:5px;padding:4px 8px;cursor:pointer;font-size:0.65rem;color:#333;';
+    l.innerHTML = `<input type="checkbox" data-f="game" data-v="${g}" style="accent-color:var(--accent);"> ${label}`;
+    l.addEventListener('mouseenter', ()=>l.style.background='#f0f4ff');
+    l.addEventListener('mouseleave', ()=>l.style.background='');
+    geDrop.appendChild(l);
+  });
+  // Toggle dropdown
+  document.getElementById('f-game-btn').addEventListener('click', ()=>{
+    const drop = document.getElementById('f-game-drop');
+    drop.style.display = drop.style.display==='none' ? 'block' : 'none';
+  });
+  // Close dropdown when clicking outside
+  document.addEventListener('click', e=>{
+    if(!document.getElementById('f-game-wrap').contains(e.target)){
+      document.getElementById('f-game-drop').style.display='none';
+    }
   });
 }
 
@@ -790,7 +807,7 @@ function applyFilters() {
     if(filters.svTech          && r.svTech!==filters.svTech)               return false;
     if(filters.rebCreated      && r.rebCreated!==filters.rebCreated)       return false;
     if(filters.rebAttacked     && r.rebAttacked!==filters.rebAttacked)     return false;
-    if(filters.game            && r.game!==filters.game)                   return false;
+    if(filters.game.size        && !filters.game.has(r.game))               return false;
     if(!hasClip(r))                                                         return false;
     if(filters.psmExact !== null) {
       const rp = r.psm||[];
@@ -820,10 +837,11 @@ function applyFilters() {
   updatePsmCounts();
   updateChipCounts();
   updateHeaderGoalie();
+  updateGameBtnLabel();
   const anyFilter = filters.ryg.size>0 ||
     ['save','goal','ph','screen','rebCreated','rebAttacked','goalQual'].some(k=>filters[k]!==null&&filters[k]!=='') ||
     ['strength','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech'].some(k=>filters[k]!=='') ||
-    filters.game!=='' ||
+    filters.game.size>0 ||
     filters.psmExact!==null;
   document.getElementById('clear-btn').classList.toggle('active', anyFilter);
   if(!initialLoad) {
@@ -907,6 +925,21 @@ function updateHeaderGoalie() {
       lbl.style.opacity = '';
     }
   });
+}
+
+function updateGameBtnLabel() {
+  const btn = document.getElementById('f-game-btn');
+  if (filters.game.size === 0) {
+    btn.innerHTML = 'All <span style="font-size:0.5rem;">▼</span>';
+  } else if (filters.game.size === 1) {
+    const g = [...filters.game][0];
+    const m = g.match(/^(\d+)\.(\d+)\.\d+_(.+)$/);
+    const months=['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const label = m ? months[+m[1]]+' '+parseInt(m[2])+' vs '+m[3] : g;
+    btn.innerHTML = label + ' <span style="font-size:0.5rem;">▼</span>';
+  } else {
+    btn.innerHTML = filters.game.size + ' Games <span style="font-size:0.5rem;">▼</span>';
+  }
 }
 
 function updatePsmCounts() {
@@ -1619,11 +1652,7 @@ document.querySelector('.sidebar').addEventListener('change', e=>{
  ['f-rushType','rushType'],['f-svTech','svTech']
 ].forEach(([id,key])=>document.getElementById(id).addEventListener('change',e=>{filters[key]=e.target.value;applyFilters();}));
 
-// Game dropdown
-document.getElementById('f-game').addEventListener('change', e=>{
-  filters.game=e.target.value;
-  applyFilters();
-});
+
 
 function updatePsmVisibility() {
   document.getElementById('psm1-wrap').classList.toggle('open', !!filters.psm0);
@@ -1648,8 +1677,8 @@ document.getElementById('clear-btn').addEventListener('click',()=>{
   // reset null fields properly
   ['save','goal','ph','screen','rebCreated','rebAttacked'].forEach(k=>filters[k]=null);
   ['goalQual','period','attackType','ozpPattern','rushType','shotLocation','shotTech','psm0','psm1','psm2','psm3','svTech'].forEach(k=>filters[k]='');
-  filters.game='';
-  document.getElementById('f-game').value='';
+  filters.game=new Set();
+  document.querySelectorAll('input[data-f="game"]').forEach(cb=>cb.checked=false);
   filters.psmExact=null;
   filters.goalie = savedGoalie;
   document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
